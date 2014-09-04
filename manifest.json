@@ -1,0 +1,17 @@
+{
+	"manifest_version": 2,
+
+	"name": "Save Tabs As",
+	"description": "Save open tabs as files and other formats maybe",
+	"version": "1.0",
+
+	"permissions": [
+		"tabs",
+		"downloads"
+	],
+
+	"browser_action": {
+		"default_icon": "icon.png",
+		"default_popup": "popup.html"
+	}
+}
