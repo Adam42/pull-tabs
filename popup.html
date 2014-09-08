@@ -1,25 +1,41 @@
-
 <!doctype html>
 <html>
-  <head>
-    <title>Save Tabs as</title>
-    <style>
-      body {
-        min-width: 357px;
-        overflow-x: hidden;
-      }
-    </style>
-    <script src="popup.js"></script>
-  </head>
-  <body>
-    <ul id="links">
-    </ul>
-    <form id="confirm" action="" method="post">
-      <label>Download these files?</label>
-      <input type="radio" id="yes" name="confirmation" value="yes" checked="checked" />Yes
-      <input type="radio" id="no" name="confirmation" value="no" />No
-      <input type="submit" />
-    </form>
-  </body>
+	<head>
+		<title>Save Tabs as</title>
+		<style>
+		body{
+			min-width: 900px;
+			overflow-x: hidden;
+		}
+		</style>
+		<!--<link rel="stylesheet" href="/css/style.css" />-->
+
+		<script src="popup.js"></script>
+	</head>
+
+	<body>
+
+		<!--<form id="confirm" action="" method="post">
+			<label>Download these files?</label>
+			<input type="radio" id="yes" name="confirmation" value="yes" checked="checked" />Yes
+			<input type="radio" id="no" name="confirmation" value="no" />No
+			<input type="submit" />
+		</form>
+
+		</ul>-->
+
+		<h3>Choose files to download</h3>
+
+		<form id="list" action="" method="post">
+		
+			<ul id="resources">
+				<li><label>All<input id="tabs-ALL" type="checkbox" value="ALL"></label></li>
+			</ul>
+		
+			<input type="submit" />
+		
+		</form>
+
+	</body>
 </html>
 
