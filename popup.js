@@ -1,13 +1,10 @@
 var saveTabsAs = {
 
 	init: function() {
-
 		saveTabsAs.getTabs();
-
 	},
 
 	getTabs: function () {
-
 		var info = {currentWindow: true};
 
 		chrome.tabs.query(info,function(e){
@@ -17,6 +14,7 @@ var saveTabsAs = {
 
 	getUrls: function (tabs) {
 		var urls = [];
+
 		tabs.forEach(function(tab){
 			urls.push(tab.url);
 		});
@@ -25,11 +23,13 @@ var saveTabsAs = {
 	},
 
 	createForm: function (tabs) {
+		var numTabs = document.getElementById('numTabs');
+		numTabs.innerHTML = "<p> This window has " + tabs.length + " tabs.";
+//		form.insertBefore(numTabs);
 
 		var resources = document.getElementById('resources');
 
 		tabs.forEach(function(tab) {
-
 			var input = document.createElement('input');
 				input.type = "checkbox";
 				input.id = 'tab-' + tab.index;
@@ -41,7 +41,8 @@ var saveTabsAs = {
 			var shortDescription = tab.title.substring(0,10);
 
 			var label = document.createElement('label');
-				label.innerText = shortDescription;
+//				label.innerText = shortDescription;
+				label.innerText = tab.title;
 				label.appendChild(input);
 
 			var li = document.createElement('li');
@@ -55,7 +56,6 @@ var saveTabsAs = {
 
 	getSelectedTabs: function (inputs) {
 		var arr = [];
-		console.log(inputs);
 
 		for (var i = 0; i < inputs; i++){
 			var input = document.getElementById('tab-' + i);
@@ -63,33 +63,26 @@ var saveTabsAs = {
 				arr.push(input.value);
 			}
 		}
+
 		return arr;
 	},
 
 	getTabStatus: function(tabs){
-
 		var allTabs = document.getElementById('tabs-ALL');
 
 		if(!allTabs.checked){
-
 			var selectedTabs = this.getSelectedTabs(tabs.length);
-
 			this.downloadUrls(selectedTabs);
-
 			return;
 		}
 
 		var urls = this.getUrls(tabs);
-
 		this.downloadUrls(urls);
-
 		return;
 	},
 
 	watchSubmit: function (tabs) {
-
 		var checked = document.getElementById('list');
-
 		checked.addEventListener('submit', function(){saveTabsAs.getTabStatus(tabs)});
 	},
 
