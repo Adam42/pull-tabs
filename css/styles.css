@@ -1,0 +1,14 @@
+body{
+	min-width: 800px;
+	min-height: 600px;
+	overflow-x: hidden;
+}
+li{
+	padding:10px;
+	list-style-type: none;
+}
+input[type="checkbox"]{
+	float:left;
+	margin-right:
+	50px;
+}
