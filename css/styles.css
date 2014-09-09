@@ -1,7 +1,5 @@
 body{
-	min-width: 800px;
-	min-height: 600px;
-	overflow-x: hidden;
+	width: 800px;
 }
 li{
 	padding:10px;
@@ -12,3 +10,5 @@ input[type="checkbox"]{
 	margin-right:
 	50px;
 }
+
+.page-header{margin:100px 0 20px;}
