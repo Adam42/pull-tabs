@@ -1,41 +1,43 @@
 <!doctype html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>Save Tabs as</title>
-		<style>
-		body{
-			min-width: 900px;
-			overflow-x: hidden;
-		}
-		</style>
-		<!--<link rel="stylesheet" href="/css/style.css" />-->
 
+		<link rel="stylesheet" href="/css/bootstrap.css" />
+		<link rel="stylesheet" href="/css/styles.css" />
 		<script src="popup.js"></script>
 	</head>
 
 	<body>
+		<div class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a href="/" class="navbar-brand">Save Tabs As</a>
+					<a href="/about" class="">About</a>
+				</div>
+			</div>
+		</div>
 
-		<!--<form id="confirm" action="" method="post">
-			<label>Download these files?</label>
-			<input type="radio" id="yes" name="confirmation" value="yes" checked="checked" />Yes
-			<input type="radio" id="no" name="confirmation" value="no" />No
-			<input type="submit" />
-		</form>
+		<div class="container" role="main">
+			<h3 class="page-header">Choose files to download</h3>
 
-		</ul>-->
+			<p id="numTabs"></p>
+			
+			<a href="#resources" class="btn btn-primary" data-toggle="checkboxes" data-action="check">Check all</a>
+			<a href="#resources" class="btn btn-link" data-toggle="checkboxes" data-action="uncheck">Reset</a>
+			
+			<form id="list" action="" method="post">
 
-		<h3>Choose files to download</h3>
-
-		<form id="list" action="" method="post">
-		
-			<ul id="resources">
-				<li><label>All<input id="tabs-ALL" type="checkbox" value="ALL"></label></li>
-			</ul>
-		
-			<input type="submit" />
-		
-		</form>
-
+				<ul id="resources">
+				</ul>
+			
+				<button>Submit</button>
+			
+			</form>
+		</div>
+		<script src="/js/jquery.js"></script>
+		<script src="/js/bootstrap.js"></script>
+		<script src="/js/jquery.checkboxes-1.0.5.min.js"></script>
 	</body>
 </html>
-

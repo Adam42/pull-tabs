@@ -1,0 +1,14 @@
+body{
+	width: 800px;
+}
+li{
+	padding:10px;
+	list-style-type: none;
+}
+input[type="checkbox"]{
+	float:left;
+	margin-right:
+	50px;
+}
+
+.page-header{margin:100px 0 20px;}
