@@ -6,9 +6,9 @@ li{
 	list-style-type: none;
 }
 input[type="checkbox"]{
-	float:left;
-	margin-right:
-	50px;
+	/*display: none;*/
 }
-
+label{display: block;z-index: 10;}
+.list-group-item.active{background-color: #7A8288;}
 .page-header{margin:100px 0 20px;}
+
