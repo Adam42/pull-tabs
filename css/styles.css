@@ -1,12 +1,12 @@
 body{
-	width: 800px;
+    width: 800px;
 }
 li{
-	padding:10px;
-	list-style-type: none;
+    padding:10px;
+    list-style-type: none;
 }
 input[type="checkbox"]{
-	/*display: none;*/
+    /*display: none;*/
 }
 label{display: block;z-index: 10;}
 .list-group-item.active{background-color: #7A8288;}
