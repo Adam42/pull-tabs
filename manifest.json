@@ -3,7 +3,7 @@
 
 	"name": "Save Tabs As",
 	"description": "Save open tabs as files and other formats maybe",
-	"version": "0.1",
+	"version": "0.3",
 
 	"permissions": [
 		"tabs",
@@ -21,3 +21,4 @@
 		"default_title": "Save Tabs As"
 	}
 }
+
