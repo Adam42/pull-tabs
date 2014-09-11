@@ -1,24 +1,23 @@
 {
-	"manifest_version": 2,
+    "manifest_version": 2,
 
-	"name": "Save Tabs As",
-	"description": "Save open tabs as files and other formats maybe",
-	"version": "0.3",
+    "name": "Save Tabs As",
+    "description": "Save open tabs as files and other formats maybe",
+    "version": "0.4",
 
-	"permissions": [
-		"tabs",
-		"downloads",
-		"http://*/*",
-		"https://*/*"
-	],
+    "permissions": [
+        "tabs",
+        "downloads",
+        "http://*/*",
+        "https://*/*"
+    ],
 
-	"browser_action": {
-		"default_icon": {
-			"19": "icon-19.png",
-			"38": "icon-38.png"
-		},
-		"default_popup": "popup.html",
-		"default_title": "Save Tabs As"
-	}
+    "browser_action": {
+        "default_icon": {
+            "19": "icon-19.png",
+            "38": "icon-38.png"
+        },
+        "default_popup": "popup.html",
+        "default_title": "Save Tabs As"
+    }
 }
-
