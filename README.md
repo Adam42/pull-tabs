@@ -1,4 +1,5 @@
-#Save Tabs As
+#PullTabs
+
 A chrome extension to gather the current window's
 tabs and offer options to save them to disk.
 
