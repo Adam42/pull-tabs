@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "Save Tabs As",
-    "description": "Save open tabs as files and other formats maybe",
-    "version": "0.6",
+    "name": "Pull Tabs",
+    "description": "Save open tabs to disk as files or to put them in your Pocket.",
+    "version": "0.7",
 
     "permissions": [
         "tabs",
@@ -24,6 +24,6 @@
             "38": "icon-38.png"
         },
         "default_popup": "popup.html",
-        "default_title": "Save Tabs As"
+        "default_title": "Pull Tabs"
     }
 }
