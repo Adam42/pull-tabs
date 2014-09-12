@@ -10,4 +10,4 @@ tabs and offer options to save them to disk.
 ###Planned features
 - [ ] Save tabs by file type [ e.g. .html, .pdf, .png etc.]
 - [ ] Save tabs by file group type [ e.g. 'images', 'text', 'webpage' etc.]
-
+- [ ] Save to Pocket
