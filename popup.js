@@ -10,9 +10,8 @@ var saveTabsAs = {
     getTabs: function () {
         var info = {currentWindow: true};
 
-        chrome.tabs.query(info,function(e){
-            var tabs = saveTabsAs.createForm(e);
-        });
+        Browser.getTabs(info);
+
     },
 
     getUrls: function (tabs) {
@@ -78,7 +77,7 @@ var saveTabsAs = {
 
     getTabStatus: function(tabs){
             var selectedTabs = this.getSelectedTabs(tabs.length);
-            this.downloadUrls(selectedTabs);
+            Browser.downloadUrls(selectedTabs);
     },
 
     getContentType: function(url, callback){
@@ -186,7 +185,33 @@ var saveTabsAs = {
         var checked = document.getElementById('list');
         checked.addEventListener('submit', function(){saveTabsAs.getTabStatus(tabs);});
     },
+}
 
+document.addEventListener('DOMContentLoaded', function () {
+    saveTabsAs.init();
+});
+
+
+var Browser = {
+
+    getTabs: function (info) {
+        if (chrome) { 
+            var browser = STSChrome;
+        }
+
+        browser.getTabs(info);
+    },
+
+    downloadUrls: function (urls) {
+        if (chrome) { 
+            var browser = STSChrome;
+        }
+
+        browser.downloadUrls(urls)
+    },
+}
+
+var STSChrome = {
     downloadUrls: function (urls) {
         urls.forEach(function(url){
             var file = {
@@ -198,8 +223,10 @@ var saveTabsAs = {
             });
         });
     },
-}
 
-document.addEventListener('DOMContentLoaded', function () {
-    saveTabsAs.init();
-});
+    getTabs: function ( info ) {
+        chrome.tabs.query(info,function(e){
+            var tabs = saveTabsAs.createForm(e);
+        });
+    },
+}
