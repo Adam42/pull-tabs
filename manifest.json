@@ -8,8 +8,14 @@
     "permissions": [
         "tabs",
         "downloads",
+        "identity",
         "http://*/*",
-        "https://*/*"
+        "https://*/*",
+        "https://getpocket.com/v3/*",
+    ],
+
+    "web_accessible_resources": [
+        "chrome-extension://jhmcfppppedffaabfckmcgokchccekgn/pocket/*"
     ],
 
     "browser_action": {
