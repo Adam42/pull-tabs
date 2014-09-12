@@ -3,7 +3,7 @@
 
     "name": "Save Tabs As",
     "description": "Save open tabs as files and other formats maybe",
-    "version": "0.4",
+    "version": "0.6",
 
     "permissions": [
         "tabs",
