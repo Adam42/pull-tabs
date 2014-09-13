@@ -6,8 +6,7 @@ var pullTabs = {
         pullTabs.watchMutateCheck();
         pullTabs.setActions();
         pullTabs.watchLinks();
-        pullTabs.getOptions();
-        //Pocket.init();
+        Pocket.init();
 
     },
 
@@ -32,6 +31,41 @@ var pullTabs = {
         var numTabs = document.getElementById('numTabs');
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
 
+        pullTabs.getOptions(function(options){
+   
+            pullTabs.assembleForm( tabs, options );
+            return;
+        });
+
+        pullTabs.watchSubmit(tabs);
+        return;
+    },
+
+    createInput: function (tab, type, checked) {
+        var input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = 'tab-' + tab.index;
+            input.name = 'tabs' + tab.index;
+            input.title = tab.title + type;
+            input.value = tab.url;
+            input.checked = checked;
+
+        return input;
+    },
+
+    createLabel: function ( tab, type, active){
+        var label = document.createElement('label');
+            label.setAttribute('class','list-group-item ' + active);
+            label.setAttribute('id','label-tab-' + tab.index);
+            label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
+            if(type.split("/").shift() == 'image'){
+                label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
+            }
+
+        return label;
+    },
+
+    assembleForm: function ( tabs, options ){
         var resources = document.getElementById('resources');
 
         tabs.forEach(function(tab) {
@@ -40,31 +74,27 @@ var pullTabs = {
                 this.mType = response;
             });
 
-            var input = document.createElement('input');
-                input.type = 'checkbox';
-                input.id = 'tab-' + tab.index;
-                input.name = 'tabs' + tab.index;
-                input.title = tab.title + this.mType;
-                input.value = tab.url;
-                input.checked = 'checked';
+            var type = this.mType.split("/").shift();
 
-            var shortDescription = tab.title.substring(0,10);
+            var pref = options[type];
 
-            var label = document.createElement('label');
-//              label.innerText = shortDescription;
-                label.setAttribute('class','list-group-item active');
-                label.setAttribute('id','label-tab-' + tab.index);
-                label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + this.mType + '</p>';
-                if(this.mType.split("/").shift() == 'image'){
-                    label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
-                }
-                label.appendChild(input);
+            var checked = '';            
+            var active = '';
 
-                resources.appendChild(label);
+            if( (pref === 'download') || (pref === 'pocket') ){
+                checked = 'checked';
+                active = 'active';
+            }
+
+            var input = pullTabs.createInput ( tab, type, checked );
+
+            var label = pullTabs.createLabel ( tab, type, active );
+
+            label.appendChild(input);
+
+            resources.appendChild(label);
 
         });
-
-        pullTabs.watchSubmit(tabs);
     },
 
     getSelectedTabs: function (inputs) {
@@ -121,7 +151,7 @@ var pullTabs = {
     },
 */
 
-    getOptions: function () {
+    getOptions: function ( callback ) {
         chrome.storage.sync.get({
             application: 'download',
             image: 'download',
@@ -131,12 +161,14 @@ var pullTabs = {
             text: 'download',
             video: 'download'
         }, function ( items ) {
-            pullTabs.setOptions( items );
+            callback( items );
         });
+
+        return;
     },
 
-    setOptions: function () {
-        console.log('set Options');
+    setOptions: function ( items ) {
+        console.log( items );
     },
 
     getConfig: function ( callback ) {
@@ -313,6 +345,7 @@ var Browser = {
     getEnvMode: function( config ) {
         if(!config){
             pullTabs.getConfig( Browser.getEnvMode );
+            return;
         }
         if(config){
             Browser.ENV = JSON.parse(config)['1']['environment_mode'];
@@ -347,6 +380,11 @@ var Browser = {
         var browser = Browser.getBrowser();
 
         browser.login( pocket );
+    },
+
+    save: function ( key, object ) {
+         var browser = Browser.getBrowser();
+         browser.save( key, object );
     },
 }
 
@@ -415,12 +453,39 @@ var PTChrome = {
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
             Pocket.getAccessToken(pocket);
         });
-    }
+    },
+
+    save: function ( key, object ) {
+        console.log(key + ' save ' + object);
+        console.log(chrome.storage.local);
+        if(typeof(chrome.storage) == 'undefined'){
+            console.log('ERROR');
+        }
+        try{
+            chrome.storage.local.set( object , function () {
+                var status = document.getElementsById('status');
+                status.textContent = key + ' saved.';
+                setTimeout( function () {
+                    status.textContent = '';
+                }, 750);
+            });
+        }
+        catch(e){
+            console.log(e);
+        }
+    },
+
 }
 
 var Pocket = {
 
-    init: function( key ) {
+    init: function( ) {
+
+        Pocket.getStoredCredentials(); 
+
+    },
+
+    initLogin: function( key ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
         
@@ -436,14 +501,26 @@ var Pocket = {
         }
     },
 
+    getPocketItems: function ( items ) {
+        if( items ){
+            console.log( 'getPocketItems ' + items );
+            return;
+        }
+        else{
+            Pocket.initLogin();
+        }
+    },
+
     getConsumerKey: function( config ) {
         if(!config){
             pullTabs.getConfig( Pocket.getConsumerKey );
+            return;
         }
+        var consumerKey = JSON.parse(config)['0'];
 
-        key = JSON.parse(config)['0']['consumer_key'];
+        var key = consumerKey['consumer_key'];
 
-        Pocket.init(key);
+        Pocket.initLogin(key);
     },
 
     getRequestToken: function ( pocket ) {
@@ -483,6 +560,47 @@ var Pocket = {
         xhr.send(data);
     },
 
+    getStoredCredentials: function () {
+        chrome.storage.sync.get({
+            access_token: 'default',
+            user_name: 'default'
+        }, function ( items ) {
+                if(items['username'] !== 'default'){
+                    Pocket.getPocketItems( items );
+                    console.log( 'From storage ' + items['user_name'] );
+                }
+                else{
+                    Pocket.initLogin( );
+                }
+                return;
+        });
+    },
+
+    setStoredCredentials: function () {
+
+        //response = access_token=ACCESS_TOKEN&username=USERNAME
+        var accessTokenStart = xhr.response.search('=') + 1; 
+        var accessTokenEnd = xhr.response.search('&');
+        var userNameStart = accessTokenEnd + 10;
+
+        var accessToken = xhr.response.substring(accessTokenStart,accessTokenEnd);
+        var userName = xhr.response.substring(userNameStart);
+
+        var pocket = {
+            'access_token': accessToken,
+            'user_name': userName
+        };
+
+        //Browser.save('Pocket', pocket );
+         chrome.storage.local.set( pocket , function () {
+            var status = document.getElementsById('status');
+            status.textContent = key + ' saved.';
+            setTimeout( function () {
+                status.textContent = '';
+            }, 750);
+        });
+    },
+
     getAccessToken: function (pocket) {
         pocket.url = 'https://getpocket.com/v3/oauth/authorize';
 
@@ -497,7 +615,7 @@ var Pocket = {
         xhr.onload =  function(e) {
             if (xhr.readyState == 4) {
                 if(xhr.status === 200) {
-                    console.log(xhr.response);
+                    Pocket.setStoredCredentials(xhr.response);
                 }
                 else{
                     console.error(xhr.statusText);
