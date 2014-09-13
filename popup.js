@@ -5,6 +5,7 @@ var pullTabs = {
         pullTabs.getTabs();
         pullTabs.watchMutateCheck();
         pullTabs.setActions();
+        pullTabs.watchLinks();
         //Pocket.init();
 
     },
@@ -215,6 +216,56 @@ var pullTabs = {
     watchSubmit: function (tabs) {
         var checked = document.getElementById('list');
         checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
+    },
+
+    swapContent: function ( link, content ) {
+        if(!content){
+            pullTabs.getContent( link, pullTabs.swapContent );
+        }
+
+        if(content){
+            var container = document.getElementById('content');
+            container.innerHTML = content;
+        }
+    },
+
+    getContent: function ( link, callback ) {
+        try{
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", link.href, false);
+            xhr.onload =  function(e) {
+                if (xhr.readyState == 4) {
+                    if(xhr.status === 200) {
+                        callback(link,xhr.response);
+                    }
+                    else{
+                        console.error(xhr.statusText);
+                        return;
+                    }
+                }
+            };
+
+            xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+                return;
+            };
+
+            xhr.send();
+        }
+        catch (e) {
+            console.log(e);
+        }
+    },
+
+    watchLinks: function () {
+        var navLinks = document.getElementById("main-nav");
+        var links = navLinks.children;
+        var numLinks = links.length;
+
+        for (i=0; i < numLinks; i++) {
+            var link = links[i];
+            links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
+        }
     },
 }
 
