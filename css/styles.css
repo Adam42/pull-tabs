@@ -27,6 +27,12 @@ body#options { margin: 0 auto;}
 #options label { margin: 0; padding: 10px 20px; }
 #options h4 {background: #000; margin: 0; padding: 10px 0px; text-align: center;}
 
+#main-nav a { margin: 0 20px; padding: 10px 20px;}
+.container[role="main"]{min-height: 400px; }
+.container[role="complementary"]{padding-top: 20px;}
+
+.bounce{margin-left: -9999px; height: 0;}
+
 /* CSS - Cascading Style Sheet */
 /* Palette color codes */
 /* Palette URL: http://paletton.com/#uid=22W0u0klGaDdRiChqdkq47nvy47 */
