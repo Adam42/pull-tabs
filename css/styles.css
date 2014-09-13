@@ -24,7 +24,7 @@ body#options { margin: 0 auto;}
 #options .list-group-item { margin: 5px 10px; float: left; padding: 0;}
 #options input { margin: 0 10px 0 0;}
 #file-type-destinations { padding: 10px 20px;}
-#options label { padding: 10px 20px; }
+#options label { margin: 0; padding: 10px 20px; }
 #options h4 {background: #000; margin: 0; padding: 10px 0px; text-align: center;}
 
 /* CSS - Cascading Style Sheet */
