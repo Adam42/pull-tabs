@@ -4,8 +4,9 @@ var pullTabs = {
 
         pullTabs.getTabs();
         pullTabs.watchMutateCheck();
-        pullTabs.setActions();
-        //Pocket.getRequestToken();
+        pullTabs.setActions();        
+        pullTabs.watchLinks();
+        //Pocket.init();
 
     },
 
@@ -116,6 +117,44 @@ var pullTabs = {
         return url.split('.').pop();
     },
 */
+
+    getOptions: function () {
+        chrome.storage.sync.get({
+            application: 'download',
+            image: 'download',
+            message: 'ignore',
+            model: 'ignore',
+            multipart: 'ignore',
+            text: 'download',
+            video: 'download'
+        }, function ( items ) {
+            setOptions( items );
+        });
+    },
+
+    setOptions: function () {
+        console.log('setOptions');
+    },
+
+    getConfig: function ( callback ) {
+        var file = 'config.json';
+
+        try{
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType("application/json");
+            xhr.open('GET', file, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    callback(xhr.responseText);
+                }
+            }
+            xhr.send(null);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    },
+
     setActions: function (){
         var actions = {
             check: function() {pullTabs.setAllActive();},
@@ -196,18 +235,35 @@ var pullTabs = {
         var checked = document.getElementById('list');
         checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
     },
+
+    swapContent: function (link) {
+
+        console.log(link);
+    },
+
+    watchLinks: function () {
+        var navLinks = document.getElementById("main-nav");
+        var links = navLinks.children;
+        var numLinks = links.length;
+
+        for (i=0; i < numLinks; i++) {
+            var link = links[i];
+            links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
+            console.log(links[i]);
+        }
+    },
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
 });
 
-
+//Generic Browser: switch between Chrome and Firefox
 var Browser = {
 
     getTabs: function (info) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
@@ -218,7 +274,7 @@ var Browser = {
 
     downloadUrls: function (urls) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
@@ -227,15 +283,15 @@ var Browser = {
         browser.downloadUrls(urls)
     },
 
-    login: function ( auth, token ) {
+    login: function ( pocket ) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
         }
 
-        browser.login( auth, token );
+        browser.login( pocket );
     },
 }
 
@@ -257,14 +313,38 @@ var DevBrowse = {
 }
 
 var Pocket = {
-    getRequestToken: function () {
 
-        var redirectURL = chrome.extension.getURL('pocket');
+    init: function( key ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
+        
+        if(key){
+            pocket.key = key
+        }
+        else{
+            Pocket.getConsumerKey();
+        }  
+
+        if(pocket.key){
+            Pocket.getRequestToken(pocket);
+        }
+    },
+
+    getConsumerKey: function( config ) {
+        if(!config){
+            pullTabs.getConfig( Pocket.getConsumerKey );
+        }
+
+        key = JSON.parse(config)['0']['consumer_key'];
+
+        Pocket.init(key);
+    },
+
+    getRequestToken: function ( pocket ) {
+        var redirectURL = chrome.extension.getURL('pocket');
 
         var data = new FormData();
-            data.append('consumer_key', '');
+            data.append('consumer_key', pocket.key);
             data.append('redirect_uri', encodeURIComponent(redirectURL));
 
         var xhr = new XMLHttpRequest();
@@ -274,14 +354,14 @@ var Pocket = {
         xhr.onload =  function(e) {
             if (xhr.readyState == 4) {
                 if(xhr.status === 200) {
-                    var token = xhr.response.substring(5);
+                    pocket.token = xhr.response.substring(5);
 
-                    var auth = {};
-                        auth.url = 'https://getpocket.com/auth/authorize?request_token=' +
-                            token +
+                    pocket.auth = 'https://getpocket.com/auth/authorize?request_token=' +
+                            pocket.token +
                             '&redirect_uri=';
 
-                    Browser.login(auth,token);
+
+                    Browser.login(pocket);
 
                 }
                 else{
@@ -297,13 +377,12 @@ var Pocket = {
         xhr.send(data);
     },
 
-    getAccessToken: function (token) {
-        var pocket = {};
+    getAccessToken: function (pocket) {
         pocket.url = 'https://getpocket.com/v3/oauth/authorize';
 
         var data = new FormData();
-            data.append('consumer_key', '');
-            data.append('code', token);
+            data.append('consumer_key', pocket.key);
+            data.append('code', pocket.token);
 
         var xhr = new XMLHttpRequest();
 
@@ -328,7 +407,9 @@ var Pocket = {
     },
 }
 
-var STSChrome = {
+
+//PullTabs Chrome wrapper, should only be automatically called via Browser
+var PTChrome = {
     downloadUrls: function (urls) {
         urls.forEach(function(url){
             var file = {
@@ -347,14 +428,19 @@ var STSChrome = {
         });
     },
 
-    login: function ( auth, token ) {
+    login: function ( pocket ) {
 
-        auth.url = auth.url + encodeURIComponent(chrome.identity.getRedirectURL());
+        pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
 
-        auth.interactive = true;
+        pocket.interactive = true;
+
+        var auth = {
+            'url': pocket.auth,
+            'interactive': pocket.interactive
+        };
 
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
-            Pocket.getAccessToken(token);
+            Pocket.getAccessToken(pocket);
         });
     }
 }
