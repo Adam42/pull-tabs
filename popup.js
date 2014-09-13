@@ -1,11 +1,11 @@
-var saveTabsAs = {
+var pullTabs = {
 
     init: function() {
 
-        saveTabsAs.getTabs();
-        saveTabsAs.watchMutateCheck();
-        saveTabsAs.setActions();
-        Pocket.getRequestToken();
+        pullTabs.getTabs();
+        pullTabs.watchMutateCheck();
+        pullTabs.setActions();
+        //Pocket.init();
 
     },
 
@@ -33,7 +33,7 @@ var saveTabsAs = {
         var resources = document.getElementById('resources');
 
         tabs.forEach(function(tab) {
-            var contentType = saveTabsAs.getContentType(tab.url, function(response){
+            var contentType = pullTabs.getContentType(tab.url, function(response){
                 this.response = response;
             });
 
@@ -61,7 +61,7 @@ var saveTabsAs = {
 
         });
 
-        saveTabsAs.watchSubmit(tabs);
+        pullTabs.watchSubmit(tabs);
     },
 
     getSelectedTabs: function (inputs) {
@@ -83,7 +83,9 @@ var saveTabsAs = {
     },
 
     getContentType: function(url, callback){
-        var xhr = new XMLHttpRequest();
+
+        try{
+            var xhr = new XMLHttpRequest();
             xhr.open("HEAD", url, false);
             xhr.onload =  function(e) {
                 if (xhr.readyState == 4) {
@@ -91,25 +93,53 @@ var saveTabsAs = {
                         callback(xhr.getResponseHeader("Content-Type"));
                     }
                     else{
+                        callback('Unknown');
                         console.error(xhr.statusText);
+                        return;
                     }
                 }
             };
+
             xhr.onerror = function (e) {
                 console.error(xhr.statusText);
+                return;
             };
-            xhr.send();
 
+            xhr.send();
+        }
+        catch (e) {
+            console.log(e);
+        }
     },
 
 /*  getExtension: function(url){
         return url.split('.').pop();
     },
 */
+
+    getConfig: function ( callback ) {
+        var file = 'config.json';
+
+        try{
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType("application/json");
+            xhr.open('GET', file, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    callback(xhr.responseText);
+                }
+            }
+            xhr.send(null);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    },
+
     setActions: function (){
         var actions = {
-            check: function() {saveTabsAs.setAllActive();},
-            uncheck: function() {saveTabsAs.setAllInactive();},
+            check: function() {pullTabs.setAllActive();},
+            uncheck: function() {pullTabs.setAllInactive();},
         };
 
         $('body').on('click', '[data-action]', function() {
@@ -184,20 +214,20 @@ var saveTabsAs = {
 
     watchSubmit: function (tabs) {
         var checked = document.getElementById('list');
-        checked.addEventListener('submit', function(){saveTabsAs.getTabStatus(tabs);});
+        checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
     },
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    saveTabsAs.init();
+    pullTabs.init();
 });
 
-
+//Generic Browser: switch between Chrome and Firefox
 var Browser = {
 
     getTabs: function (info) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
@@ -208,7 +238,7 @@ var Browser = {
 
     downloadUrls: function (urls) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
@@ -217,15 +247,15 @@ var Browser = {
         browser.downloadUrls(urls)
     },
 
-    login: function ( auth, token ) {
+    login: function ( pocket ) {
         if (!(typeof chrome ==='undefined')) {
-            var browser = STSChrome;
+            var browser = PTChrome;
         }
         else{
             var browser = DevBrowse;
         }
 
-        browser.login( auth, token );
+        browser.login( pocket );
     },
 }
 
@@ -242,19 +272,43 @@ var DevBrowse = {
 
     getTabs: function ( info ) {
         var devtabs = '[{"active":false,"height":779,"highlighted":false,"id":71,"incognito":false,"index":0,"pinned":false,"selected":false,"status":"complete","title":"Dot Boston: Apple, Bicycles, Boston, Dot and Web Media","url":"http://adamp.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":83,"incognito":false,"index":1,"pinned":false,"selected":false,"status":"complete","title":"Is It Boston? Find out if your area is part of Boston.","url":"http://isitboston.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":85,"incognito":false,"index":2,"pinned":false,"selected":false,"status":"complete","title":"amiacylon.com","url":"http://amiacylon.com/","width":1440,"windowId":68},{"active":true,"height":779,"highlighted":true,"id":91,"incognito":false,"index":3,"pinned":false,"selected":true,"status":"complete","title":"3571814663_5c742efc65_b.jpg (1024×768)","url":"https://c4.staticflickr.com/4/3322/3571814663_5c742efc65_b.jpg","width":1440,"windowId":68}]';
-        var tabs = saveTabsAs.createForm(JSON.parse(devtabs));
+        var tabs = pullTabs.createForm(JSON.parse(devtabs));
     },
 }
 
 var Pocket = {
-    getRequestToken: function () {
 
-        var redirectURL = chrome.extension.getURL('pocket');
+    init: function( key ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
+        
+        if(key){
+            pocket.key = key
+        }
+        else{
+            Pocket.getConsumerKey();
+        }  
+
+        if(pocket.key){
+            Pocket.getRequestToken(pocket);
+        }
+    },
+
+    getConsumerKey: function( config ) {
+        if(!config){
+            pullTabs.getConfig( Pocket.getConsumerKey );
+        }
+
+        key = JSON.parse(config)['0']['consumer_key'];
+
+        Pocket.init(key);
+    },
+
+    getRequestToken: function ( pocket ) {
+        var redirectURL = chrome.extension.getURL('pocket');
 
         var data = new FormData();
-            data.append('consumer_key', '');
+            data.append('consumer_key', pocket.key);
             data.append('redirect_uri', encodeURIComponent(redirectURL));
 
         var xhr = new XMLHttpRequest();
@@ -264,14 +318,14 @@ var Pocket = {
         xhr.onload =  function(e) {
             if (xhr.readyState == 4) {
                 if(xhr.status === 200) {
-                    var token = xhr.response.substring(5);
+                    pocket.token = xhr.response.substring(5);
 
-                    var auth = {};
-                        auth.url = 'https://getpocket.com/auth/authorize?request_token=' +
-                            token +
+                    pocket.auth = 'https://getpocket.com/auth/authorize?request_token=' +
+                            pocket.token +
                             '&redirect_uri=';
 
-                    Browser.login(auth,token);
+
+                    Browser.login(pocket);
 
                 }
                 else{
@@ -287,13 +341,12 @@ var Pocket = {
         xhr.send(data);
     },
 
-    getAccessToken: function (token) {
-        var pocket = {};
+    getAccessToken: function (pocket) {
         pocket.url = 'https://getpocket.com/v3/oauth/authorize';
 
         var data = new FormData();
-            data.append('consumer_key', '');
-            data.append('code', token);
+            data.append('consumer_key', pocket.key);
+            data.append('code', pocket.token);
 
         var xhr = new XMLHttpRequest();
 
@@ -318,7 +371,9 @@ var Pocket = {
     },
 }
 
-var STSChrome = {
+
+//PullTabs Chrome wrapper, should only be automatically called via Browser
+var PTChrome = {
     downloadUrls: function (urls) {
         urls.forEach(function(url){
             var file = {
@@ -333,18 +388,23 @@ var STSChrome = {
 
     getTabs: function ( info ) {
         chrome.tabs.query(info,function(e){
-            var tabs = saveTabsAs.createForm(e);
+            var tabs = pullTabs.createForm(e);
         });
     },
 
-    login: function ( auth, token ) {
+    login: function ( pocket ) {
 
-        auth.url = auth.url + encodeURIComponent(chrome.identity.getRedirectURL());
+        pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
 
-        auth.interactive = true;
+        pocket.interactive = true;
+
+        var auth = {
+            'url': pocket.auth,
+            'interactive': pocket.interactive
+        };
 
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
-            Pocket.getAccessToken(token);
+            Pocket.getAccessToken(pocket);
         });
     }
 }
