@@ -457,7 +457,6 @@ var PTChrome = {
 
     save: function ( key, object ) {
         console.log(key + ' save ' + object);
-        console.log(chrome.storage.local);
         if(typeof(chrome.storage) == 'undefined'){
             console.log('ERROR');
         }
@@ -503,7 +502,7 @@ var Pocket = {
 
     getPocketItems: function ( items ) {
         if( items ){
-            console.log( 'getPocketItems ' + items );
+            console.log( 'Pocket authorized' );
             return;
         }
         else{
@@ -567,7 +566,6 @@ var Pocket = {
         }, function ( items ) {
                 if(items['username'] !== 'default'){
                     Pocket.getPocketItems( items );
-                    console.log( 'From storage ' + items['user_name'] );
                 }
                 else{
                     Pocket.initLogin( );
