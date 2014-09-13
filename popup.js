@@ -4,8 +4,7 @@ var pullTabs = {
 
         pullTabs.getTabs();
         pullTabs.watchMutateCheck();
-        pullTabs.setActions();        
-        pullTabs.watchLinks();
+        pullTabs.setActions();
         //Pocket.init();
 
     },
@@ -118,24 +117,6 @@ var pullTabs = {
     },
 */
 
-    getOptions: function () {
-        chrome.storage.sync.get({
-            application: 'download',
-            image: 'download',
-            message: 'ignore',
-            model: 'ignore',
-            multipart: 'ignore',
-            text: 'download',
-            video: 'download'
-        }, function ( items ) {
-            setOptions( items );
-        });
-    },
-
-    setOptions: function () {
-        console.log('setOptions');
-    },
-
     getConfig: function ( callback ) {
         var file = 'config.json';
 
@@ -234,23 +215,6 @@ var pullTabs = {
     watchSubmit: function (tabs) {
         var checked = document.getElementById('list');
         checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
-    },
-
-    swapContent: function (link) {
-
-        console.log(link);
-    },
-
-    watchLinks: function () {
-        var navLinks = document.getElementById("main-nav");
-        var links = navLinks.children;
-        var numLinks = links.length;
-
-        for (i=0; i < numLinks; i++) {
-            var link = links[i];
-            links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
-            console.log(links[i]);
-        }
     },
 }
 
