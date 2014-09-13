@@ -12,7 +12,7 @@ function saveOptions () {
 			model: '',
 			multipart: '',
 			text: '',
-			video: ''	
+			video: ''
 		}
 
 	for ( i=0; i < numOfmimeTypes; i++ ) {
@@ -42,19 +42,18 @@ function saveOptions () {
 	});
 }
 
-function getSettings ( ) {
-	var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
-
-	var numOfmimeTypes = mimeTypes.length;
-
-	for ( i=0; i < numOfmimeTypes; i++ ) {
-		var settings = document.getElementsByName(mimeTypes[i]);
-
-		var download = settings[0].checked;
-		var pocket = settings[1].checked;
-		var ignore = settings[2].checked;
-
-	}
+function getSettings ( callback ) {
+	chrome.storage.sync.get({
+		application: 'download',
+		image: 'download',
+		message: 'ignore',
+		model: 'ignore',
+		multipart: 'ignore',
+		text: 'download',
+		video: 'download'
+	}, function ( items ) {
+		callback( items );
+	});
 }
 
 function setSettings ( items ) {
@@ -65,18 +64,29 @@ function setSettings ( items ) {
 	for ( i=0; i < numOfmimeTypes; i++ ) {
 		var settings = document.getElementsByName(mimeTypes[i]);
 
-		settings[0].checked = false;
-		settings[1].checked = false;
-		settings[2].checked = false;
+		var download = settings[0];
+		var pocket = settings[1];
+		var ignore = settings[2];
+
+		download.checked = false;
+		pocket.checked = false;
+		ignore.checked = false;
+
+		download.parentNode.classList.remove('active');
+		pocket.parentNode.classList.remove('active');
+		ignore.parentNode.classList.remove('active');
 
 		if( items[mimeTypes[i]] == 'download') {
-			settings[0].checked = true;
+			download.checked = true;
+			download.parentNode.classList.add('active');
 		}
 		else if ( items[mimeTypes[i]] == 'pocket' ) {
 			settings[1].checked = true;
+			pocket.parentNode.classList.add('active');
 		}
 		else if ( items[mimeTypes[i]] == 'ignore' ) {
 			settings[2].checked = true;
+			ignore.parentNode.classList.add('active');
 		}
 	}
 }
