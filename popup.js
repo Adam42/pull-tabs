@@ -6,6 +6,7 @@ var pullTabs = {
         pullTabs.watchMutateCheck();
         pullTabs.setActions();
         pullTabs.watchLinks();
+        pullTabs.getOptions();
         //Pocket.init();
 
     },
@@ -29,22 +30,23 @@ var pullTabs = {
 
     createForm: function (tabs) {
         var numTabs = document.getElementById('numTabs');
-        numTabs.innerHTML = "<p> This window has " + tabs.length + " tabs.";
+        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
 
         var resources = document.getElementById('resources');
 
         tabs.forEach(function(tab) {
-            var contentType = pullTabs.getContentType(tab.url, function(response){
-                this.response = response;
+
+            pullTabs.getContentType(tab.url, function(response){
+                this.mType = response;
             });
 
             var input = document.createElement('input');
-                input.type = "checkbox";
+                input.type = 'checkbox';
                 input.id = 'tab-' + tab.index;
                 input.name = 'tabs' + tab.index;
-                input.title = tab.title + this.response;
+                input.title = tab.title + this.mType;
                 input.value = tab.url;
-                input.checked = "checked";
+                input.checked = 'checked';
 
             var shortDescription = tab.title.substring(0,10);
 
@@ -52,8 +54,8 @@ var pullTabs = {
 //              label.innerText = shortDescription;
                 label.setAttribute('class','list-group-item active');
                 label.setAttribute('id','label-tab-' + tab.index);
-                label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + this.response + '</p>';
-                if(this.response.split("/").shift() == 'image'){
+                label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + this.mType + '</p>';
+                if(this.mType.split("/").shift() == 'image'){
                     label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
                 }
                 label.appendChild(input);
@@ -67,8 +69,9 @@ var pullTabs = {
 
     getSelectedTabs: function (inputs) {
         var arr = [];
+        var i;
 
-        for (var i = 0; i < inputs; i++){
+        for ( i=0; i < inputs; i++){
             var input = document.getElementById('tab-' + i);
             if(input.checked){
                 arr.push(input.value);
@@ -118,6 +121,24 @@ var pullTabs = {
     },
 */
 
+    getOptions: function () {
+        chrome.storage.sync.get({
+            application: 'download',
+            image: 'download',
+            message: 'ignore',
+            model: 'ignore',
+            multipart: 'ignore',
+            text: 'download',
+            video: 'download'
+        }, function ( items ) {
+            pullTabs.setOptions( items );
+        });
+    },
+
+    setOptions: function () {
+        console.log('set Options');
+    },
+
     getConfig: function ( callback ) {
         var file = 'config.json';
 
@@ -154,6 +175,7 @@ var pullTabs = {
     setAllActive: function () {
         var labels = document.querySelectorAll("#resources > label");
         var numLabels = labels.length;
+        var i;
 
         for (i=0; i < numLabels; i++ ) {
             if(!labels[i].classList.contains('active')){
@@ -165,6 +187,7 @@ var pullTabs = {
     setAllInactive: function () {
         var labels = document.querySelectorAll("#resources > label");
         var numLabels = labels.length;
+        var i;
 
         for (i=0; i < numLabels; i++ ) {
             if(labels[i].classList.contains('active')){
@@ -176,12 +199,12 @@ var pullTabs = {
     updateBackground: function (node, label){
         if(label.classList.contains('active')){
             if(!node.checked){
-                label.classList.remove("active");
+                label.classList.remove('active');
             }
         }
         if(!label.classList.contains('active')){
             if(node.checked){
-                label.classList.add("active");
+                label.classList.add('active');
             }
         }
     },
@@ -196,12 +219,12 @@ var pullTabs = {
                 label.addEventListener('click', function () {
                     if(label.classList.contains('active')){
                         if(!node.checked){
-                            label.classList.remove("active");
+                            label.classList.remove('active');
                         }
                     }
                     if(!label.classList.contains('active')){
                         if(node.checked){
-                            label.classList.add("active");
+                            label.classList.add('active');
                         }
                     }
                 });
@@ -261,6 +284,7 @@ var pullTabs = {
         var navLinks = document.getElementById("main-nav");
         var links = navLinks.children;
         var numLinks = links.length;
+        var i;
 
         for (i=0; i < numLinks; i++) {
             var link = links[i];
@@ -284,35 +308,43 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 var Browser = {
 
-    getTabs: function (info) {
+    ENV: 'PROD',
+
+    getEnvMode: function( config ) {
+        if(!config){
+            pullTabs.getConfig( Browser.getEnvMode );
+        }
+        if(config){
+            Browser.ENV = JSON.parse(config)['1']['environment_mode'];
+        }
+    },
+
+    getBrowser: function () {
+        if(Browser.ENV === 'DEV'){
+            return DevBrowse;
+        }
         if (!(typeof chrome ==='undefined')) {
-            var browser = PTChrome;
+            return PTChrome;
         }
         else{
-            var browser = DevBrowse;
+            return DevBrowse;
         }
+    },
+
+    getTabs: function (info) {
+        var browser = Browser.getBrowser();
 
         browser.getTabs(info);
     },
 
     downloadUrls: function (urls) {
-        if (!(typeof chrome ==='undefined')) {
-            var browser = PTChrome;
-        }
-        else{
-            var browser = DevBrowse;
-        }
+        var browser = Browser.getBrowser();
 
         browser.downloadUrls(urls)
     },
 
     login: function ( pocket ) {
-        if (!(typeof chrome ==='undefined')) {
-            var browser = PTChrome;
-        }
-        else{
-            var browser = DevBrowse;
-        }
+        var browser = Browser.getBrowser();
 
         browser.login( pocket );
     },
