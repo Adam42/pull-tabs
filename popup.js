@@ -83,7 +83,9 @@ var pullTabs = {
     },
 
     getContentType: function(url, callback){
-        var xhr = new XMLHttpRequest();
+
+        try{
+            var xhr = new XMLHttpRequest();
             xhr.open("HEAD", url, false);
             xhr.onload =  function(e) {
                 if (xhr.readyState == 4) {
@@ -91,15 +93,23 @@ var pullTabs = {
                         callback(xhr.getResponseHeader("Content-Type"));
                     }
                     else{
+                        callback('Unknown');
                         console.error(xhr.statusText);
+                        return;
                     }
                 }
             };
+
             xhr.onerror = function (e) {
                 console.error(xhr.statusText);
+                return;
             };
-            xhr.send();
 
+            xhr.send();
+        }
+        catch (e) {
+            console.log(e);
+        }
     },
 
 /*  getExtension: function(url){
