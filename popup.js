@@ -273,7 +273,15 @@ document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
 });
 
-//Generic Browser: switch between Chrome and Firefox
+
+/* 
+ * Browser
+ * 
+ * Generic browser object switches between Chrome & Firefox
+ * Use this through pullTabs to keep it as browser-agnostic
+ * as possible.
+ *
+ */
 var Browser = {
 
     getTabs: function (info) {
@@ -310,7 +318,15 @@ var Browser = {
     },
 }
 
+/* 
+ * Development Browser
+ * 
+ * Stub in sample API results when in
+ * development. 
+ * 
+ */
 var DevBrowse = {
+
     downloadUrls: function (urls) {
         urls.forEach(function(url){
             var file = {
@@ -422,8 +438,13 @@ var Pocket = {
     },
 }
 
-
-//PullTabs Chrome wrapper, should only be automatically called via Browser
+/* 
+ * PullTabs Chrome
+ *
+ * Wrapper around Google Chrome API.
+ * Should only be automatically called via Browser.
+ *
+ */
 var PTChrome = {
     downloadUrls: function (urls) {
         urls.forEach(function(url){
