@@ -343,6 +343,49 @@ var DevBrowse = {
     },
 }
 
+/* 
+ * PullTabs Chrome
+ *
+ * Wrapper around Google Chrome API.
+ * Should only be automatically called via Browser.
+ *
+ */
+var PTChrome = {
+    downloadUrls: function (urls) {
+        urls.forEach(function(url){
+            var file = {
+                "url": url,
+                "method": "GET"
+            };
+            var downloads = chrome.downloads.download(file, function(e){
+                console.log(e);
+            });
+        });
+    },
+
+    getTabs: function ( info ) {
+        chrome.tabs.query(info,function(e){
+            var tabs = pullTabs.createForm(e);
+        });
+    },
+
+    login: function ( pocket ) {
+
+        pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
+
+        pocket.interactive = true;
+
+        var auth = {
+            'url': pocket.auth,
+            'interactive': pocket.interactive
+        };
+
+        chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
+            Pocket.getAccessToken(pocket);
+        });
+    }
+}
+
 var Pocket = {
 
     init: function( key ) {
@@ -436,47 +479,4 @@ var Pocket = {
 
         xhr.send(data);
     },
-}
-
-/* 
- * PullTabs Chrome
- *
- * Wrapper around Google Chrome API.
- * Should only be automatically called via Browser.
- *
- */
-var PTChrome = {
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
-            var file = {
-                "url": url,
-                "method": "GET"
-            };
-            var downloads = chrome.downloads.download(file, function(e){
-                console.log(e);
-            });
-        });
-    },
-
-    getTabs: function ( info ) {
-        chrome.tabs.query(info,function(e){
-            var tabs = pullTabs.createForm(e);
-        });
-    },
-
-    login: function ( pocket ) {
-
-        pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
-
-        pocket.interactive = true;
-
-        var auth = {
-            'url': pocket.auth,
-            'interactive': pocket.interactive
-        };
-
-        chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
-            Pocket.getAccessToken(pocket);
-        });
-    }
 }
