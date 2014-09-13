@@ -6,7 +6,7 @@ var pullTabs = {
         pullTabs.watchMutateCheck();
         pullTabs.setActions();
         pullTabs.watchLinks();
-        Pocket.init();
+        //Pocket.init();
 
     },
 
@@ -273,14 +273,35 @@ var pullTabs = {
         checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
     },
 
+    showMainContent: function ( ) {
+        var mainContent = document.getElementById('main');
+            mainContent.classList.remove('bounce');
+
+        return;
+    },
+
+    swapMainContent: function ( ) {
+        var mainContent = document.getElementById('main');
+        if(mainContent.classList.contains('bounce')){
+            mainContent.classList.remove('bounce');
+            return;
+        }
+        if(!mainContent.classList.contains('bounce')){
+            mainContent.classList.add('bounce');
+            return;
+        }
+    },
+
     swapContent: function ( link, content ) {
         if(!content){
             pullTabs.getContent( link, pullTabs.swapContent );
+            return;
         }
 
         if(content){
             var container = document.getElementById('content');
             container.innerHTML = content;
+            return;
         }
     },
 
@@ -313,6 +334,25 @@ var pullTabs = {
     },
 
     watchLinks: function () {
+        var pocketLink = document.getElementById('pocket');
+        pocketLink.addEventListener('click', function(){
+            Pocket.init();
+            return;
+            });
+
+        var aboutLink = document.getElementById('about');
+        aboutLink.addEventListener('click', function(){
+           pullTabs.swapMainContent();
+            return;
+        }, false);
+
+        var homeLink = document.getElementById('home');
+        homeLink.addEventListener('click', function(){
+           pullTabs.showMainContent();
+            return;
+        }, false);
+
+/*
         var navLinks = document.getElementById("main-nav");
         var links = navLinks.children;
         var numLinks = links.length;
@@ -320,8 +360,13 @@ var pullTabs = {
 
         for (i=0; i < numLinks; i++) {
             var link = links[i];
-            links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
-        }
+            //links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
+            //link = document.getElementById();
+            link.addEventListener('click', function(){
+                pullTabs.swapContent(link);
+                return;
+            });
+        }*/
     },
 }
 

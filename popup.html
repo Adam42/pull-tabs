@@ -14,14 +14,15 @@
         <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div id="main-nav" class="navbar-header">
-                    <a href="/" class="navbar-brand">Pull Tabs</a>
-                    <a data-toggle="modal" data-target="#main" href="about.html" class="">About</a>
+                    <a id="home" href="#" class="navbar-brand">Pull Tabs</a>
+                    <a id="about" href="#about">About</a>
+                    <a id="pocket" href="#pocket">Pocket</a>
                 </div>
             </div>
         </div>
          <div id="status"></div>
         <div id="content">
-            <div class="container" role="main">
+            <div id="main" class="container" role="main">
                 <h3 class="page-header">Choose files to download</h3>
 
                 <p id="numTabs"></p>
@@ -37,6 +38,12 @@
                     <button>Submit</button>
 
                 </form>
+            </div>
+            <div id="about" class="container" role="complementary">
+                <A href="#about"><h3 class="page-header">About & Credits</h3></a>
+                <p>Pull Tabs - The 42nd Estate</p>
+                <p>Developed by: Adam Pieniazek</p>
+                <p>Icon: Pull Tab designed by <a href="http://www.thenounproject.com/chamaquitopan">Chamaquito Pan de Dulce</a> from the <a href="http://www.thenounproject.com">Noun Project</a></p>
             </div>
         </div>
         <script src="/js/jquery.js"></script>
