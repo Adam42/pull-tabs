@@ -174,6 +174,7 @@ var pullTabs = {
             var results = pullTabs.getSelectedTabs(tabs.length);
 
             Browser.downloadUrls(results['downloads']);
+            Pocket.saveTabsToPocket(results['pockets']);
     },
 
     getContentType: function(url, callback){
@@ -615,6 +616,22 @@ var Pocket = {
         }
     },
 
+    saveTabToPocket: function ( url, credentials ) {
+        console.log(url);
+        if(!credentials){
+//            getStoredCredentials(saveTabToPocket(url));
+            return;
+        }
+    },
+
+    saveTabsToPocket: function ( urls, credentials ) {
+        console.log(urls);
+        if(!credentials){
+            //Pocket.getStoredCredentials(Pocket.saveTabsToPocket);
+            return;
+        }
+    },
+
     getConsumerKey: function( config ) {
         if(!config){
             pullTabs.getConfig( Pocket.getConsumerKey );
@@ -664,13 +681,13 @@ var Pocket = {
         xhr.send(data);
     },
 
-    getStoredCredentials: function () {
+    getStoredCredentials: function (callback) {
         chrome.storage.sync.get({
             access_token: 'default',
             user_name: 'default'
         }, function ( items ) {
                 if(items['username'] !== 'default'){
-                    Pocket.getPocketItems( items );
+                    callback( items );
                 }
                 else{
                     Pocket.initLogin( );
