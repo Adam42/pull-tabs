@@ -75,6 +75,13 @@ var pullTabs = {
     },
 
     createLabel: function ( tab, type, active){
+        if(active === 'active'){
+            active = active +  ' alert-success';
+        }
+        else{
+//            active = active + ' alert-danger';
+        }
+
         var label = document.createElement('label');
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
