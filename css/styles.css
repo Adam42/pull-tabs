@@ -6,12 +6,25 @@ li{
     list-style-type: none;
 }
 input[type="checkbox"]{
+    position: absolute;
+    top: 25px;
     /*display: none;*/
+}
+
+button { width: 100%; margin: 10px auto;}
+
+label.list-group-item { padding-left: 40px;}
+label.list-group-item p {
+margin-right: 20px;
+margin-left: 50px;
 }
 label{display: block;z-index: 10; color: #817768;}
 .list-group-item{background-color: #55241B; width: 750px; margin: 10px 0;}
 .list-group-item.active{background-color: #143E22; color: #817768;}
 .list-group-item.active:hover{color:#B0A593;}
+
+label.preferences {display: inline; padding: 10px;}
+label.preferences input { margin: 0 10px }
 
 .list-group-item{background-color: #55241B; width: 750px; margin: 10px 0;}
 label.active{background-color: #143E22; color: #817768;}
