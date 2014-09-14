@@ -1,24 +1,35 @@
 var
 config,
-
 pullTabs = {
 
-    init: function() {
+    tabs: '',
 
-        this.getConfig(this.setConfig);
-        pullTabs.getTabs();
-        pullTabs.watchMutateCheck();
-        pullTabs.setActions();
-        pullTabs.watchLinks();
-        //Pocket.init();
+    init: function(  ) {
 
+        if(typeof(config) === 'undefined'){
+            this.getConfig(this.setConfig);
+        }
+
+        if(config){
+            var info = {currentWindow: true};
+
+            if(!this.tabs){
+                    Browser.init(info);
+                    return;
+            }
+
+            if(this.tabs){
+                this.createForm(this.tabs);
+                pullTabs.watchMutateCheck();
+                pullTabs.setActions();
+                pullTabs.watchLinks();
+                //Pocket.init();
+            }
+        }
     },
 
     getTabs: function () {
-        var info = {currentWindow: true};
-
-        Browser.getTabs(info);
-
+        return Browser.getTabs();
     },
 
     getUrls: function (tabs) {
@@ -29,6 +40,11 @@ pullTabs = {
         });
 
         return urls;
+    },
+
+    setTabs: function(tabs){
+        this.tabs = tabs;
+        this.init();
     },
 
     createForm: function (tabs) {
@@ -256,7 +272,7 @@ pullTabs = {
     },
 
     setConfig: function ( configContents ) {
-        config = JSON.parse(configContents);
+        this.config = JSON.parse(configContents);
     },
 
     setActions: function (){
