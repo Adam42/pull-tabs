@@ -2,20 +2,20 @@ var Pocket = {
 
     init: function( ) {
 
-        Pocket.getStoredCredentials(); 
+        Pocket.getStoredCredentials();
 
     },
 
     initLogin: function( key ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
-        
+
         if(key){
-            pocket.key = key
+            pocket.key = key;
         }
         else{
             Pocket.getConsumerKey();
-        }  
+        }
 
         if(pocket.key){
             Pocket.getRequestToken(pocket);
@@ -75,7 +75,7 @@ var Pocket = {
             return;
         }
 
-        var numURLs = urls.length
+        var numURLs = urls.length;
         var i;
 
         for ( i=0; i < numURLs; i++ ){
@@ -150,7 +150,7 @@ var Pocket = {
     setStoredCredentials: function () {
 
         //response = access_token=ACCESS_TOKEN&username=USERNAME
-        var accessTokenStart = xhr.response.search('=') + 1; 
+        var accessTokenStart = xhr.response.search('=') + 1;
         var accessTokenEnd = xhr.response.search('&');
         var userNameStart = accessTokenEnd + 10;
 

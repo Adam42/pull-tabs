@@ -4,7 +4,7 @@ function saveOptions () {
     var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
 
     numOfmimeTypes = mimeTypes.length;
-    
+
     var mimeSettings = {
             application: '',
             image: '',

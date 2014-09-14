@@ -1,4 +1,4 @@
-var 
+var
 config,
 
 pullTabs = {
@@ -36,7 +36,7 @@ pullTabs = {
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
 
         pullTabs.getOptions(function(options){
-   
+
             pullTabs.assembleForm( tabs, options );
             return;
         });
@@ -110,7 +110,7 @@ pullTabs = {
 
             var pref = options[type];
 
-            var checked = '';            
+            var checked = '';
             var active = '';
 
             if( (pref === 'download') || (pref === 'pocket') ){
