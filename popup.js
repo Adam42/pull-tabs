@@ -405,13 +405,13 @@ var pullTabs = {
         aboutLink.addEventListener('click', function(){
            pullTabs.swapMainContent();
             return;
-        }, false);
+        });
 
         var homeLink = document.getElementById('home');
         homeLink.addEventListener('click', function(){
            pullTabs.showMainContent();
             return;
-        }, false);
+        });
 
 /*
         var navLinks = document.getElementById("main-nav");
