@@ -619,9 +619,37 @@ var Pocket = {
     saveTabToPocket: function ( url, credentials ) {
         console.log(url);
         if(!credentials){
-//            getStoredCredentials(saveTabToPocket(url));
+            getStoredCredentials(saveTabToPocket(url));
             return;
         }
+
+/*
+
+       var data = new FormData();
+            data.append('url', encodeURIComponent(url));
+
+            data.append('redirect_uri', encodeURIComponent(redirectURL));
+
+        try{
+            var xhr = new XMLHttpRequest();
+//            xhr.overrideMimeType("application/json");
+            xhr.open('POST', 'https://getpocket.com/v3/add', true);
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xhr.setRequestHeader('X-Accept', 'application/json');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    console.log(xhr.responseText);
+                }
+            }
+            xhr.send(null);
+        }
+        catch (e) {
+            console.log(e);
+        }
+
+*/
+
     },
 
     saveTabsToPocket: function ( urls, credentials ) {
@@ -629,6 +657,13 @@ var Pocket = {
         if(!credentials){
             //Pocket.getStoredCredentials(Pocket.saveTabsToPocket);
             return;
+        }
+
+        var numURLs = urls.length
+        var i;
+
+        for ( i=0; i < numURLs; i++ ){
+            Pocket.saveTabToPocket( urls[i], credentials );
         }
     },
 
