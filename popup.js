@@ -60,7 +60,7 @@ var pullTabs = {
         }
        var input = document.createElement('input');
             input.type = 'radio';
-            input.id = 'tab-pref' + tab.index;
+            input.id = 'tab-pref-' + tab.index;
             input.name = 'tab-pref-' + tab.index;
             input.value = value;
             input.checked = checked;
