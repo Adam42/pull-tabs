@@ -41,7 +41,7 @@ var pullTabs = {
         return;
     },
 
-    createInput: function (tab, type, checked) {
+    createCheckbox: function (tab, type, checked) {
         var input = document.createElement('input');
             input.type = 'checkbox';
             input.id = 'tab-' + tab.index;
@@ -51,6 +51,27 @@ var pullTabs = {
             input.checked = checked;
 
         return input;
+    },
+
+    createRadioInput: function ( tab, value, defaultPref ) {
+        var checked = '';
+        if(value == defaultPref){
+            checked = 'checked';
+        }
+       var input = document.createElement('input');
+            input.type = 'radio';
+            input.id = 'tab-pref-' + tab.index;
+            input.name = 'tab-pref-' + tab.index;
+            input.value = value;
+            input.checked = checked;
+
+        var label = document.createElement('label');
+            label.setAttribute('class', 'preferences');
+            label.innerHTML = '<span>' + value + '</span>';
+
+            label.appendChild(input);
+
+        return label;
     },
 
     createLabel: function ( tab, type, active){
@@ -86,11 +107,23 @@ var pullTabs = {
                 active = 'active';
             }
 
-            var input = pullTabs.createInput ( tab, type, checked );
+            var input = pullTabs.createCheckbox ( tab, type, checked );
+
+
+            if(pref === 'download'){
+
+            }
+            var radioDown = pullTabs.createRadioInput ( tab, 'download', pref );
+            var radioPocket = pullTabs.createRadioInput ( tab, 'pocket', pref );
+            var radioIgnore = pullTabs.createRadioInput ( tab, 'ignore', pref );
+
 
             var label = pullTabs.createLabel ( tab, type, active );
 
             label.appendChild(input);
+            label.appendChild(radioDown);
+            label.appendChild(radioPocket);
+            label.appendChild(radioIgnore);
 
             resources.appendChild(label);
 
@@ -98,22 +131,42 @@ var pullTabs = {
     },
 
     getSelectedTabs: function (inputs) {
-        var arr = [];
+        var downloadURLs = [];
+        var pocketURLs = [];
+        var ignoreURLs = [];
+        var results = [];
+
         var i;
 
         for ( i=0; i < inputs; i++){
             var input = document.getElementById('tab-' + i);
             if(input.checked){
-                arr.push(input.value);
+                var radios = document.getElementsByName('tab-pref-' + i);
+
+                if(radios[0].checked){
+                    downloadURLs.push(input.value);
+                }
+
+                if(radios[1].checked){
+                    pocketURLs.push(input.value);
+                }
+            }
+            else{
+                ignoreURLs.push(input.value);
             }
         }
 
-        return arr;
+        results['downloads'] = downloadURLs;
+        results['pockets'] = pocketURLs;
+        results['ignores'] = ignoreURLs;
+
+        return results;
     },
 
     getTabStatus: function(tabs){
-            var selectedTabs = this.getSelectedTabs(tabs.length);
-            Browser.downloadUrls(selectedTabs);
+            var results = pullTabs.getSelectedTabs(tabs.length);
+
+            Browser.downloadUrls(results['downloads']);
     },
 
     getContentType: function(url, callback){
