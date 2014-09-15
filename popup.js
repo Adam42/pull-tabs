@@ -452,7 +452,7 @@ pullTabs = {
             });
         }*/
     },
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
