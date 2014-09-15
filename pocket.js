@@ -1,8 +1,21 @@
 var Pocket = {
 
-    init: function( ) {
+    username: 'default',
+    access_token:  'default',
 
-        Pocket.getStoredCredentials();
+    init: function( credentials ) {
+
+        if(!credentials){
+
+            this.getStoredCredentials(this.init);
+            return;
+        }
+
+        if( credentials ){
+            this.username = credentials.user_name;
+            this.access_token = credentials.access_token;
+        }
+            console.log(this.username);
 
     },
 
@@ -35,7 +48,7 @@ var Pocket = {
     saveTabToPocket: function ( url, credentials ) {
         console.log(url);
         if(!credentials){
-            getStoredCredentials(saveTabToPocket(url));
+            this.getStoredCredentials(saveTabToPocket(url));
             return;
         }
 
@@ -90,7 +103,7 @@ var Pocket = {
         }
         var consumerKey = JSON.parse(config)['0'];
 
-        var key = consumerKey['consumer_key'];
+        var key = consumerKey.consumer_key;
 
         Pocket.initLogin(key);
     },
@@ -133,11 +146,13 @@ var Pocket = {
     },
 
     getStoredCredentials: function (callback) {
-        chrome.storage.sync.get({
+        if(chrome.storage.local){
+        chrome.storage.local.get({
             access_token: 'default',
             user_name: 'default'
         }, function ( items ) {
-                if(items['username'] !== 'default'){
+                if(items.username !== 'default'){
+//                    console.log(items);
                     callback( items );
                 }
                 else{
@@ -145,6 +160,7 @@ var Pocket = {
                 }
                 return;
         });
+    }
     },
 
     setStoredCredentials: function () {

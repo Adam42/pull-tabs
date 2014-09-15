@@ -11,19 +11,18 @@ pullTabs = {
         }
 
         if(config){
-            var info = {currentWindow: true};
 
             if(!this.tabs){
-                    Browser.init(info);
-                    return;
+                Browser.init();
+                return;
             }
 
             if(this.tabs){
                 this.createForm(this.tabs);
-                pullTabs.watchMutateCheck();
-                pullTabs.setActions();
-                pullTabs.watchLinks();
-                //Pocket.init();
+                this.watchMutateCheck();
+                this.setActions();
+                this.watchLinks();
+                Pocket.init();
             }
         }
     },
@@ -51,13 +50,13 @@ pullTabs = {
         var numTabs = document.getElementById('numTabs');
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
 
-        pullTabs.getOptions(function(options){
+        this.getOptions(function(options){
 
             pullTabs.assembleForm( tabs, options );
             return;
         });
 
-        pullTabs.watchSubmit(tabs);
+        this.watchSubmit(tabs);
         return;
     },
 
@@ -183,9 +182,9 @@ pullTabs = {
             }
         }
 
-        results['downloads'] = downloadURLs;
-        results['pockets'] = pocketURLs;
-        results['ignores'] = ignoreURLs;
+        results.downloads = downloadURLs;
+        results.pockets = pocketURLs;
+        results.ignores = ignoreURLs;
 
         return results;
     },
@@ -193,8 +192,8 @@ pullTabs = {
     getTabStatus: function(tabs){
             var results = pullTabs.getSelectedTabs(tabs.length);
 
-            Browser.downloadUrls(results['downloads']);
-            Pocket.saveTabsToPocket(results['pockets']);
+            Browser.downloadUrls(results.downloads);
+            Pocket.saveTabsToPocket(results.pockets);
     },
 
     getContentType: function(url, callback){
@@ -263,7 +262,7 @@ pullTabs = {
                 if (xhr.readyState == 4 && xhr.status == "200") {
                     callback(xhr.responseText);
                 }
-            }
+            };
             xhr.send(null);
         }
         catch (e) {
