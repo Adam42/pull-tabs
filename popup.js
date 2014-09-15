@@ -121,9 +121,9 @@ pullTabs = {
                 this.mType = response;
             });
 
-            var type = this.mType.split("/").shift();
+            var type = this.mType.split("/").shift().toLowerCase();
 
-            var pref = options[type];
+            var pref = options[type] ? options[type] : 'ignore';
 
             var checked = '';
             var active = '';
