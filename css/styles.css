@@ -16,7 +16,7 @@ button { width: 100%; margin: 10px auto;}
 label{display: block;z-index: 10; color: #817768;}
 label.list-group-item { padding-left: 40px;}
 label.list-group-item p { margin-right: 20px; margin-left: 50px; }
-label.active{background-color: #143E22; color: #817768;}
+label.active{ color: #817768;}
 label.preferences {display: inline; padding: 10px;}
 label.preferences input { margin: 0 10px }
 
@@ -25,7 +25,7 @@ label.preferences input { margin: 0 10px }
 .list-group-item.active:hover{color:#B0A593;}
 
 
-
+.panel-body label {float: left;}
 
 
 .page-header{margin:100px 0 20px;}
@@ -36,7 +36,7 @@ body#options { margin: 0 auto;}
 #options input { margin: 0 10px 0 0;}
 #file-type-destinations { padding: 10px 20px;}
 #options label { margin: 0; padding: 10px 20px; }
-#options h4 {background: #000; margin: 0; padding: 10px 0px; text-align: center;}
+#options h4 {margin: 0; padding: 10px 0px; text-align: center;}
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
 .container[role="main"]{min-height: 400px; }
