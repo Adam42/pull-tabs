@@ -13,17 +13,13 @@ input[type="checkbox"]{
 
 button { width: 100%; margin: 10px auto;}
 
-label{display: block;z-index: 10; color: #817768;}
+label{display: block;z-index: 10; }
 label.list-group-item { padding-left: 40px;}
 label.list-group-item p { margin-right: 20px; margin-left: 50px; }
-label.active{ color: #817768;}
 label.preferences {display: inline; padding: 10px;}
 label.preferences input { margin: 0 10px }
 
 .list-group-item{ width: 750px; margin: 10px 0;}
-.list-group-item.active{ color: #817768;}
-.list-group-item.active:hover{color:#B0A593;}
-
 
 .panel-body label {float: left;}
 
