@@ -41,7 +41,7 @@ var Browser = {
         }
         if(config){
             this.config = config;
-            this.ENV = JSON.parse(config)['1'].environment_mode;
+            this.ENV = JSON.parse(config).configuration.mode;
         }
         return;
     },
