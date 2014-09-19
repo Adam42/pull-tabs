@@ -3,7 +3,7 @@ function saveOptions () {
 
     var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
 
-    numOfmimeTypes = mimeTypes.length;
+    var numOfmimeTypes = mimeTypes.length;
 
     var mimeSettings = {
             application: '',
@@ -13,9 +13,9 @@ function saveOptions () {
             multipart: '',
             text: '',
             video: ''
-        }
+        };
 
-    for ( i=0; i < numOfmimeTypes; i++ ) {
+    for ( var i=0; i < numOfmimeTypes; i++ ) {
         var settings = document.getElementsByName(mimeTypes[i]);
 
         var download = settings[0].checked;
@@ -32,14 +32,18 @@ function saveOptions () {
             mimeSettings[mimeTypes[i]] = 'ignore';
         }
     }
-
-    chrome.storage.sync.set(mimeSettings , function () {
-        var status = document.getElementsById('status');
-        status.textContent = 'Options saved.';
-        setTimeout( function () {
-            status.textContent = '';
-        }, 750);
-    });
+    try{
+        chrome.storage.sync.set(mimeSettings , function () {
+            var status = document.getElementsById('status');
+            status.textContent = 'Options saved.';
+            setTimeout( function () {
+                status.textContent = '';
+            }, 750);
+        });
+    }
+    catch(e){
+        console.log(e);
+    }
 }
 
 function getSettings ( callback ) {
