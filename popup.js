@@ -1,20 +1,34 @@
-var pullTabs = {
+var
+config,
+pullTabs = {
 
-    init: function() {
+    tabs: '',
 
-        pullTabs.getTabs();
-        pullTabs.watchMutateCheck();
-        pullTabs.setActions();
-        pullTabs.watchLinks();
-        //Pocket.init();
+    init: function(  ) {
 
+        if(typeof(config) === 'undefined'){
+            this.getConfig(this.setConfig);
+        }
+
+        if(config){
+
+            if(!this.tabs){
+                Browser.init();
+                return;
+            }
+
+            if(this.tabs){
+                this.createForm(this.tabs);
+                this.watchMutateCheck();
+                this.setActions();
+                this.watchLinks();
+                Pocket.init();
+            }
+        }
     },
 
     getTabs: function () {
-        var info = {currentWindow: true};
-
-        Browser.getTabs(info);
-
+        return Browser.getTabs();
     },
 
     getUrls: function (tabs) {
@@ -27,17 +41,22 @@ var pullTabs = {
         return urls;
     },
 
+    setTabs: function(tabs){
+        this.tabs = tabs;
+        this.init();
+    },
+
     createForm: function (tabs) {
         var numTabs = document.getElementById('numTabs');
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
 
-        pullTabs.getOptions(function(options){
-   
+        this.getOptions(function(options){
+
             pullTabs.assembleForm( tabs, options );
             return;
         });
 
-        pullTabs.watchSubmit(tabs);
+        this.watchSubmit(tabs);
         return;
     },
 
@@ -75,6 +94,13 @@ var pullTabs = {
     },
 
     createLabel: function ( tab, type, active){
+        if(active === 'active'){
+            active = active +  ' alert-success';
+        }
+        else{
+//            active = active + ' alert-danger';
+        }
+
         var label = document.createElement('label');
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
@@ -95,11 +121,11 @@ var pullTabs = {
                 this.mType = response;
             });
 
-            var type = this.mType.split("/").shift();
+            var type = this.mType.split("/").shift().toLowerCase();
 
-            var pref = options[type];
+            var pref = options[type] ? options[type] : 'ignore';
 
-            var checked = '';            
+            var checked = '';
             var active = '';
 
             if( (pref === 'download') || (pref === 'pocket') ){
@@ -156,9 +182,9 @@ var pullTabs = {
             }
         }
 
-        results['downloads'] = downloadURLs;
-        results['pockets'] = pocketURLs;
-        results['ignores'] = ignoreURLs;
+        results.downloads = downloadURLs;
+        results.pockets = pocketURLs;
+        results.ignores = ignoreURLs;
 
         return results;
     },
@@ -166,7 +192,8 @@ var pullTabs = {
     getTabStatus: function(tabs){
             var results = pullTabs.getSelectedTabs(tabs.length);
 
-            Browser.downloadUrls(results['downloads']);
+            Browser.downloadUrls(results.downloads);
+            Pocket.saveTabsToPocket(results.pockets);
     },
 
     getContentType: function(url, callback){
@@ -230,17 +257,21 @@ var pullTabs = {
         try{
             var xhr = new XMLHttpRequest();
             xhr.overrideMimeType("application/json");
-            xhr.open('GET', file, true);
+            xhr.open('GET', file, false);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == "200") {
                     callback(xhr.responseText);
                 }
-            }
+            };
             xhr.send(null);
         }
         catch (e) {
             console.log(e);
         }
+    },
+
+    setConfig: function ( configContents ) {
+        this.config = JSON.parse(configContents);
     },
 
     setActions: function (){
@@ -397,13 +428,13 @@ var pullTabs = {
         aboutLink.addEventListener('click', function(){
            pullTabs.swapMainContent();
             return;
-        }, false);
+        });
 
         var homeLink = document.getElementById('home');
         homeLink.addEventListener('click', function(){
            pullTabs.showMainContent();
             return;
-        }, false);
+        });
 
 /*
         var navLinks = document.getElementById("main-nav");
@@ -421,308 +452,8 @@ var pullTabs = {
             });
         }*/
     },
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
 });
-
-
-/* 
- * Browser
- * 
- * Generic browser object switches between Chrome & Firefox
- * Use this through pullTabs to keep it as browser-agnostic
- * as possible.
- *
- */
-var Browser = {
-
-    ENV: 'PROD',
-
-    getEnvMode: function( config ) {
-        if(!config){
-            pullTabs.getConfig( Browser.getEnvMode );
-            return;
-        }
-        if(config){
-            Browser.ENV = JSON.parse(config)['1']['environment_mode'];
-        }
-    },
-
-    getBrowser: function () {
-        if(Browser.ENV === 'DEV'){
-            return DevBrowse;
-        }
-        if (!(typeof chrome ==='undefined')) {
-            return PTChrome;
-        }
-        else{
-            return DevBrowse;
-        }
-    },
-
-    getTabs: function (info) {
-        var browser = Browser.getBrowser();
-
-        browser.getTabs(info);
-    },
-
-    downloadUrls: function (urls) {
-        var browser = Browser.getBrowser();
-
-        browser.downloadUrls(urls)
-    },
-
-    login: function ( pocket ) {
-        var browser = Browser.getBrowser();
-
-        browser.login( pocket );
-    },
-
-    save: function ( key, object ) {
-         var browser = Browser.getBrowser();
-         browser.save( key, object );
-    },
-}
-
-/* 
- * Development Browser
- * 
- * Stub in sample API results when in
- * development. 
- * 
- */
-var DevBrowse = {
-
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
-            var file = {
-                "url": url,
-                "method": "GET"
-            };
-            console.log('Dev downloaded ' + file);
-        });
-    },
-
-    getTabs: function ( info ) {
-        var devtabs = '[{"active":false,"height":779,"highlighted":false,"id":71,"incognito":false,"index":0,"pinned":false,"selected":false,"status":"complete","title":"Dot Boston: Apple, Bicycles, Boston, Dot and Web Media","url":"http://adamp.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":83,"incognito":false,"index":1,"pinned":false,"selected":false,"status":"complete","title":"Is It Boston? Find out if your area is part of Boston.","url":"http://isitboston.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":85,"incognito":false,"index":2,"pinned":false,"selected":false,"status":"complete","title":"amiacylon.com","url":"http://amiacylon.com/","width":1440,"windowId":68},{"active":true,"height":779,"highlighted":true,"id":91,"incognito":false,"index":3,"pinned":false,"selected":true,"status":"complete","title":"3571814663_5c742efc65_b.jpg (1024×768)","url":"https://c4.staticflickr.com/4/3322/3571814663_5c742efc65_b.jpg","width":1440,"windowId":68}]';
-        var tabs = pullTabs.createForm(JSON.parse(devtabs));
-    },
-}
-
-/* 
- * PullTabs Chrome
- *
- * Wrapper around Google Chrome API.
- * Should only be automatically called via Browser.
- *
- */
-var PTChrome = {
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
-            var file = {
-                "url": url,
-                "method": "GET"
-            };
-            var downloads = chrome.downloads.download(file, function(e){
-                console.log(e);
-            });
-        });
-    },
-
-    getTabs: function ( info ) {
-        chrome.tabs.query(info,function(e){
-            var tabs = pullTabs.createForm(e);
-        });
-    },
-
-    login: function ( pocket ) {
-
-        pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
-
-        pocket.interactive = true;
-
-        var auth = {
-            'url': pocket.auth,
-            'interactive': pocket.interactive
-        };
-
-        chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
-            Pocket.getAccessToken(pocket);
-        });
-    },
-
-    save: function ( key, object ) {
-        console.log(key + ' save ' + object);
-        if(typeof(chrome.storage) == 'undefined'){
-            console.log('ERROR');
-        }
-        try{
-            chrome.storage.local.set( object , function () {
-                var status = document.getElementsById('status');
-                status.textContent = key + ' saved.';
-                setTimeout( function () {
-                    status.textContent = '';
-                }, 750);
-            });
-        }
-        catch(e){
-            console.log(e);
-        }
-    },
-
-}
-
-var Pocket = {
-
-    init: function( ) {
-
-        Pocket.getStoredCredentials(); 
-
-    },
-
-    initLogin: function( key ) {
-        var pocket = {};
-        pocket.url = 'https://getpocket.com/v3/oauth/request';
-        
-        if(key){
-            pocket.key = key
-        }
-        else{
-            Pocket.getConsumerKey();
-        }  
-
-        if(pocket.key){
-            Pocket.getRequestToken(pocket);
-        }
-    },
-
-    getPocketItems: function ( items ) {
-        if( items ){
-            console.log( 'Pocket authorized' );
-            return;
-        }
-        else{
-            Pocket.initLogin();
-        }
-    },
-
-    getConsumerKey: function( config ) {
-        if(!config){
-            pullTabs.getConfig( Pocket.getConsumerKey );
-            return;
-        }
-        var consumerKey = JSON.parse(config)['0'];
-
-        var key = consumerKey['consumer_key'];
-
-        Pocket.initLogin(key);
-    },
-
-    getRequestToken: function ( pocket ) {
-        var redirectURL = chrome.extension.getURL('pocket');
-
-        var data = new FormData();
-            data.append('consumer_key', pocket.key);
-            data.append('redirect_uri', encodeURIComponent(redirectURL));
-
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("POST", pocket.url, true);
-
-        xhr.onload =  function(e) {
-            if (xhr.readyState == 4) {
-                if(xhr.status === 200) {
-                    pocket.token = xhr.response.substring(5);
-
-                    pocket.auth = 'https://getpocket.com/auth/authorize?request_token=' +
-                            pocket.token +
-                            '&redirect_uri=';
-
-
-                    Browser.login(pocket);
-
-                }
-                else{
-                    console.error(xhr.statusText);
-                }
-            }
-        };
-
-        xhr.onerror = function (e) {
-            console.error(xhr.statusText);
-        };
-
-        xhr.send(data);
-    },
-
-    getStoredCredentials: function () {
-        chrome.storage.sync.get({
-            access_token: 'default',
-            user_name: 'default'
-        }, function ( items ) {
-                if(items['username'] !== 'default'){
-                    Pocket.getPocketItems( items );
-                }
-                else{
-                    Pocket.initLogin( );
-                }
-                return;
-        });
-    },
-
-    setStoredCredentials: function () {
-
-        //response = access_token=ACCESS_TOKEN&username=USERNAME
-        var accessTokenStart = xhr.response.search('=') + 1; 
-        var accessTokenEnd = xhr.response.search('&');
-        var userNameStart = accessTokenEnd + 10;
-
-        var accessToken = xhr.response.substring(accessTokenStart,accessTokenEnd);
-        var userName = xhr.response.substring(userNameStart);
-
-        var pocket = {
-            'access_token': accessToken,
-            'user_name': userName
-        };
-
-        //Browser.save('Pocket', pocket );
-         chrome.storage.local.set( pocket , function () {
-            var status = document.getElementsById('status');
-            status.textContent = key + ' saved.';
-            setTimeout( function () {
-                status.textContent = '';
-            }, 750);
-        });
-    },
-
-    getAccessToken: function (pocket) {
-        pocket.url = 'https://getpocket.com/v3/oauth/authorize';
-
-        var data = new FormData();
-            data.append('consumer_key', pocket.key);
-            data.append('code', pocket.token);
-
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("POST", pocket.url, true);
-
-        xhr.onload =  function(e) {
-            if (xhr.readyState == 4) {
-                if(xhr.status === 200) {
-                    Pocket.setStoredCredentials(xhr.response);
-                }
-                else{
-                    console.error(xhr.statusText);
-                }
-            }
-        };
-
-        xhr.onerror = function (e) {
-            console.error(xhr.statusText);
-        };
-
-        xhr.send(data);
-    },
-}
