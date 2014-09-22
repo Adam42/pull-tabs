@@ -12,36 +12,37 @@ var Browser = {
 
     browser: function(){},
 
-    init: function () {
-        this.getEnvMode();
+    init: function (config) {
+        this.getEnvMode( config );
         this.browser = this.getBrowser();
         this.getTabs();
+
         return;
     },
 
     getEnvMode: function( config ) {
-        if(!config){
+        if(typeof(config) === 'undefined'){
             if(typeof(pullTabs) === 'undefined'){
                 this.getEnvMode(JSON.stringify(
-                    [
-                        {
-                            "consumer_key": "KEY"
+                    {
+                        credentials: {
+                            consumer_key: "KEY"
                         },
-                        {
+                        configuration: {
                             "mode": "DEVELOPMENT"
                         }
-                    ]
+                    }
                 ));
                 return;
             }
-            else if (typeof(this.config) === 'undefined'){
+            else if (typeof(config) === 'undefined'){
                 pullTabs.getConfig( Browser.getEnvMode );
                 return;
             }
         }
         if(config){
-            this.config = config;
-            this.ENV = JSON.parse(config).configuration.mode;
+            this.ENV = config.configuration.mode;
+
         }
         return;
     },
@@ -59,6 +60,7 @@ var Browser = {
     },
 
     getTabs: function (tabs) {
+
         if(!tabs){
             var result = this.browser.getTabs();
             if(result !== 'undefined'){
@@ -179,7 +181,7 @@ var PTChrome = {
 
 };
 
-//Browser.init('DEV');
+//Browser.init();
 if(typeof(Browser.ENV !== 'undefined') && Browser.ENV === 'DEVELOPMENT'){
 
     console.log("DEFAULT TABS: " + Browser.getTabs());
