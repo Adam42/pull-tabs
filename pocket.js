@@ -15,7 +15,7 @@ var Pocket = {
             this.username = credentials.user_name;
             this.access_token = credentials.access_token;
         }
-            console.log(this.username);
+            //console.log(this.username);
 
     },
 
@@ -101,9 +101,9 @@ var Pocket = {
             pullTabs.getConfig( Pocket.getConsumerKey );
             return;
         }
-        var consumerKey = JSON.parse(config)['0'];
+        var credentials = JSON.parse(config).credentials;
 
-        var key = consumerKey.consumer_key;
+        var key = credentials.consumer_key;
 
         Pocket.initLogin(key);
     },
@@ -216,4 +216,4 @@ var Pocket = {
 
         xhr.send(data);
     },
-}
+};
