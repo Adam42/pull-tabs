@@ -1,28 +1,34 @@
 var
 config,
+prefs,
 pullTabs = {
 
     tabs: '',
 
     init: function(  ) {
-
         if(typeof(config) === 'undefined'){
             this.getConfig(this.setConfig);
         }
 
         if(config){
-
             if(!this.tabs){
-                Browser.init();
+                Browser.init(config);
                 return;
             }
-
             if(this.tabs){
-                this.createForm(this.tabs);
-                this.watchMutateCheck();
-                this.setActions();
-                this.watchLinks();
-                Pocket.init();
+                this.setNumTabs(this.tabs);
+                if(prefs){
+                    console.log('options ' + this.prefs);
+                }
+                else{
+                    this.getOptions(pullTabs.setOptions);
+
+                    this.createForm(this.tabs);
+                    this.watchMutateCheck();
+                    this.setActions();
+                    this.watchLinks();
+                    Pocket.init();
+                }
             }
         }
     },
@@ -46,9 +52,17 @@ pullTabs = {
         this.init();
     },
 
-    createForm: function (tabs) {
+    setNumTabs: function(tabs){
         var numTabs = document.getElementById('numTabs');
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
+    },
+
+    createForm: function (tabs) {
+
+        if(this.options){
+            console.log("this: " + this.options);
+            return;
+        }
 
         this.getOptions(function(options){
 
@@ -95,7 +109,7 @@ pullTabs = {
 
     createLabel: function ( tab, type, active){
         if(active === 'active'){
-            active = active +  ' alert-success';
+//            active = active +  ' alert-success';
         }
         else{
 //            active = active + ' alert-danger';
@@ -248,7 +262,7 @@ pullTabs = {
     },
 
     setOptions: function ( items ) {
-        console.log( items );
+        this.prefs = items;
     },
 
     getConfig: function ( callback ) {
