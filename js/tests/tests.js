@@ -49,13 +49,13 @@ console.log(setter.getConfig());
 
 
 
-QUnit.asyncTest("Load global config variable", function( assert ) {
-    expect(1);
+//QUnit.asyncTest("Load global config variable", function( assert ) {
+//    expect(1);
 
-    Config.init();
+   // Config.init();
 
-        assert.strictEqual(config.app.name, 'Pull Tabs');
-        QUnit.start();
-});
+     //   assert.strictEqual(config.app.name, 'Pull Tabs');
+       // QUnit.start();
+//});
 
 
