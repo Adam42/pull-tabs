@@ -10,7 +10,7 @@ pullTabs = {
             this.getConfig(this.setConfig);
         }
 
-        if(config){
+        if(config && config != 'pending'){
             if(!this.tabs){
                 Browser.init(config);
                 return;
@@ -22,7 +22,6 @@ pullTabs = {
                 }
                 else{
                     this.getOptions(pullTabs.setOptions);
-
                     this.createForm(this.tabs);
                     this.watchMutateCheck();
                     this.setActions();
@@ -30,6 +29,10 @@ pullTabs = {
                     Pocket.init();
                 }
             }
+        }
+        else{
+            window.setTimeout( this.init, 50 );
+            return;
         }
     },
 
@@ -129,15 +132,28 @@ pullTabs = {
     assembleForm: function ( tabs, options ){
         var resources = document.getElementById('resources');
 
+        var fullMimeType = true;
+
         tabs.forEach(function(tab) {
 
-            pullTabs.getContentType(tab.url, function(response){
-                this.mType = response;
-            });
+            var type,pref;
 
-            var type = this.mType.split("/").shift().toLowerCase();
+            if(fullMimeType){
+                pullTabs.getContentType(tab.url, function(response){
+                    this.mType = response;
+                });
 
-            var pref = options[type] ? options[type] : 'ignore';
+                type = this.mType.split("/").shift().toLowerCase();
+
+                pref = options[type] ? options[type] : 'ignore';
+
+            }
+            else{
+                type = 'Unknown';
+                pref = 'download';
+            }
+
+
 
             var checked = '';
             var active = '';
@@ -204,10 +220,17 @@ pullTabs = {
     },
 
     getTabStatus: function(tabs){
-            var results = pullTabs.getSelectedTabs(tabs.length);
+            var results = this.getSelectedTabs(tabs.length);
 
-            Browser.downloadUrls(results.downloads);
-            Pocket.saveTabsToPocket(results.pockets);
+            if(results.downloads.length > 0){
+                Browser.downloadUrls(results.downloads);
+            }
+
+            if(results.pockets.length > 0){
+                Pocket.saveTabsToPocket(results.pockets, config);
+            }
+
+            return;
     },
 
     getContentType: function(url, callback){
@@ -236,6 +259,8 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
+            window.setTimeout(this.getContentType(url, callback), 50);
+            console.log('Did not retrieve');
             console.log(e);
         }
     },
@@ -268,10 +293,12 @@ pullTabs = {
     getConfig: function ( callback ) {
         var file = 'config.json';
 
+        config = 'pending';
+
         try{
             var xhr = new XMLHttpRequest();
             xhr.overrideMimeType("application/json");
-            xhr.open('GET', file, false);
+            xhr.open('GET', file, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == "200") {
                     callback(xhr.responseText);
@@ -280,12 +307,12 @@ pullTabs = {
             xhr.send(null);
         }
         catch (e) {
-            console.log(e);
+            console.log("Error acquiring config" + e);
         }
     },
 
     setConfig: function ( configContents ) {
-        this.config = JSON.parse(configContents);
+        config = JSON.parse(configContents);
     },
 
     setActions: function (){
@@ -361,9 +388,9 @@ pullTabs = {
             });
         });
 
-        var config = { attributes: true, childList: true, characterData: true };
+        var setup = { attributes: true, childList: true, characterData: true };
 
-        observer.observe(form, config);
+        observer.observe(form, setup);
     },
 
     watchSubmit: function (tabs) {
@@ -427,6 +454,7 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
+            console.log("getContent Error: ");
             console.log(e);
         }
     },
@@ -471,3 +499,15 @@ pullTabs = {
 document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
 });
+
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+        for (var key in changes) {
+          var storageChange = changes[key];
+          console.log('Storage key "%s" in namespace "%s" changed. ' +
+                      'Old value was "%s", new value is "%s".',
+                      key,
+                      namespace,
+                      storageChange.oldValue,
+                      storageChange.newValue);
+        }
+      });
