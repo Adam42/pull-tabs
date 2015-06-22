@@ -17,16 +17,16 @@ pullTabs = {
             }
             if(this.tabs){
                 this.setNumTabs(this.tabs);
+                this.getOptions(this.setOptions);
                 if(prefs){
-                    console.log('options ' + this.prefs);
-                }
-                else{
-                    this.getOptions(pullTabs.setOptions);
                     this.createForm(this.tabs);
                     this.watchMutateCheck();
                     this.setActions();
                     this.watchLinks();
-                    Pocket.init();
+                    Pocket.init();                
+                }
+                else{
+	                window.setTimeout( this.init, 50);
                 }
             }
         }
@@ -62,16 +62,9 @@ pullTabs = {
 
     createForm: function (tabs) {
 
-        if(this.options){
-            console.log("this: " + this.options);
-            return;
+        if(prefs){
+            pullTabs.assembleForm( tabs, prefs );
         }
-
-        this.getOptions(function(options){
-
-            pullTabs.assembleForm( tabs, options );
-            return;
-        });
 
         this.watchSubmit(tabs);
         return;
@@ -129,7 +122,7 @@ pullTabs = {
         return label;
     },
 
-    assembleForm: function ( tabs, options ){
+    assembleForm: function ( tabs, prefs ){
         var resources = document.getElementById('resources');
 
         var fullMimeType = true;
@@ -145,7 +138,7 @@ pullTabs = {
 
                 type = this.mType.split("/").shift().toLowerCase();
 
-                pref = options[type] ? options[type] : 'ignore';
+                pref = prefs[type] ? prefs[type] : 'ignore';
 
             }
             else{
@@ -259,7 +252,6 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
-            window.setTimeout(this.getContentType(url, callback), 50);
             console.log('Did not retrieve');
             console.log(e);
         }
@@ -287,7 +279,7 @@ pullTabs = {
     },
 
     setOptions: function ( items ) {
-        this.prefs = items;
+        prefs = items;
     },
 
     getConfig: function ( callback ) {
