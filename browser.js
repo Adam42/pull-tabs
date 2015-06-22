@@ -126,7 +126,9 @@ var PTChrome = {
                 "url": url,
                 "method": "GET"
             };
+
             var downloads = chrome.downloads.download(file, function(e){
+                console.log('Downloading: ' + file + ' message: ');
                 console.log(e);
             });
         });
@@ -167,7 +169,7 @@ var PTChrome = {
         }
         try{
             chrome.storage.local.set( object , function () {
-                var status = document.getElementsById('status');
+                var status = document.getElementById('status');
                 status.textContent = key + ' saved.';
                 setTimeout( function () {
                     status.textContent = '';
