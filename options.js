@@ -1,7 +1,7 @@
 
 function saveOptions () {
 
-    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
+    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
 
     var numOfmimeTypes = mimeTypes.length;
 
@@ -12,7 +12,8 @@ function saveOptions () {
             model: '',
             multipart: '',
             text: '',
-            video: ''
+            video: '',
+            unknown: '',
         };
 
     for ( var i=0; i < numOfmimeTypes; i++ ) {
@@ -34,7 +35,7 @@ function saveOptions () {
     }
     try{
         chrome.storage.sync.set(mimeSettings , function () {
-            var status = document.getElementsById('status');
+            var status = document.getElementById('status');
             status.textContent = 'Options saved.';
             setTimeout( function () {
                 status.textContent = '';
@@ -42,6 +43,7 @@ function saveOptions () {
         });
     }
     catch(e){
+        console.log("Chrome storage sync set Exception: ");
         console.log(e);
     }
 }
@@ -54,14 +56,15 @@ function getSettings ( callback ) {
         model: 'ignore',
         multipart: 'ignore',
         text: 'download',
-        video: 'download'
+        video: 'download',
+        unknown: 'ignore'
     }, function ( items ) {
         callback( items );
     });
 }
 
 function setSettings ( items ) {
-    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
+    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
 
     var numOfmimeTypes = mimeTypes.length;
 
@@ -103,7 +106,8 @@ function restoreOptions () {
         model: 'ignore',
         multipart: 'ignore',
         text: 'download',
-        video: 'download'
+        video: 'download',
+        unknown: 'ignore'
     }, function ( items ) {
         setSettings( items );
     });
