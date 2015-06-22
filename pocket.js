@@ -2,9 +2,9 @@ var Pocket = {
 
     username: 'default',
     access_token:  'default',
+    urls: 'default',
 
     init: function( credentials ) {
-
         if(!credentials){
 
             this.getStoredCredentials(this.init);
@@ -12,11 +12,9 @@ var Pocket = {
         }
 
         if( credentials ){
-            this.username = credentials.user_name;
-            this.access_token = credentials.access_token;
+            config.username = credentials.user_name;
+            config.access_token = credentials.access_token;
         }
-            //console.log(this.username);
-
     },
 
     initLogin: function( key ) {
@@ -46,54 +44,77 @@ var Pocket = {
     },
 
     saveTabToPocket: function ( url, credentials ) {
-        console.log(url);
-        if(!credentials){
-            this.getStoredCredentials(saveTabToPocket(url));
+      if(!credentials){
+            this.getStoredCredentials(this.saveTabToPocket(url));
             return;
         }
 
-/*
 
-       var data = new FormData();
-            data.append('url', encodeURIComponent(url));
-
-            data.append('redirect_uri', encodeURIComponent(redirectURL));
+            var pocket_data = {
+                "url": url,
+                "consumer_key": config.credentials.consumer_key,
+                "access_token": credentials.access_token
+            };
 
         try{
             var xhr = new XMLHttpRequest();
-//            xhr.overrideMimeType("application/json");
-            xhr.open('POST', 'https://getpocket.com/v3/add', true);
+            xhr.overrideMimeType("application/json");
+            xhr.open('POST', 'https://getpocket.com/v3/add', false);
             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
             xhr.setRequestHeader('X-Accept', 'application/json');
 
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == "200") {
+                    console.log("Response from Pocket: ");
                     console.log(xhr.responseText);
                 }
-            }
-            xhr.send(null);
+            };
+
+            xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+                return;
+            };
+
+            xhr.send(JSON.stringify(pocket_data));
         }
         catch (e) {
+            console.log("saveTabToPocket Exception: ");
             console.log(e);
         }
 
-*/
+
 
     },
 
-    saveTabsToPocket: function ( urls, credentials ) {
-        console.log(urls);
-        if(!credentials){
-            //Pocket.getStoredCredentials(Pocket.saveTabsToPocket);
-            return;
-        }
+    getConfig: function ( ) {
+                    chrome.storage.local.get({
+                        access_token: 'default',
+                        user_name: 'default'
+                    }, function ( items ) {
+                            Pocket.saveTabsToPocket( urls, items );
+                    return;
+                    });
+    },
 
-        var numURLs = urls.length;
-        var i;
+
+    saveTabsToPocket: function ( urls, config ) {
+        this.config = config;
+
+        this.urls = urls;
+        if(typeof(config) === 'undefined'){
+            console.log("Config is not defined");
+            this.urls = urls;
+            Pocket.getConfig();
+        }
+        else{
+           var numURLs = urls.length;
+            var i;
 
         for ( i=0; i < numURLs; i++ ){
-            Pocket.saveTabToPocket( urls[i], credentials );
+//            console.log(this);
+            this.saveTabToPocket( urls[i], config );
         }
+    }
     },
 
     getConsumerKey: function( config ) {
@@ -149,10 +170,10 @@ var Pocket = {
         if(chrome.storage.local){
         chrome.storage.local.get({
             access_token: 'default',
-            user_name: 'default'
+            user_name: 'default',
+            key: 'default'
         }, function ( items ) {
-                if(items.username !== 'default'){
-//                    console.log(items);
+                if(items.user_name !== 'default'){
                     callback( items );
                 }
                 else{
@@ -163,15 +184,17 @@ var Pocket = {
     }
     },
 
-    setStoredCredentials: function () {
+    setStoredCredentials: function (credentials) {
+        console.log("Credentials" + credentials);
+
 
         //response = access_token=ACCESS_TOKEN&username=USERNAME
-        var accessTokenStart = xhr.response.search('=') + 1;
-        var accessTokenEnd = xhr.response.search('&');
+        var accessTokenStart = credentials.search('=') + 1;
+        var accessTokenEnd = credentials.search('&');
         var userNameStart = accessTokenEnd + 10;
 
-        var accessToken = xhr.response.substring(accessTokenStart,accessTokenEnd);
-        var userName = xhr.response.substring(userNameStart);
+        var accessToken = credentials.substring(accessTokenStart,accessTokenEnd);
+        var userName = credentials.substring(userNameStart);
 
         var pocket = {
             'access_token': accessToken,
@@ -180,10 +203,10 @@ var Pocket = {
 
         //Browser.save('Pocket', pocket );
          chrome.storage.local.set( pocket , function () {
-            var status = document.getElementsById('status');
-            status.textContent = key + ' saved.';
+            var status = document.getElementById('status');
+            status.textContent = pocket.key + ' saved.';
             setTimeout( function () {
-                status.textContent = '';
+               status.textContent = '';
             }, 750);
         });
     },
@@ -202,6 +225,7 @@ var Pocket = {
         xhr.onload =  function(e) {
             if (xhr.readyState == 4) {
                 if(xhr.status === 200) {
+                    console.log('dat data ' + xhr.response);
                     Pocket.setStoredCredentials(xhr.response);
                 }
                 else{
