@@ -98,7 +98,6 @@ var Pocket = {
 
 
     saveTabsToPocket: function ( urls, config ) {
-        this.config = config;
 
         this.urls = urls;
         if(typeof(config) === 'undefined'){
