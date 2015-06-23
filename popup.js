@@ -23,7 +23,7 @@ pullTabs = {
                     this.watchMutateCheck();
                     this.setActions();
                     this.watchLinks();
-                    Pocket.init();                
+                    Pocket.init();
                 }
                 else{
 	                window.setTimeout( this.init, 50);
@@ -70,58 +70,6 @@ pullTabs = {
         return;
     },
 
-    createCheckbox: function (tab, type, checked) {
-        var input = document.createElement('input');
-            input.type = 'checkbox';
-            input.id = 'tab-' + tab.index;
-            input.name = 'tabs' + tab.index;
-            input.title = tab.title + type;
-            input.value = tab.url;
-            input.checked = checked;
-
-        return input;
-    },
-
-    createRadioInput: function ( tab, value, defaultPref ) {
-        var checked = '';
-        if(value == defaultPref){
-            checked = 'checked';
-        }
-       var input = document.createElement('input');
-            input.type = 'radio';
-            input.id = 'tab-pref-' + tab.index;
-            input.name = 'tab-pref-' + tab.index;
-            input.value = value;
-            input.checked = checked;
-
-        var label = document.createElement('label');
-            label.setAttribute('class', 'preferences');
-            label.innerHTML = '<span>' + value + '</span>';
-
-            label.appendChild(input);
-
-        return label;
-    },
-
-    createLabel: function ( tab, type, active){
-        if(active === 'active'){
-//            active = active +  ' alert-success';
-        }
-        else{
-//            active = active + ' alert-danger';
-        }
-
-        var label = document.createElement('label');
-            label.setAttribute('class','list-group-item ' + active);
-            label.setAttribute('id','label-tab-' + tab.index);
-            label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
-            if(type.split("/").shift() == 'image'){
-                label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
-            }
-
-        return label;
-    },
-
     assembleForm: function ( tabs, prefs ){
         var resources = document.getElementById('resources');
 
@@ -146,8 +94,6 @@ pullTabs = {
                 pref = 'download';
             }
 
-
-
             var checked = '';
             var active = '';
 
@@ -156,18 +102,18 @@ pullTabs = {
                 active = 'active';
             }
 
-            var input = pullTabs.createCheckbox ( tab, type, checked );
+            var input = Form.createCheckbox ( tab, type, checked );
 
 
             if(pref === 'download'){
 
             }
-            var radioDown = pullTabs.createRadioInput ( tab, 'download', pref );
-            var radioPocket = pullTabs.createRadioInput ( tab, 'pocket', pref );
-            var radioIgnore = pullTabs.createRadioInput ( tab, 'ignore', pref );
+            var radioDown = Form.createRadioInput ( tab, 'download', pref );
+            var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
+            var radioIgnore = Form.createRadioInput ( tab, 'ignore', pref );
 
 
-            var label = pullTabs.createLabel ( tab, type, active );
+            var label = Form.createLabel ( tab, type, active );
 
             label.appendChild(input);
             label.appendChild(radioDown);
@@ -179,41 +125,8 @@ pullTabs = {
         });
     },
 
-    getSelectedTabs: function (inputs) {
-        var downloadURLs = [];
-        var pocketURLs = [];
-        var ignoreURLs = [];
-        var results = [];
-
-        var i;
-
-        for ( i=0; i < inputs; i++){
-            var input = document.getElementById('tab-' + i);
-            if(input.checked){
-                var radios = document.getElementsByName('tab-pref-' + i);
-
-                if(radios[0].checked){
-                    downloadURLs.push(input.value);
-                }
-
-                if(radios[1].checked){
-                    pocketURLs.push(input.value);
-                }
-            }
-            else{
-                ignoreURLs.push(input.value);
-            }
-        }
-
-        results.downloads = downloadURLs;
-        results.pockets = pocketURLs;
-        results.ignores = ignoreURLs;
-
-        return results;
-    },
-
     getTabStatus: function(tabs){
-            var results = this.getSelectedTabs(tabs.length);
+            var results = Form.getSelectedTabs(tabs.length);
 
             if(results.downloads.length > 0){
                 Browser.downloadUrls(results.downloads);
@@ -270,7 +183,8 @@ pullTabs = {
             model: 'ignore',
             multipart: 'ignore',
             text: 'download',
-            video: 'download'
+            video: 'download',
+            unknown: 'ignore'
         }, function ( items ) {
             callback( items );
         });

@@ -53,7 +53,7 @@ var Form = {
 
     createLabel: function ( tab, type, active){
         if(active === 'active'){
-            active = active +  ' alert-success';
+//            active = active +  ' alert-success';
         }
         else{
 //            active = active + ' alert-danger';
@@ -147,34 +147,6 @@ var Form = {
         return results;
     },
 
-    getTabStatus: function(tabs){
-            var results = pullTabs.getSelectedTabs(tabs.length);
-
-            Browser.downloadUrls(results.downloads);
-            Pocket.saveTabsToPocket(results.pockets);
-    },
-
-    getOptions: function ( callback ) {
-        chrome.storage.sync.get({
-            application: 'download',
-            image: 'download',
-            message: 'ignore',
-            model: 'ignore',
-            multipart: 'ignore',
-            text: 'download',
-            video: 'download'
-        }, function ( items ) {
-            callback( items );
-        });
-
-        return;
-    },
-
-    setOptions: function ( items ) {
-        console.log( items );
-    },
-
-
     watchMutateCheck: function () {
         var form = document.querySelector('#resources');
 
@@ -203,9 +175,3 @@ var Form = {
     },
 
 };
-console.log(Form);
-
-Form.init('test');
-
-console.log(Form);
-//var form = new Form();
