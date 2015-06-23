@@ -128,8 +128,8 @@ var PTChrome = {
             };
 
             var downloads = chrome.downloads.download(file, function(e){
-                console.log('Downloading: ' + file + ' message: ');
-                console.log(e);
+                console.log('Downloading: ' + JSON.stringify(file, null, 4));
+                console.log('Message: ' + JSON.stringify(e, null, 4));
             });
         });
     },
