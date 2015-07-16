@@ -18,7 +18,6 @@ Config.prototype = {
     setConfig : function ( setting ){
 //        console.log(setting);
         this.settings = setting;
-        setup = setting;
 //       console.log(this);
 
 //    return this;

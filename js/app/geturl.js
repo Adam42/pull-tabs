@@ -1,14 +1,15 @@
 function getURL( url ) {
     var xhr = new XMLHttpRequest();
+    var file = 'file:///Users/adam/Dropbox/Sites/pullTabs/config.json';
+
     console.log(xhr);
     if(typeof(XMLHttpRequest) === 'undefined'){
         //we're in node.js for testing
         console.log('node.js for testing');
-        file = 'file:///Users/adam/Dropbox/Sites/pullTabs/config.json';
         console.log("Using node.js xhr");
         var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;   
         try{   
-            var xhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
             xhr.open('GET', file, true);
             xhr.setRequestHeader("Content-type: application/json");
 
@@ -27,7 +28,7 @@ function getURL( url ) {
     else{
         //we're in a browser!
         try{
-            var xhr = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
             xhr.overrideMimeType("application/json");
             xhr.open('GET', file, false);
             xhr.onreadystatechange = function () {

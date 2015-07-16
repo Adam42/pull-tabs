@@ -68,7 +68,7 @@ function setSettings ( items ) {
 
     var numOfmimeTypes = mimeTypes.length;
 
-    for ( i=0; i < numOfmimeTypes; i++ ) {
+    for ( var i=0; i < numOfmimeTypes; i++ ) {
         var settings = document.getElementsByName(mimeTypes[i]);
 
         var download = settings[0];
