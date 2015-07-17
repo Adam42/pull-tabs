@@ -70,6 +70,23 @@ var Form = {
         return label;
     },
 
+    toggleLabels: function(label) {
+        label.addEventListener('click', function () {
+            var input = label.getElementsByTagName('input')[0];
+            if(label.classList.contains('active')){
+                if(!input.checked){
+                    label.classList.remove("active");
+                }
+            }
+            if(!label.classList.contains('active')){
+                if(input.checked){
+                    label.classList.add('active');
+                }
+            }
+
+        });
+    },
+
     assembleForm: function ( tabs, options ){
         var resources = document.getElementById('resources');
 
