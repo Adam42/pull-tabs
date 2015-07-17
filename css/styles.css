@@ -26,7 +26,7 @@ label.preferences input { margin: 0 10px }
 
 .page-header{margin:100px 0 20px;}
 .container { width: 800px;}
-body#options { margin: 0 auto;}
+#options { margin: 0 auto;}
 #options .container { width: 800px;}
 #options .list-group-item { margin: 5px 10px; float: left; padding: 0;}
 #options input { margin: 0 10px 0 0;}
@@ -35,8 +35,8 @@ body#options { margin: 0 auto;}
 #options h4 {margin: 0; padding: 10px 0; text-align: center;}
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
-.container[role="main"]{min-height: 400px; }
-.container[role="complementary"]{padding-top: 20px;}
+.container[role="main"] form {min-height: 400px; }
+.container[role="complementary"] a {padding-top: 20px;}
 
 .bounce{margin-left: -9999px; height: 0;}
 
