@@ -83,15 +83,15 @@ function setSettings ( items ) {
         pocket.parentNode.classList.remove('active');
         ignore.parentNode.classList.remove('active');
 
-        if( items[mimeTypes[i]] == 'download') {
+        if( items[mimeTypes[i]] === 'download') {
             download.checked = true;
             download.parentNode.classList.add('active');
         }
-        else if ( items[mimeTypes[i]] == 'pocket' ) {
+        else if ( items[mimeTypes[i]] === 'pocket' ) {
             settings[1].checked = true;
             pocket.parentNode.classList.add('active');
         }
-        else if ( items[mimeTypes[i]] == 'ignore' ) {
+        else if ( items[mimeTypes[i]] === 'ignore' ) {
             settings[2].checked = true;
             ignore.parentNode.classList.add('active');
         }
