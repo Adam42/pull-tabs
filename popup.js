@@ -157,7 +157,7 @@ pullTabs = {
             var xhr = new XMLHttpRequest();
             xhr.open("HEAD", url, false);
             xhr.onload =  function(e) {
-                if (xhr.readyState == 4) {
+                if (xhr.readyState === 4) {
                     if(xhr.status === 200) {
                         callback(xhr.getResponseHeader("Content-Type"));
                     }
@@ -222,7 +222,7 @@ pullTabs = {
                 xhr.overrideMimeType("application/json");
                 xhr.open('GET', file, true);
                 xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == "200") {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
                         callback(xhr.responseText);
                     }
                 };
@@ -378,7 +378,7 @@ pullTabs = {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", link.href, false);
             xhr.onload =  function(e) {
-                if (xhr.readyState == 4) {
+                if (xhr.readyState === 4) {
                     if(xhr.status === 200) {
                         callback(link,xhr.response);
                     }
