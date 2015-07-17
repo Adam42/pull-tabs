@@ -20,7 +20,7 @@ function getURL( url ) {
         xhr.overrideMimeType("application/json");
 
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == "200") {
+            if (xhr.readyState === 4 && xhr.status === "200") {
                 callback.apply(xhr.responseText);
             }
         };

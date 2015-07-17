@@ -4,7 +4,7 @@ function get(url, callback) {
     xhr.open("GET", url, true);
 
     xhr.onload =  function(e) {
-        if (xhr.readyState == 4) {
+        if (xhr.readyState === 4) {
             if(xhr.status === 200) {
                 callback(xhr.responseText);
             }

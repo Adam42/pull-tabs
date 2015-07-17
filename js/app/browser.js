@@ -163,7 +163,7 @@ var PTChrome = {
 
     save: function ( key, object ) {
         console.log(key + ' save ' + object);
-        if(typeof(chrome.storage) == 'undefined'){
+        if(typeof(chrome.storage) === 'undefined'){
             console.log('ERROR');
         }
         try{

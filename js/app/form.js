@@ -32,7 +32,7 @@ var Form = {
 
     createRadioInput: function ( tab, value, defaultPref ) {
         var checked = '';
-        if(value == defaultPref){
+        if(value === defaultPref){
             checked = 'checked';
         }
        var input = document.createElement('input');
@@ -63,7 +63,7 @@ var Form = {
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
             label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
-            if(type.split("/").shift() == 'image'){
+            if(type.split("/").shift() === 'image'){
                 label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
             }
 

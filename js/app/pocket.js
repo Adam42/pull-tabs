@@ -64,7 +64,7 @@ var Pocket = {
             xhr.setRequestHeader('X-Accept', 'application/json');
 
             xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == "200") {
+                if (xhr.readyState === 4 && xhr.status === "200") {
                     console.log("Response from Pocket: ");
                     console.log(xhr.responseText);
                 }
@@ -140,7 +140,7 @@ var Pocket = {
         xhr.open("POST", pocket.url, true);
 
         xhr.onload =  function(e) {
-            if (xhr.readyState == 4) {
+            if (xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     pocket.token = xhr.response.substring(5);
 
@@ -222,7 +222,7 @@ var Pocket = {
         xhr.open("POST", pocket.url, true);
 
         xhr.onload =  function(e) {
-            if (xhr.readyState == 4) {
+            if (xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     console.log('dat data ' + xhr.response);
                     Pocket.setStoredCredentials(xhr.response);
