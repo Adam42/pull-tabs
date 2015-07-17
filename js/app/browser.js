@@ -12,53 +12,54 @@ var Browser = {
 
     browser: function(){},
 
-    init: function () {
-        this.getEnvMode();
-        this.browser = this.getBrowser();
+    init: function (config) {
+        this.getEnvMode( config );
+        this.getBrowser();
         this.getTabs();
         return;
     },
 
     getEnvMode: function( config ) {
-        if(!config){
+        if(typeof(config) === 'undefined'){
             if(typeof(pullTabs) === 'undefined'){
                 this.getEnvMode(JSON.stringify(
-                    [
-                        {
-                            "consumer_key": "KEY"
+                    {
+                        credentials: {
+                            consumer_key: "KEY"
                         },
-                        {
-                            "environment_mode": "DEVELOPMENT"
+                        configuration: {
+                            "mode": "DEVELOPMENT"
                         }
-                    ]
+                    }
                 ));
                 return;
             }
-            else if (typeof(this.config) === 'undefined'){
+            else if (typeof(config) === 'undefined'){
                 pullTabs.getConfig( Browser.getEnvMode );
                 return;
             }
         }
         if(config){
-            this.config = config;
-            this.ENV = JSON.parse(config).configuration.mode;
+            this.ENV = config.configuration.mode;
+
         }
         return;
     },
 
     getBrowser: function () {
         if(this.ENV === 'DEVELOPMENT'){
-            return DevBrowse;
+            this.browser = DevBrowse;
         }
         else if (typeof chrome !=='undefined') {
-            return PTChrome;
+            this.browser = PTChrome;
         }
         else{
-            return DevBrowse;
+            this.browser = DevBrowse;
         }
     },
 
     getTabs: function (tabs) {
+
         if(!tabs){
             var result = this.browser.getTabs();
             if(result !== 'undefined'){
@@ -124,8 +125,10 @@ var PTChrome = {
                 "url": url,
                 "method": "GET"
             };
-            var downloads = chrome.downloads.download(file, function(e){
-                console.log(e);
+
+            chrome.downloads.download(file, function(e){
+                console.log('Downloading: ' + JSON.stringify(file, null, 4));
+                console.log('Message: ' + JSON.stringify(e, null, 4));
             });
         });
     },
@@ -160,12 +163,12 @@ var PTChrome = {
 
     save: function ( key, object ) {
         console.log(key + ' save ' + object);
-        if(typeof(chrome.storage) == 'undefined'){
+        if(typeof(chrome.storage) === 'undefined'){
             console.log('ERROR');
         }
         try{
             chrome.storage.local.set( object , function () {
-                var status = document.getElementsById('status');
+                var status = document.getElementById('status');
                 status.textContent = key + ' saved.';
                 setTimeout( function () {
                     status.textContent = '';
@@ -179,7 +182,7 @@ var PTChrome = {
 
 };
 
-//Browser.init('DEV');
+//Browser.init();
 if(typeof(Browser.ENV !== 'undefined') && Browser.ENV === 'DEVELOPMENT'){
 
     console.log("DEFAULT TABS: " + Browser.getTabs());

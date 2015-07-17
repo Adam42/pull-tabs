@@ -1,0 +1,24 @@
+{
+  "name": "pulltabs",
+  "version": "0.9.3",
+  "homepage": "https://github.com/Adam42/pull-tabs",
+  "authors": [
+    "Adam <adam@the42ndestate.com>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0",
+    "checkboxes.js": "~1.0.5",
+    "qunit": "~1.15.0"
+  }
+}
