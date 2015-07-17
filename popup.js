@@ -44,6 +44,7 @@ pullTabs = {
     },
 
     watchCheckBoxes: function (numFormTabs) {
+        var i;
         for(i=0;i<numFormTabs.length; i++){
             Form.toggleLabels(numFormTabs[i]);
         }
