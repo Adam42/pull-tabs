@@ -14,9 +14,8 @@ var Browser = {
 
     init: function (config) {
         this.getEnvMode( config );
-        this.browser = this.getBrowser();
+        this.getBrowser();
         this.getTabs();
-
         return;
     },
 
@@ -49,13 +48,13 @@ var Browser = {
 
     getBrowser: function () {
         if(this.ENV === 'DEVELOPMENT'){
-            return DevBrowse;
+            this.browser = DevBrowse;
         }
         else if (typeof chrome !=='undefined') {
-            return PTChrome;
+            this.browser = PTChrome;
         }
         else{
-            return DevBrowse;
+            this.browser = DevBrowse;
         }
     },
 
@@ -127,7 +126,7 @@ var PTChrome = {
                 "method": "GET"
             };
 
-            var downloads = chrome.downloads.download(file, function(e){
+            chrome.downloads.download(file, function(e){
                 console.log('Downloading: ' + JSON.stringify(file, null, 4));
                 console.log('Message: ' + JSON.stringify(e, null, 4));
             });
