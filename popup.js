@@ -10,7 +10,7 @@ pullTabs = {
             this.getConfig(this.setConfig);
         }
 
-        if(config && config != 'pending'){
+        if(config && (config !== 'pending')){
             if(!this.tabs){
                 Browser.init(config);
                 return;
@@ -20,10 +20,17 @@ pullTabs = {
                 this.getOptions(this.setOptions);
                 if(prefs){
                     this.createForm(this.tabs);
-                    this.watchMutateCheck();
-                    this.setActions();
-                    this.watchLinks();
-                    Pocket.init();
+                    var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+                    if(numFormTabs.length === this.tabs.length){
+                        this.watchCheckBoxes(numFormTabs);
+                        this.watchMutateCheck();
+                        this.setActions();
+                        this.watchLinks();
+                        Pocket.init();
+                    }
+                    else{
+                        window.setTimeout( this.init, 50);
+                    }
                 }
                 else{
                     window.setTimeout( this.init, 50);
@@ -33,6 +40,12 @@ pullTabs = {
         else{
             window.setTimeout( this.init, 50 );
             return;
+        }
+    },
+
+    watchCheckBoxes: function (numFormTabs) {
+        for(i=0;i<numFormTabs.length; i++){
+            Form.toggleLabels(numFormTabs[i]);
         }
     },
 
@@ -61,9 +74,8 @@ pullTabs = {
     },
 
     createForm: function (tabs) {
-
         if(prefs){
-            pullTabs.assembleForm( tabs, prefs );
+            this.assembleForm( tabs, prefs );
         }
 
         this.watchSubmit(tabs);
@@ -74,7 +86,6 @@ pullTabs = {
         var resources = document.getElementById('resources');
 
         var fullMimeType = true;
-
         tabs.forEach(function(tab) {
 
             var type,pref;
@@ -83,15 +94,16 @@ pullTabs = {
                 pullTabs.getContentType(tab.url, function(response){
                     this.mType = response;
                 });
-
+            }
+            if(this.mType){
                 type = this.mType.split("/").shift().toLowerCase();
 
                 pref = prefs[type] ? prefs[type] : 'ignore';
 
             }
             else{
-                type = 'Unknown';
-                pref = 'download';
+                type = 'unknown';
+                pref = 'ignore';
             }
 
             var checked = '';
@@ -165,8 +177,8 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
-            console.log('Did not retrieve');
-            console.log(e);
+            callback('Unknown');
+            console.log('Did not retrieve ' + url + ' Error: ' + e);
         }
     },
 
@@ -321,7 +333,6 @@ pullTabs = {
         });
 
         var setup = { attributes: true, childList: true, characterData: true };
-
         observer.observe(form, setup);
     },
 
@@ -433,13 +444,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-        for (var key in changes) {
-          var storageChange = changes[key];
-          console.log('Storage key "%s" in namespace "%s" changed. ' +
-                      'Old value was "%s", new value is "%s".',
-                      key,
-                      namespace,
-                      storageChange.oldValue,
-                      storageChange.newValue);
+    for (var key in changes) {
+        if(changes.hasOwnProperty('key')){
+            var storageChange = changes[key];
+            console.log('Storage key "%s" in namespace "%s" changed. ' +
+                  'Old value was "%s", new value is "%s".',
+                  key,
+                  namespace,
+                  storageChange.oldValue,
+                  storageChange.newValue);
         }
-      });
+    }
+});
