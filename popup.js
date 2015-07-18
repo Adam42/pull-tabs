@@ -1,29 +1,52 @@
 var
 config,
+prefs,
 pullTabs = {
 
     tabs: '',
 
     init: function(  ) {
-
         if(typeof(config) === 'undefined'){
             this.getConfig(this.setConfig);
         }
 
-        if(config){
-
+        if(config && (config !== 'pending')){
             if(!this.tabs){
-                Browser.init();
+                Browser.init(config);
                 return;
             }
-
             if(this.tabs){
-                this.createForm(this.tabs);
-                this.watchMutateCheck();
-                this.setActions();
-                this.watchLinks();
-                Pocket.init();
+                this.setNumTabs(this.tabs);
+                this.getOptions(this.setOptions);
+                if(prefs){
+                    this.createForm(this.tabs);
+                    var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+                    if(numFormTabs.length === this.tabs.length){
+                        this.watchCheckBoxes(numFormTabs);
+                        this.watchMutateCheck();
+                        this.setActions();
+                        this.watchLinks();
+                        Pocket.init();
+                    }
+                    else{
+                        window.setTimeout( this.init, 50);
+                    }
+                }
+                else{
+                    window.setTimeout( this.init, 50);
+                }
             }
+        }
+        else{
+            window.setTimeout( this.init, 50 );
+            return;
+        }
+    },
+
+    watchCheckBoxes: function (numFormTabs) {
+        var i;
+        for(i=0;i<numFormTabs.length; i++){
+            Form.toggleLabels(numFormTabs[i]);
         }
     },
 
@@ -46,84 +69,43 @@ pullTabs = {
         this.init();
     },
 
-    createForm: function (tabs) {
+    setNumTabs: function(tabs){
         var numTabs = document.getElementById('numTabs');
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
+    },
 
-        this.getOptions(function(options){
-
-            pullTabs.assembleForm( tabs, options );
-            return;
-        });
+    createForm: function (tabs) {
+        if(prefs){
+            this.assembleForm( tabs, prefs );
+        }
 
         this.watchSubmit(tabs);
         return;
     },
 
-    createCheckbox: function (tab, type, checked) {
-        var input = document.createElement('input');
-            input.type = 'checkbox';
-            input.id = 'tab-' + tab.index;
-            input.name = 'tabs' + tab.index;
-            input.title = tab.title + type;
-            input.value = tab.url;
-            input.checked = checked;
-
-        return input;
-    },
-
-    createRadioInput: function ( tab, value, defaultPref ) {
-        var checked = '';
-        if(value == defaultPref){
-            checked = 'checked';
-        }
-       var input = document.createElement('input');
-            input.type = 'radio';
-            input.id = 'tab-pref-' + tab.index;
-            input.name = 'tab-pref-' + tab.index;
-            input.value = value;
-            input.checked = checked;
-
-        var label = document.createElement('label');
-            label.setAttribute('class', 'preferences');
-            label.innerHTML = '<span>' + value + '</span>';
-
-            label.appendChild(input);
-
-        return label;
-    },
-
-    createLabel: function ( tab, type, active){
-        if(active === 'active'){
-            active = active +  ' alert-success';
-        }
-        else{
-//            active = active + ' alert-danger';
-        }
-
-        var label = document.createElement('label');
-            label.setAttribute('class','list-group-item ' + active);
-            label.setAttribute('id','label-tab-' + tab.index);
-            label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
-            if(type.split("/").shift() == 'image'){
-                label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
-            }
-
-        return label;
-    },
-
-    assembleForm: function ( tabs, options ){
+    assembleForm: function ( tabs, prefs ){
         var resources = document.getElementById('resources');
 
+        var fullMimeType = true;
         tabs.forEach(function(tab) {
 
-            pullTabs.getContentType(tab.url, function(response){
-                this.mType = response;
-            });
+            var type,pref;
 
-            var type = this.mType.split("/").shift().toLowerCase();
+            if(fullMimeType){
+                pullTabs.getContentType(tab.url, function(response){
+                    this.mType = response;
+                });
+            }
+            if(this.mType){
+                type = this.mType.split("/").shift().toLowerCase();
 
-            var pref = options[type] ? options[type] : 'ignore';
+                pref = prefs[type] ? prefs[type] : 'ignore';
+
+            }
+            else{
+                type = 'unknown';
+                pref = 'ignore';
+            }
 
             var checked = '';
             var active = '';
@@ -133,18 +115,18 @@ pullTabs = {
                 active = 'active';
             }
 
-            var input = pullTabs.createCheckbox ( tab, type, checked );
+            var input = Form.createCheckbox ( tab, type, checked );
 
 
             if(pref === 'download'){
 
             }
-            var radioDown = pullTabs.createRadioInput ( tab, 'download', pref );
-            var radioPocket = pullTabs.createRadioInput ( tab, 'pocket', pref );
-            var radioIgnore = pullTabs.createRadioInput ( tab, 'ignore', pref );
+            var radioDown = Form.createRadioInput ( tab, 'download', pref );
+            var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
+            var radioIgnore = Form.createRadioInput ( tab, 'ignore', pref );
 
 
-            var label = pullTabs.createLabel ( tab, type, active );
+            var label = Form.createLabel ( tab, type, active );
 
             label.appendChild(input);
             label.appendChild(radioDown);
@@ -156,44 +138,18 @@ pullTabs = {
         });
     },
 
-    getSelectedTabs: function (inputs) {
-        var downloadURLs = [];
-        var pocketURLs = [];
-        var ignoreURLs = [];
-        var results = [];
-
-        var i;
-
-        for ( i=0; i < inputs; i++){
-            var input = document.getElementById('tab-' + i);
-            if(input.checked){
-                var radios = document.getElementsByName('tab-pref-' + i);
-
-                if(radios[0].checked){
-                    downloadURLs.push(input.value);
-                }
-
-                if(radios[1].checked){
-                    pocketURLs.push(input.value);
-                }
-            }
-            else{
-                ignoreURLs.push(input.value);
-            }
-        }
-
-        results.downloads = downloadURLs;
-        results.pockets = pocketURLs;
-        results.ignores = ignoreURLs;
-
-        return results;
-    },
-
     getTabStatus: function(tabs){
-            var results = pullTabs.getSelectedTabs(tabs.length);
+            var results = Form.getSelectedTabs(tabs.length);
 
-            Browser.downloadUrls(results.downloads);
-            Pocket.saveTabsToPocket(results.pockets);
+            if(results.downloads.length > 0){
+                Browser.downloadUrls(results.downloads);
+            }
+
+            if(results.pockets.length > 0){
+                Pocket.saveTabsToPocket(results.pockets, config);
+            }
+
+            return;
     },
 
     getContentType: function(url, callback){
@@ -202,7 +158,7 @@ pullTabs = {
             var xhr = new XMLHttpRequest();
             xhr.open("HEAD", url, false);
             xhr.onload =  function(e) {
-                if (xhr.readyState == 4) {
+                if (xhr.readyState === 4) {
                     if(xhr.status === 200) {
                         callback(xhr.getResponseHeader("Content-Type"));
                     }
@@ -222,7 +178,8 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
-            console.log(e);
+            callback('Unknown');
+            console.log('Did not retrieve ' + url + ' Error: ' + e);
         }
     },
 
@@ -239,7 +196,8 @@ pullTabs = {
             model: 'ignore',
             multipart: 'ignore',
             text: 'download',
-            video: 'download'
+            video: 'download',
+            unknown: 'ignore'
         }, function ( items ) {
             callback( items );
         });
@@ -248,30 +206,58 @@ pullTabs = {
     },
 
     setOptions: function ( items ) {
-        console.log( items );
+        prefs = items;
     },
 
     getConfig: function ( callback ) {
-        var file = 'config.json';
-
-        try{
-            var xhr = new XMLHttpRequest();
-            xhr.overrideMimeType("application/json");
-            xhr.open('GET', file, false);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == "200") {
-                    callback(xhr.responseText);
-                }
-            };
-            xhr.send(null);
+        if(config){
+            console.log('public config set ' + config);
+            return config;
         }
-        catch (e) {
-            console.log(e);
+        else{
+            var file = 'config.json';
+
+            config = 'pending';
+            try{
+                var xhr = new XMLHttpRequest();
+                xhr.overrideMimeType("application/json");
+                xhr.open('GET', file, true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        callback(xhr.responseText);
+                    }
+                };
+                xhr.send(null);
+            }
+            catch (e) {
+                console.log("Error acquiring config" + JSON.stringify(e,null,4));
+            }
+            /*
+                //we're in node.js for testing
+                file = 'file:///Users/adam/Dropbox/Sites/pullTabs/config.json';
+                console.log("Using node.js xhr");
+                var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+                try{
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', file, true);
+                    xhr.setRequestHeader("Content-type: application/json");
+
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 4 && xhr.status == "200") {
+                            callback.apply(xhr.responseText);
+                        }
+                    };
+                    xhr.send(null);
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            */
         }
     },
 
     setConfig: function ( configContents ) {
-        this.config = JSON.parse(configContents);
+        config = JSON.parse(configContents);
     },
 
     setActions: function (){
@@ -347,9 +333,8 @@ pullTabs = {
             });
         });
 
-        var config = { attributes: true, childList: true, characterData: true };
-
-        observer.observe(form, config);
+        var setup = { attributes: true, childList: true, characterData: true };
+        observer.observe(form, setup);
     },
 
     watchSubmit: function (tabs) {
@@ -394,7 +379,7 @@ pullTabs = {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", link.href, false);
             xhr.onload =  function(e) {
-                if (xhr.readyState == 4) {
+                if (xhr.readyState === 4) {
                     if(xhr.status === 200) {
                         callback(link,xhr.response);
                     }
@@ -413,6 +398,7 @@ pullTabs = {
             xhr.send();
         }
         catch (e) {
+            console.log("getContent Error: ");
             console.log(e);
         }
     },
@@ -456,4 +442,18 @@ pullTabs = {
 
 document.addEventListener('DOMContentLoaded', function () {
     pullTabs.init();
+});
+
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+    for (var key in changes) {
+        if(changes.hasOwnProperty('key')){
+            var storageChange = changes[key];
+            console.log('Storage key "%s" in namespace "%s" changed. ' +
+                  'Old value was "%s", new value is "%s".',
+                  key,
+                  namespace,
+                  storageChange.oldValue,
+                  storageChange.newValue);
+        }
+    }
 });

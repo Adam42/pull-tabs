@@ -1,9 +1,9 @@
 
 function saveOptions () {
 
-    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
+    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
 
-    numOfmimeTypes = mimeTypes.length;
+    var numOfmimeTypes = mimeTypes.length;
 
     var mimeSettings = {
             application: '',
@@ -12,10 +12,11 @@ function saveOptions () {
             model: '',
             multipart: '',
             text: '',
-            video: ''
-        }
+            video: '',
+            unknown: '',
+        };
 
-    for ( i=0; i < numOfmimeTypes; i++ ) {
+    for ( var i=0; i < numOfmimeTypes; i++ ) {
         var settings = document.getElementsByName(mimeTypes[i]);
 
         var download = settings[0].checked;
@@ -32,14 +33,19 @@ function saveOptions () {
             mimeSettings[mimeTypes[i]] = 'ignore';
         }
     }
-
-    chrome.storage.sync.set(mimeSettings , function () {
-        var status = document.getElementsById('status');
-        status.textContent = 'Options saved.';
-        setTimeout( function () {
-            status.textContent = '';
-        }, 750);
-    });
+    try{
+        chrome.storage.sync.set(mimeSettings , function () {
+            var status = document.getElementById('status');
+            status.textContent = 'Options saved.';
+            setTimeout( function () {
+                status.textContent = '';
+            }, 750);
+        });
+    }
+    catch(e){
+        console.log("Chrome storage sync set Exception: ");
+        console.log(e);
+    }
 }
 
 function getSettings ( callback ) {
@@ -50,18 +56,19 @@ function getSettings ( callback ) {
         model: 'ignore',
         multipart: 'ignore',
         text: 'download',
-        video: 'download'
+        video: 'download',
+        unknown: 'ignore'
     }, function ( items ) {
         callback( items );
     });
 }
 
 function setSettings ( items ) {
-    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video'];
+    var mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
 
     var numOfmimeTypes = mimeTypes.length;
 
-    for ( i=0; i < numOfmimeTypes; i++ ) {
+    for ( var i=0; i < numOfmimeTypes; i++ ) {
         var settings = document.getElementsByName(mimeTypes[i]);
 
         var download = settings[0];
@@ -76,15 +83,15 @@ function setSettings ( items ) {
         pocket.parentNode.classList.remove('active');
         ignore.parentNode.classList.remove('active');
 
-        if( items[mimeTypes[i]] == 'download') {
+        if( items[mimeTypes[i]] === 'download') {
             download.checked = true;
             download.parentNode.classList.add('active');
         }
-        else if ( items[mimeTypes[i]] == 'pocket' ) {
+        else if ( items[mimeTypes[i]] === 'pocket' ) {
             settings[1].checked = true;
             pocket.parentNode.classList.add('active');
         }
-        else if ( items[mimeTypes[i]] == 'ignore' ) {
+        else if ( items[mimeTypes[i]] === 'ignore' ) {
             settings[2].checked = true;
             ignore.parentNode.classList.add('active');
         }
@@ -99,7 +106,8 @@ function restoreOptions () {
         model: 'ignore',
         multipart: 'ignore',
         text: 'download',
-        video: 'download'
+        video: 'download',
+        unknown: 'ignore'
     }, function ( items ) {
         setSettings( items );
     });
