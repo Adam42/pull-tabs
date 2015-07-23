@@ -1,18 +1,12 @@
 var
-config,
 prefs,
 pullTabs = {
 
     tabs: '',
 
     init: function(  ) {
-        if(typeof(config) === 'undefined'){
-            this.getConfig(this.setConfig);
-        }
-
-        if(config && (config !== 'pending')){
             if(!this.tabs){
-                Browser.init(config);
+                Browser.init();
                 return;
             }
             if(this.tabs){
@@ -36,11 +30,6 @@ pullTabs = {
                     window.setTimeout( this.init, 50);
                 }
             }
-        }
-        else{
-            window.setTimeout( this.init, 50 );
-            return;
-        }
     },
 
     watchCheckBoxes: function (numFormTabs) {
@@ -207,57 +196,6 @@ pullTabs = {
 
     setOptions: function ( items ) {
         prefs = items;
-    },
-
-    getConfig: function ( callback ) {
-        if(config){
-            console.log('public config set ' + config);
-            return config;
-        }
-        else{
-            var file = 'config.json';
-
-            config = 'pending';
-            try{
-                var xhr = new XMLHttpRequest();
-                xhr.overrideMimeType("application/json");
-                xhr.open('GET', file, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        callback(xhr.responseText);
-                    }
-                };
-                xhr.send(null);
-            }
-            catch (e) {
-                console.log("Error acquiring config" + JSON.stringify(e,null,4));
-            }
-            /*
-                //we're in node.js for testing
-                file = 'file:///Users/adam/Dropbox/Sites/pullTabs/config.json';
-                console.log("Using node.js xhr");
-                var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-                try{
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', file, true);
-                    xhr.setRequestHeader("Content-type: application/json");
-
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState == 4 && xhr.status == "200") {
-                            callback.apply(xhr.responseText);
-                        }
-                    };
-                    xhr.send(null);
-                }
-                catch (e) {
-                    console.log(e);
-                }
-            */
-        }
-    },
-
-    setConfig: function ( configContents ) {
-        config = JSON.parse(configContents);
     },
 
     setActions: function (){
