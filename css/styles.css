@@ -21,6 +21,8 @@ label.preferences input { margin: 0 10px }
 
 .list-group-item{ width: 750px; margin: 10px 0;}
 
+.panel-heading { padding: 0;}
+.panel-body { padding: 0;}
 .panel-body label {float: left;}
 
 
