@@ -47,8 +47,8 @@ var Browser = {
         }
     },
 
-    downloadUrls: function (urls) {
-        this.browser.downloadUrls(urls);
+    downloadUrls: function (tabs) {
+        this.browser.downloadUrls(tabs);
     },
 
     login: function ( pocket ) {
@@ -69,10 +69,10 @@ var Browser = {
  */
 var DevBrowse = {
 
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
+    downloadUrls: function (tabs) {
+        tabs.forEach(function(tab){
             var file = {
-                "url": url,
+                "url": tab.url,
                 "method": "GET"
             };
             console.log('Dev downloaded ' + file);
@@ -92,10 +92,10 @@ var DevBrowse = {
  *
  */
 var PTChrome = {
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
+    downloadUrls: function (tabs) {
+        tabs.forEach(function(tab){
             var file = {
-                "url": url,
+                "url": tab.url,
                 "method": "GET"
             };
 

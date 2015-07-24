@@ -68,7 +68,7 @@ pullTabs = {
             this.assembleForm( tabs, prefs );
         }
 
-        this.watchSubmit(tabs);
+        this.watchSubmit();
         return;
     },
 
@@ -127,15 +127,15 @@ pullTabs = {
         });
     },
 
-    getTabStatus: function(tabs){
-            var results = Form.getSelectedTabs(tabs.length);
+    getTabStatus: function(){
+            this.tabs = Form.getSelectedTabs(this.tabs);
 
-            if(results.downloads.length > 0){
-                Browser.downloadUrls(results.downloads);
+            if(this.tabs.downloads.length > 0){
+                Browser.downloadUrls(this.tabs.downloads);
             }
 
-            if(results.pockets.length > 0){
-                Pocket.saveTabsToPocket(results.pockets, config);
+            if(this.tabs.pockets.length > 0){
+                Pocket.saveTabsToPocket(this.tabs.pockets);
             }
 
             return;
@@ -275,9 +275,14 @@ pullTabs = {
         observer.observe(form, setup);
     },
 
-    watchSubmit: function (tabs) {
+    process: function (evt) {
+        evt.preventDefault();
+        pullTabs.getTabStatus();
+    },
+
+    watchSubmit: function () {
         var checked = document.getElementById('list');
-        checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
+        checked.addEventListener('submit', this.process);
     },
 
     showMainContent: function ( ) {
