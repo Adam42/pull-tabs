@@ -12,41 +12,14 @@ var Browser = {
 
     browser: function(){},
 
-    init: function (config) {
-        this.getEnvMode( config );
-        this.getBrowser();
+    init: function () {
+        this.ENV = Config.configuration.mode;
+        this.setBrowser();
         this.getTabs();
         return;
     },
 
-    getEnvMode: function( config ) {
-        if(typeof(config) === 'undefined'){
-            if(typeof(pullTabs) === 'undefined'){
-                this.getEnvMode(JSON.stringify(
-                    {
-                        credentials: {
-                            consumer_key: "KEY"
-                        },
-                        configuration: {
-                            "mode": "DEVELOPMENT"
-                        }
-                    }
-                ));
-                return;
-            }
-            else if (typeof(config) === 'undefined'){
-                pullTabs.getConfig( Browser.getEnvMode );
-                return;
-            }
-        }
-        if(config){
-            this.ENV = config.configuration.mode;
-
-        }
-        return;
-    },
-
-    getBrowser: function () {
+    setBrowser: function () {
         if(this.ENV === 'DEVELOPMENT'){
             this.browser = DevBrowse;
         }
@@ -74,8 +47,8 @@ var Browser = {
         }
     },
 
-    downloadUrls: function (urls) {
-        this.browser.downloadUrls(urls);
+    downloadUrls: function (tabs) {
+        this.browser.downloadUrls(tabs);
     },
 
     login: function ( pocket ) {
@@ -96,10 +69,10 @@ var Browser = {
  */
 var DevBrowse = {
 
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
+    downloadUrls: function (tabs) {
+        tabs.forEach(function(tab){
             var file = {
-                "url": url,
+                "url": tab.url,
                 "method": "GET"
             };
             console.log('Dev downloaded ' + file);
@@ -119,10 +92,10 @@ var DevBrowse = {
  *
  */
 var PTChrome = {
-    downloadUrls: function (urls) {
-        urls.forEach(function(url){
+    downloadUrls: function (tabs) {
+        tabs.forEach(function(tab){
             var file = {
-                "url": url,
+                "url": tab.url,
                 "method": "GET"
             };
 

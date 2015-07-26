@@ -1,18 +1,12 @@
 var
-config,
 prefs,
 pullTabs = {
 
     tabs: '',
 
     init: function(  ) {
-        if(typeof(config) === 'undefined'){
-            this.getConfig(this.setConfig);
-        }
-
-        if(config && (config !== 'pending')){
             if(!this.tabs){
-                Browser.init(config);
+                Browser.init();
                 return;
             }
             if(this.tabs){
@@ -36,11 +30,6 @@ pullTabs = {
                     window.setTimeout( this.init, 50);
                 }
             }
-        }
-        else{
-            window.setTimeout( this.init, 50 );
-            return;
-        }
     },
 
     watchCheckBoxes: function (numFormTabs) {
@@ -79,7 +68,7 @@ pullTabs = {
             this.assembleForm( tabs, prefs );
         }
 
-        this.watchSubmit(tabs);
+        this.watchSubmit();
         return;
     },
 
@@ -138,15 +127,15 @@ pullTabs = {
         });
     },
 
-    getTabStatus: function(tabs){
-            var results = Form.getSelectedTabs(tabs.length);
+    getTabStatus: function(){
+            this.tabs = Form.getSelectedTabs(this.tabs);
 
-            if(results.downloads.length > 0){
-                Browser.downloadUrls(results.downloads);
+            if(this.tabs.downloads.length > 0){
+                Browser.downloadUrls(this.tabs.downloads);
             }
 
-            if(results.pockets.length > 0){
-                Pocket.saveTabsToPocket(results.pockets, config);
+            if(this.tabs.pockets.length > 0){
+                Pocket.saveTabsToPocket(this.tabs.pockets);
             }
 
             return;
@@ -207,57 +196,6 @@ pullTabs = {
 
     setOptions: function ( items ) {
         prefs = items;
-    },
-
-    getConfig: function ( callback ) {
-        if(config){
-            console.log('public config set ' + config);
-            return config;
-        }
-        else{
-            var file = 'config.json';
-
-            config = 'pending';
-            try{
-                var xhr = new XMLHttpRequest();
-                xhr.overrideMimeType("application/json");
-                xhr.open('GET', file, true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        callback(xhr.responseText);
-                    }
-                };
-                xhr.send(null);
-            }
-            catch (e) {
-                console.log("Error acquiring config" + JSON.stringify(e,null,4));
-            }
-            /*
-                //we're in node.js for testing
-                file = 'file:///Users/adam/Dropbox/Sites/pullTabs/config.json';
-                console.log("Using node.js xhr");
-                var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-                try{
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', file, true);
-                    xhr.setRequestHeader("Content-type: application/json");
-
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState == 4 && xhr.status == "200") {
-                            callback.apply(xhr.responseText);
-                        }
-                    };
-                    xhr.send(null);
-                }
-                catch (e) {
-                    console.log(e);
-                }
-            */
-        }
-    },
-
-    setConfig: function ( configContents ) {
-        config = JSON.parse(configContents);
     },
 
     setActions: function (){
@@ -337,9 +275,14 @@ pullTabs = {
         observer.observe(form, setup);
     },
 
-    watchSubmit: function (tabs) {
+    process: function (evt) {
+        evt.preventDefault();
+        pullTabs.getTabStatus();
+    },
+
+    watchSubmit: function () {
         var checked = document.getElementById('list');
-        checked.addEventListener('submit', function(){pullTabs.getTabStatus(tabs);});
+        checked.addEventListener('submit', this.process);
     },
 
     showMainContent: function ( ) {

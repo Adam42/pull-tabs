@@ -5,6 +5,7 @@ var Pocket = {
     urls: 'default',
 
     init: function( credentials ) {
+        config = Config;
         if(!credentials){
 
             this.getStoredCredentials(this.init);
@@ -43,18 +44,16 @@ var Pocket = {
         }
     },
 
-    saveTabToPocket: function ( url, credentials ) {
-      if(!credentials){
-            this.getStoredCredentials(this.saveTabToPocket(url));
-            return;
-        }
+    saveTabToPocket: function ( tab) {
+        var url = tab.url;
+        var id = tab.id;
+        var label = document.getElementById('label-tab-' + tab.labelTabId);
 
-
-            var pocket_data = {
-                "url": url,
-                "consumer_key": config.credentials.consumer_key,
-                "access_token": credentials.access_token
-            };
+        var pocket_data = {
+            "url": url,
+            "consumer_key": config.credentials.consumer_key,
+            "access_token": config.access_token
+        };
 
         try{
             var xhr = new XMLHttpRequest();
@@ -64,14 +63,23 @@ var Pocket = {
             xhr.setRequestHeader('X-Accept', 'application/json');
 
             xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === "200") {
-                    console.log("Response from Pocket: ");
+                if (xhr.readyState === 4 && xhr.status !== 200) {
+                    console.log( xhr.status + " response from Pocket: ");
                     console.log(xhr.responseText);
+                    label.setAttribute('class', label.className + ' failed');
+                    return false;
+                }
+                else if (xhr.readyState === 4 && xhr.status === 200){
+                    label.setAttribute('class', label.className + ' successful');
+                    console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
+                    return true;
                 }
             };
 
             xhr.onerror = function (e) {
-                console.error(xhr.statusText);
+                label.setAttribute('class', label.className + ' failed');
+
+                console.error("saveTabToPocket error: " + xhr.statusText);
                 return;
             };
 
@@ -80,50 +88,26 @@ var Pocket = {
         catch (e) {
             console.log("saveTabToPocket Exception: ");
             console.log(e);
+            label.setAttribute('class', label.className + ' failed');
+            return false;
         }
-
 
 
     },
 
-    getConfig: function ( ) {
-                    chrome.storage.local.get({
-                        access_token: 'default',
-                        user_name: 'default'
-                    }, function ( items ) {
-                            Pocket.saveTabsToPocket( urls, items );
-                    return;
-                    });
-    },
 
-
-    saveTabsToPocket: function ( urls, config ) {
-
-        this.urls = urls;
-        if(typeof(config) === 'undefined'){
-            console.log("Config is not defined");
-            this.urls = urls;
-            Pocket.getConfig();
-        }
-        else{
-           var numURLs = urls.length;
-            var i;
+    saveTabsToPocket: function ( tabs ) {
+        var numURLs = tabs.length;
+        var i;
 
         for ( i=0; i < numURLs; i++ ){
-//            console.log(this);
-            this.saveTabToPocket( urls[i], config );
+            this.saveTabToPocket( tabs[i] );
         }
-    }
     },
 
-    getConsumerKey: function( config ) {
-        if(!config){
-            pullTabs.getConfig( Pocket.getConsumerKey );
-            return;
-        }
-        var credentials = JSON.parse(config).credentials;
+    getConsumerKey: function( ) {
 
-        var key = credentials.consumer_key;
+        var key = Config.credentials.consumer_key;
 
         Pocket.initLogin(key);
     },
@@ -184,9 +168,6 @@ var Pocket = {
     },
 
     setStoredCredentials: function (credentials) {
-        console.log("Credentials" + credentials);
-
-
         //response = access_token=ACCESS_TOKEN&username=USERNAME
         var accessTokenStart = credentials.search('=') + 1;
         var accessTokenEnd = credentials.search('&');
@@ -224,7 +205,6 @@ var Pocket = {
         xhr.onload =  function(e) {
             if (xhr.readyState === 4) {
                 if(xhr.status === 200) {
-                    console.log('dat data ' + xhr.response);
                     Pocket.setStoredCredentials(xhr.response);
                 }
                 else{

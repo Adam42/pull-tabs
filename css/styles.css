@@ -19,8 +19,13 @@ label.list-group-item p { margin-right: 20px; margin-left: 50px; }
 label.preferences {display: inline; padding: 10px;}
 label.preferences input { margin: 0 10px }
 
+label.list-group-item.successful { background-color: green;}
+label.list-group-item.failed { background-color: red;}
+
 .list-group-item{ width: 750px; margin: 10px 0;}
 
+.panel-heading { padding: 0;}
+.panel-body { padding: 0;}
 .panel-body label {float: left;}
 
 
