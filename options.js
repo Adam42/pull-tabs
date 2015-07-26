@@ -14,8 +14,13 @@ var Options = (function () {
         }, this);
     }
 
+    function bindUIActions() {
+        document.getElementById('settings').addEventListener('submit', Options.saveOptions);
+        document.getElementById('pocket').addEventListener('click', Pocket.init);
+    }
+
     opt.init = function(){
-        document.getElementById('settings').addEventListener('submit', Options.saveOptions );
+        bindUIActions();
         setDefaultMimeTypes();
         this.restoreOptions();
     };
