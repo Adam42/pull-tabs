@@ -131,7 +131,8 @@ var Form = {
         });
     },
 
-    getSelectedTabs: function (inputs) {
+    getSelectedTabs: function (tabs) {
+        var inputs = tabs.length;
         var downloadURLs = [];
         var pocketURLs = [];
         var ignoreURLs = [];
@@ -145,23 +146,26 @@ var Form = {
                 var radios = document.getElementsByName('tab-pref-' + i);
 
                 if(radios[0].checked){
-                    downloadURLs.push(input.value);
+                    tabs[i].labelTabId = i;
+                    downloadURLs.push(tabs[i]);
                 }
 
                 if(radios[1].checked){
-                    pocketURLs.push(input.value);
+                    tabs[i].labelTabId = i;
+                    pocketURLs.push(tabs[i]);
                 }
             }
             else{
-                ignoreURLs.push(input.value);
+                tabs[i].labelTabId = i;
+                ignoreURLs.push(tabs[i]);
             }
         }
 
-        results.downloads = downloadURLs;
-        results.pockets = pocketURLs;
-        results.ignores = ignoreURLs;
+        tabs.downloads = downloadURLs;
+        tabs.pockets = pocketURLs;
+        tabs.ignores = ignoreURLs;
 
-        return results;
+        return tabs;
     },
 
     watchMutateCheck: function () {
