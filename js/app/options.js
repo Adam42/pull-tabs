@@ -1,21 +1,27 @@
-var Options = (function () {
+var pullTabsApp = pullTabsApp || {};
+pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     var mimeSettings = {},
     opt = {};
 
+    //list of mimetypes we'll act on
     opt.mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
     opt.numOfmimeTypes = opt.mimeTypes.length;
 
+    //list of available actions to apply to a tab
     opt.tabActions = ['ignore', 'download', 'pocket'];
 
+    //create a default preferences object to pass to restoreOptions
+    //in case there is no existing preferences stored or
+    //if stored preferences can't be retrieved will use this default
     function setDefaultMimeTypes() {
         opt.mimeTypes.forEach(function(element){
-            mimeSettings[element] = opt.tabActions[0];
-        }, this);
+            mimeSettings[element] = this.tabActions[0];
+        }, opt);
     }
 
     function bindUIActions() {
-        document.getElementById('settings').addEventListener('submit', Options.saveOptions);
+        document.getElementById('settings').addEventListener('submit', opt.saveOptions);
         document.getElementById('pocket').addEventListener('click', Pocket.init);
     }
 
@@ -34,6 +40,13 @@ var Options = (function () {
             opt.setSettings( items );
         });
     };
+
+    /*
+     *
+     * Loop through available mimeTypes and apply user's
+     * stored preferences to each tab.
+     *
+    */
 
     opt.setSettings = function( items ) {
     for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
@@ -65,6 +78,14 @@ var Options = (function () {
         }
     }
 };
+
+    /*
+     *
+     * Save user's mimetype prefences to local storage
+     *
+     * @to-do Factor out the chrome specific part to Browser
+     *
+     */
 
     opt.saveOptions = function (evt) {
         evt.preventDefault();
@@ -109,6 +130,6 @@ var Options = (function () {
 
     return opt;
 
-}());
+}(pullTabsApp));
 
-Options.init();
+pullTabsApp.Options.init();

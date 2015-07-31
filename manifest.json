@@ -17,7 +17,8 @@
     ],
 
     "web_accessible_resources": [
-        "chrome-extension://nkahgcmmjalificcpdjpbbpbahlgfjcp/pocket/*"
+        "pocket.html"
+
     ],
 
     "browser_action": {
