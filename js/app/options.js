@@ -9,10 +9,14 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     opt.mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
     opt.numOfmimeTypes = opt.mimeTypes.length;
 
-    //list of available actions to apply to a tab
-    opt.tabActions = ['ignore', 'download', 'pocket'];
+    opt.mimeSettings = [];
 
-    opt.TabOptions = ['enabled', 'disabled'];
+    //list of available actions to apply to a tab
+    opt.tabActions = ['ignore', 'download', 'pocket', 'bookmark', 'close'];
+
+    opt.tabOptions = ['enabled', 'disabled'];
+
+    opt.numOftabActions = opt.tabActions.length;
 
     //create a default preferences object to pass to restoreOptions
     //in case there is no existing preferences stored or
@@ -29,6 +33,52 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }, opt);
     }
 
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+
+    function createForm() {
+        var optionsForm = document.getElementById('file-type-destinations');
+
+        for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
+            var panel = document.createElement('div');
+                panel.setAttribute('class', 'panel panel-default row');
+
+            var headerDiv = document.createElement('div');
+                headerDiv.setAttribute('class', 'panel-heading col-md-2');
+
+            var header = document.createElement('h4');
+                header.textContent = capitalize(opt.mimeTypes[i]);
+
+                headerDiv.appendChild(header);
+                panel.appendChild(headerDiv);
+
+            var formDiv = document.createElement('div');
+                formDiv.setAttribute('class', 'panel-body col-md-10');
+
+                for(var x=0; x < opt.numOftabActions; x++ ) {
+                    var label = document.createElement('label');
+
+                    var input = document.createElement('input');
+                        input.type = 'radio';
+                        input.id = opt.tabActions[x];
+                        input.name = opt.mimeTypes[i];
+                        input.value = opt.tabActions[x];
+
+                    var span = document.createElement('span');
+                        span.textContent = capitalize(opt.tabActions[x]);
+                        label.appendChild(input);
+                        label.appendChild(span);
+                        formDiv.appendChild(label);
+                }
+                panel.appendChild(formDiv);
+
+                optionsForm.appendChild(panel);
+        }
+
+    }
+
     function bindUIActions() {
         document.getElementById('settings').addEventListener('submit', opt.saveOptions);
         document.getElementById('pocket-status').addEventListener('click', Pocket.checkLink);
@@ -37,6 +87,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     opt.init = function(){
         bindUIActions();
         setDefaultMimeTypes();
+                createForm();
         this.restoreOptions();
     };
 
@@ -58,35 +109,22 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     */
 
     opt.setSettings = function( items ) {
-    for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
-        var settings = document.getElementsByName(opt.mimeTypes[i]);
+        for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
+           var settings = document.getElementsByName(opt.mimeTypes[i]);
 
-        var download = settings[0];
-        var pocket = settings[1];
-        var ignore = settings[2];
+            var setting = items[opt.mimeTypes[i]];
 
-        download.checked = false;
-        pocket.checked = false;
-        ignore.checked = false;
-
-        download.parentNode.classList.remove('active');
-        pocket.parentNode.classList.remove('active');
-        ignore.parentNode.classList.remove('active');
-
-        if( items[opt.mimeTypes[i]] === 'download') {
-            download.checked = true;
-            download.parentNode.classList.add('active');
+           for (var x = 0; x < settings.length; x++){
+                if(settings[x].id === setting){
+                    opt.mimeSettings[opt.mimeTypes[i]] = settings[x].id;
+                    settings[x].checked = true;
+                }
+                else{
+                    settings[x].checked = false;
+               }
+           }
         }
-        else if ( items[opt.mimeTypes[i]] === 'pocket' ) {
-            settings[1].checked = true;
-            pocket.parentNode.classList.add('active');
-        }
-        else if ( items[opt.mimeTypes[i]] === 'ignore' ) {
-            settings[2].checked = true;
-            ignore.parentNode.classList.add('active');
-        }
-    }
-};
+    };
 
     /*
      *
@@ -103,18 +141,10 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
             var settings = document.getElementsByName(opt.mimeTypes[i]);
 
-            var download = settings[0].checked;
-            var pocket = settings[1].checked;
-            var ignore = settings[2].checked;
-
-            if(download){
-                mimeSettings[opt.mimeTypes[i]] = 'download';
-            }
-            else if(pocket){
-                mimeSettings[opt.mimeTypes[i]] = 'pocket';
-            }
-            else if(ignore){
-                mimeSettings[opt.mimeTypes[i]] = 'ignore';
+            for ( var x = 0; x < opt.numOftabActions; x++){
+                if(settings[x].checked){
+                    mimeSettings[opt.mimeTypes[i]] = opt.tabActions[x];
+                }
             }
         }
 
