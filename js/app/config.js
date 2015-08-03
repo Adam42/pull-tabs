@@ -1,13 +1,20 @@
-var Config = {
-    "credentials" : {
-        "consumer_key": ""
-    },
+var pullTabsApp = pullTabsApp || {};
+pullTabsApp.Config = pullTabsApp.Config || (function () {
 
-    "configuration" : {
-        "mode": "PRODUCTION"
-    },
+    var setup = {
+        "credentials" : {
+            "consumer_key": ""
+        },
 
-    "app": {
-        "name": "Pull Tabs"
-    }
-};
+        "configuration" : {
+            "mode": "PRODUCTION"
+        },
+
+        "app": {
+            "name": "Pull Tabs"
+        }
+    };
+
+    return setup;
+
+}(pullTabsApp));
