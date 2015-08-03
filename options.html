@@ -15,13 +15,27 @@
             <div class="container">
                 <div id="main-nav" class="navbar-header">
                     <a href="/" class="navbar-brand">Pull Tabs</a>
-                    <a id="pocket" href="#pocket">Pocket</a>
-
                     <a data-toggle="modal" data-target="#main" href="about.html" class="">About</a>
                 </div>
             </div>
         </div>
         <div id="content">
+            <div class="container" role="button">
+                <h3 class="page-header">APIs</h3>
+
+                 <div id="api-options">
+                     <div class="panel-heading col-md-2">
+                        <h4>Pocket</h4>
+                    </div>
+
+                    <div class="panel-body col-md-6">
+                        <label class="active"></label>
+                        <a id="pocket-status" href="#pocket-login">You are not authorized, please sign in.</a>
+
+                    </div>
+
+            </div>
+
             <div class="container" role="main">
                 <h3 class="page-header">Options</h3>
                  <form id="settings" action="" method="post">
@@ -127,6 +141,9 @@
 
             </div>
         </div>
+        <script src="/js/app/config.js"></script>
+        <script src="/js/app/browser.js"></script>
+        <script src="/js/app/pocket.js"></script>
         <script src="/js/app/options.js"></script>
         <script src="/js/vendors/jquery.js"></script>
         <script src="/js/vendors/bootstrap.js"></script>

@@ -1,35 +1,42 @@
 var
-prefs,
 pullTabs = {
 
     tabs: '',
 
+    prefs: '',
+
     init: function(  ) {
             if(!this.tabs){
-                Browser.init();
+                var callback = pullTabs.setTabs();
+                Browser.getTabs(callback);
                 return;
             }
-            if(this.tabs){
-                this.setNumTabs(this.tabs);
-                this.getOptions(this.setOptions);
-                if(prefs){
-                    this.createForm(this.tabs);
-                    var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
-                    if(numFormTabs.length === this.tabs.length){
-                        this.watchCheckBoxes(numFormTabs);
-                        this.watchMutateCheck();
-                        this.setActions();
-                        this.watchLinks();
-                        Pocket.init();
-                    }
-                    else{
-                        window.setTimeout( this.init, 50);
-                    }
+
+            this.continueLoad();
+    },
+
+    continueLoad: function( ) {
+        if(this.tabs){
+            this.setNumTabs(this.tabs);
+            this.getOptions(this.setOptions);
+            if(pullTabs.prefs){
+                this.createForm(this.tabs);
+                var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+                if(numFormTabs.length === this.tabs.length){
+                    this.watchCheckBoxes(numFormTabs);
+                    this.watchMutateCheck();
+                    this.setActions();
+                    this.watchLinks();
+                    Pocket.init();
                 }
                 else{
                     window.setTimeout( this.init, 50);
                 }
             }
+            else{
+                window.setTimeout( this.init, 50);
+            }
+        }
     },
 
     watchCheckBoxes: function (numFormTabs) {
@@ -39,9 +46,6 @@ pullTabs = {
         }
     },
 
-    getTabs: function () {
-        return Browser.getTabs();
-    },
 
     getUrls: function (tabs) {
         var urls = [];
@@ -55,7 +59,7 @@ pullTabs = {
 
     setTabs: function(tabs){
         this.tabs = tabs;
-        this.init();
+        this.continueLoad();
     },
 
     setNumTabs: function(tabs){
@@ -64,8 +68,8 @@ pullTabs = {
     },
 
     createForm: function (tabs) {
-        if(prefs){
-            this.assembleForm( tabs, prefs );
+        if(pullTabs.prefs){
+            this.assembleForm( tabs, pullTabs.prefs );
         }
 
         this.watchSubmit();
@@ -195,7 +199,7 @@ pullTabs = {
     },
 
     setOptions: function ( items ) {
-        prefs = items;
+        pullTabs.prefs = items;
     },
 
     setActions: function (){
@@ -347,12 +351,6 @@ pullTabs = {
     },
 
     watchLinks: function () {
-        var pocketLink = document.getElementById('pocket');
-        pocketLink.addEventListener('click', function(){
-            Pocket.init();
-            return;
-            });
-
         var aboutLink = document.getElementById('about');
         aboutLink.addEventListener('click', function(){
            pullTabs.swapMainContent();

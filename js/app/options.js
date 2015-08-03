@@ -2,7 +2,8 @@ var pullTabsApp = pullTabsApp || {};
 pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     var mimeSettings = {},
-    opt = {};
+        tabSettings = {},
+        opt = {};
 
     //list of mimetypes we'll act on
     opt.mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
@@ -10,6 +11,8 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     //list of available actions to apply to a tab
     opt.tabActions = ['ignore', 'download', 'pocket'];
+
+    opt.TabOptions = ['enabled', 'disabled'];
 
     //create a default preferences object to pass to restoreOptions
     //in case there is no existing preferences stored or
@@ -20,9 +23,15 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }, opt);
     }
 
+    function setDefaultTabActions() {
+        opt.tabActions.forEach(function(element){
+            tabSettings[element] = this.tabOptions[0];
+        }, opt);
+    }
+
     function bindUIActions() {
         document.getElementById('settings').addEventListener('submit', opt.saveOptions);
-        document.getElementById('pocket').addEventListener('click', Pocket.init);
+        document.getElementById('pocket-status').addEventListener('click', Pocket.checkLink);
     }
 
     opt.init = function(){

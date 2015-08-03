@@ -1,47 +1,65 @@
 var Pocket = {
 
-    username: 'default',
-    access_token:  'default',
-    urls: 'default',
+    pocketKey: {
+            access_token: 'access_token',
+            user_name: 'user_name',
+    },
 
-    init: function( credentials ) {
-        config = Config;
-        if(!credentials){
-
-            this.getStoredCredentials(this.init);
+    init: function(  ) {
+        if(localStorage[this.pocketKey.user_name] !== 'user_name'){
+            this.isAuthorized();
             return;
         }
 
-        if( credentials ){
-            config.username = credentials.user_name;
-            config.access_token = credentials.access_token;
-        }
+        this.isNotAuthorized();
+        return;
     },
 
-    initLogin: function( key ) {
+    isAuthorized: function (  ) {
+        var status = document.getElementById('pocket-status');
+            status.href = '#pocket-logout';
+            status.textContent = 'You are signed in as ' + localStorage[this.pocketKey.user_name] + ' Click to log out.';
+    },
+
+    isNotAuthorized: function() {
+
+       var status = document.getElementById('pocket-status');
+            status.href = '#pocket-login';
+            status.textContent = 'You are not authorized, please sign in.';
+    },
+
+    logOut: function ( ) {
+        localStorage[this.pocketKey.user_name] = 'user_name';
+        localStorage[this.pocketKey.access_token] = 'access_token';
+
+        chrome.storage.local.set({
+            access_token: 'access_token',
+            user_name: 'user_name',
+        }, function ( items ) {
+                return;
+        });
+
+        this.isNotAuthorized();
+    },
+
+    checkLink: function (event) {
+        var hash = event.target.href.indexOf("#") + 1;
+        var action = event.target.href.substring(hash);
+
+        if(action === 'pocket-logout'){
+            Pocket.logOut();
+            return;
+        }
+
+        Pocket.initLogin();
+
+    },
+
+    initLogin: function( ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
-
-        if(key){
-            pocket.key = key;
-        }
-        else{
-            Pocket.getConsumerKey();
-        }
-
-        if(pocket.key){
-            Pocket.getRequestToken(pocket);
-        }
-    },
-
-    getPocketItems: function ( items ) {
-        if( items ){
-            console.log( 'Pocket authorized' );
-            return;
-        }
-        else{
-            Pocket.initLogin();
-        }
+        pocket.key = pullTabsApp.Config.credentials.consumer_key;
+        Pocket.getRequestToken(pocket);
     },
 
     saveTabToPocket: function ( tab) {
@@ -51,8 +69,8 @@ var Pocket = {
 
         var pocket_data = {
             "url": url,
-            "consumer_key": config.credentials.consumer_key,
-            "access_token": config.access_token
+            "consumer_key": pullTabsApp.Config.credentials.consumer_key,
+            "access_token": localStorage[this.pocketKey.access_token]
         };
 
         try{
@@ -105,15 +123,8 @@ var Pocket = {
         }
     },
 
-    getConsumerKey: function( ) {
-
-        var key = Config.credentials.consumer_key;
-
-        Pocket.initLogin(key);
-    },
-
     getRequestToken: function ( pocket ) {
-        var redirectURL = chrome.extension.getURL('pocket');
+        var redirectURL = chrome.extension.getURL('pocket.html');
 
         var data = new FormData();
             data.append('consumer_key', pocket.key);
@@ -131,7 +142,6 @@ var Pocket = {
                     pocket.auth = 'https://getpocket.com/auth/authorize?request_token=' +
                             pocket.token +
                             '&redirect_uri=';
-
 
                     Browser.login(pocket);
 
@@ -152,15 +162,14 @@ var Pocket = {
     getStoredCredentials: function (callback) {
         if(chrome.storage.local){
         chrome.storage.local.get({
-            access_token: 'default',
-            user_name: 'default',
-            key: 'default'
+            access_token: 'access_token',
+            user_name: 'user_name',
         }, function ( items ) {
-                if(items.user_name !== 'default'){
-                    callback( items );
+                if(items.user_name !== 'user_name'){
+                    Pocket.isAuthorized( items );
                 }
                 else{
-                    Pocket.initLogin( );
+                    Pocket.isNotAuthorized( );
                 }
                 return;
         });
@@ -180,7 +189,12 @@ var Pocket = {
             'access_token': accessToken,
             'user_name': userName
         };
+        localStorage[this.pocketKey.access_token] = accessToken;
 
+        localStorage[this.pocketKey.user_name] =  userName;
+
+        this.isAuthorized();
+/*
         //Browser.save('Pocket', pocket );
          chrome.storage.local.set( pocket , function () {
             var status = document.getElementById('status');
@@ -189,6 +203,7 @@ var Pocket = {
                status.textContent = '';
             }, 750);
         });
+*/
     },
 
     getAccessToken: function (pocket) {
@@ -220,3 +235,5 @@ var Pocket = {
         xhr.send(data);
     },
 };
+
+Pocket.init();
