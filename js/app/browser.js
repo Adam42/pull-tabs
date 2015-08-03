@@ -87,14 +87,20 @@ var DevBrowse = {
 var PTChrome = {
     downloadUrls: function (tabs) {
         tabs.forEach(function(tab){
+            var label = document.getElementById('label-tab-' + tab.labelTabId);
+
             var file = {
                 "url": tab.url,
                 "method": "GET"
             };
 
             chrome.downloads.download(file, function(e){
-                console.log('Downloading: ' + JSON.stringify(file, null, 4));
-                console.log('Message: ' + JSON.stringify(e, null, 4));
+                if(e === undefined){
+                    label.setAttribute('class', label.className + ' failed');
+                    return;
+                }
+                label.setAttribute('class', label.className + ' successful');
+                chrome.tabs.remove(tab.id);
             });
         });
     },
