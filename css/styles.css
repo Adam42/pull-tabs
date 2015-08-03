@@ -41,6 +41,7 @@ label.preferences input { margin: 0 10px }
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
 .container[role="main"] form {min-height: 400px; }
+#setup {margin-top: 100px; min-height: 400px; }
 .container[role="complementary"] a {padding-top: 20px;}
 
 .bounce{margin-left: -9999px; height: 0;}

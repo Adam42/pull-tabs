@@ -6,13 +6,40 @@ pullTabs = {
     prefs: '',
 
     init: function(  ) {
-            if(!this.tabs){
-                var callback = pullTabs.setTabs();
-                Browser.getTabs(callback);
-                return;
-            }
 
-            this.continueLoad();
+        //Force user to go to options page on initial load
+        if(localStorage.initialSetup !== 'no'){
+            localStorage.initialSetup = 'yes';
+            this.doInitialSetup();
+            return;
+        }
+
+        if(!this.tabs){
+            var callback = pullTabs.setTabs();
+            Browser.getTabs(callback);
+            return;
+        }
+
+        this.continueLoad();
+    },
+
+    doInitialSetup: function () {
+        if(localStorage.initialSetup === 'yes'){
+            var mainDiv = document.getElementById('main');
+                mainDiv.setAttribute('class', 'hidden');
+
+            var optionsLink = document.createElement('a');
+                optionsLink.href = chrome.extension.getURL('options.html');
+                optionsLink.textContent = " Setup PullTabs with your preferences.";
+
+            var setupMessage = document.getElementById('setup-message');
+                setupMessage.classList.remove('hidden');
+                setupMessage.appendChild(optionsLink);
+
+                setupMessage.addEventListener('click', function () {
+                    localStorage.initialSetup = 'no';
+                });
+        }
     },
 
     continueLoad: function( ) {
@@ -27,7 +54,6 @@ pullTabs = {
                     this.watchMutateCheck();
                     this.setActions();
                     this.watchLinks();
-                    Pocket.init();
                 }
                 else{
                     window.setTimeout( this.init, 50);
