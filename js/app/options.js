@@ -1,15 +1,14 @@
 var pullTabsApp = pullTabsApp || {};
 pullTabsApp.Options = pullTabsApp.Options || (function () {
 
-    var mimeSettings = {},
-        tabSettings = {},
+    var tabSettings = {},
         opt = {};
 
     //list of mimetypes we'll act on
     opt.mimeTypes = ['application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown'];
     opt.numOfmimeTypes = opt.mimeTypes.length;
 
-    opt.mimeSettings = [];
+    opt.mimeSettings = {};
 
     //list of available actions to apply to a tab
     opt.tabActions = ['ignore', 'download', 'pocket', 'bookmark', 'close'];
@@ -23,9 +22,13 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     //if stored preferences can't be retrieved will use this default
     function setDefaultMimeTypes() {
         opt.mimeTypes.forEach(function(element){
-            mimeSettings[element] = this.tabActions[0];
+            opt.mimeSettings[element] = this.tabActions[0];
         }, opt);
     }
+
+    opt.getMimeSettings = function(){
+        return opt.mimeSettings;
+    };
 
     function setDefaultTabActions() {
         opt.tabActions.forEach(function(element){
@@ -88,16 +91,16 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         bindUIActions();
         setDefaultMimeTypes();
                 createForm();
-        this.restoreOptions();
+        this.restoreOptions(opt.setSettings);
     };
 
     opt.getMimeTypes = function(){
-        return mimeSettings;
+        return opt.mimeSettings;
     };
 
-    opt.restoreOptions = function () {
-        chrome.storage.sync.get(mimeSettings, function ( items ) {
-            opt.setSettings( items );
+    opt.restoreOptions = function (callback) {
+        chrome.storage.sync.get(opt.mimeSettings, function ( items ) {
+            callback( items );
         });
     };
 
@@ -136,20 +139,19 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     opt.saveOptions = function (evt) {
         evt.preventDefault();
-        var mimeSettings = opt.getMimeTypes();
 
         for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
             var settings = document.getElementsByName(opt.mimeTypes[i]);
 
             for ( var x = 0; x < opt.numOftabActions; x++){
                 if(settings[x].checked){
-                    mimeSettings[opt.mimeTypes[i]] = opt.tabActions[x];
+                    opt.mimeSettings[opt.mimeTypes[i]] = opt.tabActions[x];
                 }
             }
         }
 
         try{
-            chrome.storage.sync.set(mimeSettings , function () {
+            chrome.storage.sync.set(opt.mimeSettings , function () {
                 var status = document.getElementById('status');
                 status.textContent = 'Options saved.';
                 setTimeout( function () {
