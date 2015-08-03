@@ -17,8 +17,10 @@ var Pocket = {
 
     isAuthorized: function (  ) {
         var status = document.getElementById('pocket-status');
+        if(status !== null){
             status.href = '#pocket-logout';
             status.textContent = 'You are signed in as ' + localStorage[this.pocketKey.user_name] + ' Click to log out.';
+        }
     },
 
     isNotAuthorized: function() {
@@ -90,6 +92,7 @@ var Pocket = {
                 else if (xhr.readyState === 4 && xhr.status === 200){
                     label.setAttribute('class', label.className + ' successful');
                     console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
+                    chrome.tabs.remove(tab.id);
                     return true;
                 }
             };
