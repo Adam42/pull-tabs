@@ -14,4 +14,3 @@ tabs and offer options to save them to disk.
 ###Planned features
 - [ ] Save tabs by file type [ e.g. .html, .pdf, .png etc.]
 - [ ] Mozilla Firefox extension
-- [ ] Make Pocket requests server side

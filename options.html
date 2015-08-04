@@ -15,110 +15,35 @@
             <div class="container">
                 <div id="main-nav" class="navbar-header">
                     <a href="/" class="navbar-brand">Pull Tabs</a>
-                    <a id="pocket" href="#pocket">Pocket</a>
-
                     <a data-toggle="modal" data-target="#main" href="about.html" class="">About</a>
                 </div>
             </div>
         </div>
         <div id="content">
+            <div class="container" role="button">
+                <h3 class="page-header">APIs</h3>
+
+                 <div id="api-options">
+                     <div class="panel-heading col-md-2">
+                        <h4>Pocket</h4>
+                    </div>
+
+                    <div class="panel-body col-md-6">
+                        <label class="active"></label>
+                        <a id="pocket-status" href="#pocket-login">You are not authorized, please sign in.</a>
+
+                    </div>
+
+            </div>
+
             <div class="container" role="main">
                 <h3 class="page-header">Options</h3>
                  <form id="settings" action="" method="post">
 
                     <div id="file-type-destinations">
 
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Applications</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label class="active"><input type="radio" name="application" value="download" checked="checked" />Download</label>
-                                <label><input type="radio" name="application" value="pocket" />Pocket</label>
-                                <label><input type="radio" name="application" value="ignore" />Ignore</label>
-                            </div>
-                        </div>
 
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Images</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label class="active"><input type="radio" name="image" value="download" checked="checked" />Download</label>
-                                <label><input type="radio" name="image" value="pocket" />Pocket</label>
-                                <label><input type="radio" name="image" value="ignore" />Ignore</label>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Messages</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label><input type="radio" name="message" value="download" />Download</label>
-                                <label><input type="radio" name="message" value="pocket" />Pocket</label>
-                                <label class="active"><input type="radio" name="message" value="ignore" checked="checked" />Ignore</label>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Models</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label><input type="radio" name="model" value="download" />Download</label>
-                                <label><input type="radio" name="model" value="pocket" />Pocket</label>
-                                <label class="active"><input type="radio" name="model" value="ignore" checked="checked" />Ignore</label>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Multipart</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label><input type="radio" name="multipart" value="download" />Download</label>
-                                <label><input type="radio" name="multipart" value="pocket" />Pocket</label>
-                                <label class="active"><input type="radio" name="multipart" value="ignore" checked="checked" />Ignore</label>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Text</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label class="active"><input type="radio" name="text" value="download" checked="checked" />Download</label>
-                                <label><input type="radio" name="text" value="pocket" />Pocket</label>
-                                <label><input type="radio" name="text" value="ignore" />Ignore</label>
-                            </div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Video</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label class="active"><input type="radio" name="video" value="download" checked="checked" />Download</label>
-                                <label><input type="radio" name="video" value="pocket" />Pocket</label>
-                                <label><input type="radio" name="video" value="ignore" />Ignore</label>
-                            </div>
-                            <div style="clear:both"></div>
-                        </div>
-
-                        <div class="panel panel-default row">
-                            <div class="panel-heading col-md-2">
-                                <h4>Unknown</h4>
-                            </div>
-                            <div class="panel-body col-md-6">
-                                <label class="active"><input type="radio" name="unknown" value="download" checked="checked" />Download</label>
-                                <label><input type="radio" name="unknown" value="pocket" />Pocket</label>
-                                <label><input type="radio" name="unknown" value="ignore" />Ignore</label>
-                            </div>
-                            <div style="clear:both"></div>
-                        </div>
-
-                     </div>
+                    </div>
 
                     <div id="status"></div>
                     <button>Submit</button>
@@ -127,6 +52,9 @@
 
             </div>
         </div>
+        <script src="/js/app/config.js"></script>
+        <script src="/js/app/browser.js"></script>
+        <script src="/js/app/pocket.js"></script>
         <script src="/js/app/options.js"></script>
         <script src="/js/vendors/jquery.js"></script>
         <script src="/js/vendors/bootstrap.js"></script>

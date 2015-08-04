@@ -13,9 +13,8 @@ var Browser = {
     browser: function(){},
 
     init: function () {
-        this.ENV = Config.configuration.mode;
+        this.ENV = pullTabsApp.Config.configuration.mode;
         this.setBrowser();
-        this.getTabs();
         return;
     },
 
@@ -31,19 +30,13 @@ var Browser = {
         }
     },
 
-    getTabs: function (tabs) {
-
-        if(!tabs){
-            var result = this.browser.getTabs();
-            if(result !== 'undefined'){
-                return result;
-            }
-            else{
-                return;
-            }
+    getTabs: function (callback) {
+        var result = this.browser.getTabs(callback);
+        if(result !== 'undefined'){
+            return result;
         }
-        if(tabs){
-            return tabs;
+        else{
+            return;
         }
     },
 
@@ -94,14 +87,20 @@ var DevBrowse = {
 var PTChrome = {
     downloadUrls: function (tabs) {
         tabs.forEach(function(tab){
+            var label = document.getElementById('label-tab-' + tab.labelTabId);
+
             var file = {
                 "url": tab.url,
                 "method": "GET"
             };
 
             chrome.downloads.download(file, function(e){
-                console.log('Downloading: ' + JSON.stringify(file, null, 4));
-                console.log('Message: ' + JSON.stringify(e, null, 4));
+                if(e === undefined){
+                    label.setAttribute('class', label.className + ' failed');
+                    return;
+                }
+                label.setAttribute('class', label.className + ' successful');
+                chrome.tabs.remove(tab.id);
             });
         });
     },
@@ -109,12 +108,7 @@ var PTChrome = {
     getTabs: function ( callback ) {
         var info = {currentWindow: true};
         chrome.tabs.query(info,function(e){
-                if(typeof callback !== 'undefined'){
-                    callback(e);
-                }
-                else{
-                   pullTabs.setTabs(e);
-                }
+            pullTabs.setTabs(e);
         });
     },
 
@@ -160,3 +154,4 @@ if(typeof(Browser.ENV !== 'undefined') && Browser.ENV === 'DEVELOPMENT'){
 
     console.log("DEFAULT TABS: " + Browser.getTabs());
 }
+Browser.init();
