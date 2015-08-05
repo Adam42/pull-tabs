@@ -110,20 +110,22 @@ pullTabs = {
         var fullMimeType = true;
         tabs.forEach(function(tab) {
 
-            var type,pref;
+            var type,pref, fullType;
 
             if(fullMimeType){
                 pullTabs.getContentType(tab.url, function(response){
                     this.mType = response;
                 });
             }
-            if(this.mType){
-                type = this.mType.split("/").shift().toLowerCase();
 
+            if(this.mType){
+                fullType = this.mType.split(";").shift();
+                type = this.mType.split("/").shift().toLowerCase();
                 pref = prefs[type] ? prefs[type] : 'ignore';
 
             }
             else{
+                fullType = 'unknown';
                 type = 'unknown';
                 pref = 'ignore';
             }
@@ -136,23 +138,16 @@ pullTabs = {
                 active = 'active';
             }
 
-            var input = Form.createCheckbox ( tab, type, checked );
+            var input = Form.createCheckbox ( tab, fullType, checked );
 
-
-            if(pref === 'download'){
-
-            }
             var radioDown = Form.createRadioInput ( tab, 'download', pref );
             var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
-            var radioIgnore = Form.createRadioInput ( tab, 'ignore', pref );
 
-
-            var label = Form.createLabel ( tab, type, active );
+            var label = Form.createLabel ( tab, fullType, active );
 
             label.appendChild(input);
             label.appendChild(radioDown);
             label.appendChild(radioPocket);
-            label.appendChild(radioIgnore);
 
             resources.appendChild(label);
 
