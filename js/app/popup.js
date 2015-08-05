@@ -32,8 +32,10 @@ pullTabs = {
                 optionsLink.href = chrome.extension.getURL('options.html');
                 optionsLink.textContent = " Setup PullTabs with your preferences.";
 
+            var setupDiv = document.getElementById('setup');
+                setupDiv.classList.remove('hidden');
+
             var setupMessage = document.getElementById('setup-message');
-                setupMessage.classList.remove('hidden');
                 setupMessage.appendChild(optionsLink);
 
                 setupMessage.addEventListener('click', function () {
@@ -234,6 +236,9 @@ pullTabs = {
             uncheck: function() {pullTabs.setAllInactive();},
         };
 
+        //Here be the only piece of jQuery code in this extension's
+        //core files. Maybe one day I'll rewrite this in pure JS
+        //but this gets the job done easier now
         $('body').on('click', '[data-action]', function() {
             var action = $(this).data('action');
             if (action in actions) {
