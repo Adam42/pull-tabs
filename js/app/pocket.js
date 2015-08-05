@@ -6,7 +6,7 @@ var Pocket = {
     },
 
     init: function(  ) {
-        if(localStorage[this.pocketKey.user_name] !== 'user_name'){
+        if(localStorage[this.pocketKey.user_name] !== 'user_name' && typeof(localStorage[this.pocketKey.user_name]) !== 'undefined'){
             this.isAuthorized();
             return;
         }
@@ -92,7 +92,17 @@ var Pocket = {
                 else if (xhr.readyState === 4 && xhr.status === 200){
                     label.setAttribute('class', label.className + ' successful');
                     console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
-                    chrome.tabs.remove(tab.id);
+
+                    //if we remove the tab that the popup was invoked on the popup
+                    //goes away, ideally we should move to event scripts
+                    //so the popup isn't dependent on a tab being open
+                    chrome.tabs.query({ active: true, lastFocusedWindow: true }, function (tabs) {
+                        if(tab.id !== tabs[0].id){
+                            chrome.tabs.remove(tab.id);
+                        }
+                    });
+
+
                     return true;
                 }
             };
