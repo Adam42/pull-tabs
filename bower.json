@@ -17,8 +17,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.2.0",
-    "checkboxes.js": "~1.0.5",
-    "qunit": "~1.15.0"
+    "bootstrap": "3.2.0",
+    "bootswatch-dist": "3.2.0-yeti",
+    "checkboxes.js": "1.0.5",
+    "qunit": "1.15.0"
   }
 }
