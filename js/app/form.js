@@ -3,7 +3,6 @@ var Form = {
     options: '',
 
     init: function (values) {
-        console.log('init Form');
         this.options = values;
     },
 
@@ -52,13 +51,6 @@ var Form = {
     },
 
     createLabel: function ( tab, type, active){
-        if(active === 'active'){
-//            active = active +  ' alert-success';
-        }
-        else{
-//            active = active + ' alert-danger';
-        }
-
         var label = document.createElement('label');
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
