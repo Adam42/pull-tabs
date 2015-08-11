@@ -19,7 +19,7 @@ var Pocket = {
         var status = document.getElementById('pocket-status');
         if(status !== null){
             status.href = '#pocket-logout';
-            status.textContent = 'You are signed in as ' + localStorage[this.pocketKey.user_name] + ' Click to log out.';
+            status.textContent = 'You are signed in as ' + decodeURIComponent(localStorage[this.pocketKey.user_name])+ ' Click to log out.';
         }
     },
 
