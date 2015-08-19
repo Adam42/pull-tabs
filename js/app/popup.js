@@ -133,7 +133,7 @@ pullTabs = {
             var checked = '';
             var active = '';
 
-            if( (pref === 'download') || (pref === 'pocket') ){
+            if( (pref !== 'ignore') ){
                 checked = 'checked';
                 active = 'active';
             }
@@ -142,12 +142,16 @@ pullTabs = {
 
             var radioDown = Form.createRadioInput ( tab, 'download', pref );
             var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
+            var radioBookmark = Form.createRadioInput( tab, 'bookmark', pref);
+            var radioClose = Form.createRadioInput( tab, 'close', pref);
 
             var label = Form.createLabel ( tab, fullType, active );
 
             label.appendChild(input);
             label.appendChild(radioDown);
             label.appendChild(radioPocket);
+            label.appendChild(radioBookmark);
+            label.appendChild(radioClose);
 
             resources.appendChild(label);
 
@@ -163,6 +167,14 @@ pullTabs = {
 
             if(this.tabs.pockets.length > 0){
                 Pocket.saveTabsToPocket(this.tabs.pockets);
+            }
+
+            if(this.tabs.closes.length > 0){
+                Browser.closeTabs(this.tabs.closes);
+            }
+
+            if(this.tabs.bookmarks.length > 0){
+                Browser.bookmarkTabs(this.tabs.bookmarks);
             }
 
             return;

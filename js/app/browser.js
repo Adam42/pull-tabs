@@ -15,6 +15,9 @@ var Browser = {
     init: function () {
         this.ENV = pullTabsApp.Config.configuration.mode;
         this.setBrowser();
+        if(typeof(localStorage['pullTabsFolderId']) === 'undefined'){
+            this.getBookmarks();
+        }
         return;
     },
 
@@ -38,6 +41,26 @@ var Browser = {
         else{
             return;
         }
+    },
+
+    getBookmarks: function ( callback ){
+        this.browser.getBookmarks(callback);
+    },
+
+    closeTabs: function (tabs){
+        this.browser.closeTabs(tabs);
+    },
+
+    closeTab: function () {
+        this.browser.closeTab(tab);
+    },
+
+    bookmarkTabs: function (tabs){
+        this.browser.bookmarkTabs(tabs);
+    },
+
+    bookmarkTab: function () {
+        this.browser.bookmarkTab(tab);
     },
 
     downloadUrls: function (tabs) {
@@ -110,6 +133,75 @@ var PTChrome = {
         chrome.tabs.query(info,function(e){
             pullTabs.setTabs(e);
         });
+    },
+
+    getBookmarks: function ( callback ) {
+        var otherBookmarks;
+
+        callback = function(tree){
+            //other bookmarks folder
+            otherBookmarks = tree[0].children[1];
+
+            var count = otherBookmarks.children.length;
+            var i;
+            var logIt = function(newFolder){
+                console.log(newFolder.title);
+            };
+
+            for(i=0; i < count; i++){
+                if(otherBookmarks.children[i].title === 'Pulltabs'){
+                    break;
+                }
+                if(i == (count - 1)){
+                    var folder = {
+                        parentId: otherBookmarks.id,
+                        title: "Pulltabs"
+                    };
+                    chrome.bookmarks.create(folder, logIt);
+                }
+            }
+
+            localStorage['pullTabsFolderId'] = otherBookmarks.children[i].id;
+
+        };
+
+        if(typeof(localStorage['pullTabsFolderId']) === 'undefined'){
+            chrome.bookmarks.getTree(callback);
+        }
+    },
+
+    closeTabs: function (tabs){
+        var numTabs = tabs.length;
+        var i;
+        for (i=0; i < numTabs; i++){
+            this.closeTab(tabs[i]);
+        }
+    },
+
+    closeTab: function (tab) {
+        chrome.tabs.remove(tab.id);
+    },
+
+    bookmarkTabs: function (tabs){
+
+        var numTabs = tabs.length;
+        var i;
+        for (i=0; i < numTabs; i++){
+            this.bookmarkTab(tabs[i]);
+        }
+    },
+
+    bookmarkTab: function (tab, callback) {
+
+        var bookmark = {
+            'parentId': localStorage['pullTabsFolderId'],
+            'title': tab.title,
+            'url': tab.url
+        };
+
+        chrome.bookmarks.create(bookmark, function(savedMark) {
+            Form.setLabelStatus(tab, 'successful');
+      });
     },
 
     login: function ( pocket ) {

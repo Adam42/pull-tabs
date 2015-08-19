@@ -79,6 +79,11 @@ var Form = {
         });
     },
 
+    setLabelStatus: function ( tab, status ){
+        var label = document.getElementById('label-tab-' + tab.labelTabId);
+            label.setAttribute('class', label.className + ' ' + status);
+    },
+
     assembleForm: function ( tabs, options ){
         var resources = document.getElementById('resources');
 
@@ -127,6 +132,8 @@ var Form = {
         var inputs = tabs.length;
         var downloadURLs = [];
         var pocketURLs = [];
+        var bookmarkURLs = [];
+        var closeURLs = [];
         var ignoreURLs = [];
         var results = [];
 
@@ -136,25 +143,41 @@ var Form = {
             var input = document.getElementById('tab-' + i);
             if(input.checked){
                 var radios = document.getElementsByName('tab-pref-' + i);
-
-                if(radios[0].checked){
-                    tabs[i].labelTabId = i;
-                    downloadURLs.push(tabs[i]);
-                }
-
-                if(radios[1].checked){
-                    tabs[i].labelTabId = i;
-                    pocketURLs.push(tabs[i]);
+                var x;
+                tabs[i].labelTabId = i;
+                for ( x=0; x < radios.length; x++){
+                    if(radios[x].checked){
+                        var action = radios[x].value;
+                        switch (action){
+                            case "download":
+                                downloadURLs.push(tabs[i]);
+                                break;
+                            case "pocket":
+                                pocketURLs.push(tabs[i]);
+                                break;
+                            case "bookmark":
+                                bookmarkURLs.push(tabs[i]);
+                                break;
+                            case "close":
+                                closeURLs.push(tabs[i]);
+                                break;
+                            default:
+                                console.log("Ignoring" + tabs[i]);
+                                ignoreURLs.push(tabs[i]);
+                                break;
+                        }
+                    }
                 }
             }
             else{
-                tabs[i].labelTabId = i;
                 ignoreURLs.push(tabs[i]);
             }
         }
 
         tabs.downloads = downloadURLs;
         tabs.pockets = pocketURLs;
+        tabs.closes = closeURLs;
+        tabs.bookmarks = bookmarkURLs;
         tabs.ignores = ignoreURLs;
 
         return tabs;

@@ -67,7 +67,6 @@ var Pocket = {
     saveTabToPocket: function ( tab) {
         var url = tab.url;
         var id = tab.id;
-        var label = document.getElementById('label-tab-' + tab.labelTabId);
 
         var pocket_data = {
             "url": url,
@@ -86,11 +85,11 @@ var Pocket = {
                 if (xhr.readyState === 4 && xhr.status !== 200) {
                     console.log( xhr.status + " response from Pocket: ");
                     console.log(xhr.responseText);
-                    label.setAttribute('class', label.className + ' failed');
+                    Form.setLabelStatus(tab, 'failed');
                     return false;
                 }
                 else if (xhr.readyState === 4 && xhr.status === 200){
-                    label.setAttribute('class', label.className + ' successful');
+                    Form.setLabelStatus(tab, 'successful');
                     console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
 
                     //if we remove the tab that the popup was invoked on the popup
@@ -108,7 +107,7 @@ var Pocket = {
             };
 
             xhr.onerror = function (e) {
-                label.setAttribute('class', label.className + ' failed');
+                Form.setLabelStatus(tab, 'failed');
 
                 console.error("saveTabToPocket error: " + xhr.statusText);
                 return;
@@ -119,7 +118,7 @@ var Pocket = {
         catch (e) {
             console.log("saveTabToPocket Exception: ");
             console.log(e);
-            label.setAttribute('class', label.className + ' failed');
+            Form.setLabelStatus(tab, 'failed');
             return false;
         }
 
