@@ -54,7 +54,10 @@ var Form = {
         var label = document.createElement('label');
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
-            label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
+            label.innerHTML = '<p>Title: ' + tab.title + '</p>';
+            //if Full Mime Type add mimetype
+            //label.innerHTML = label.innerHTML + "<p> Type: " + type + "</p>";
+
             if(type.split("/").shift() === 'image'){
                 label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
             }
@@ -82,6 +85,23 @@ var Form = {
     setLabelStatus: function ( tab, status ){
         var label = document.getElementById('label-tab-' + tab.labelTabId);
             label.setAttribute('class', label.className + ' ' + status);
+    },
+
+    updateStatus: function (tab, text){
+
+        var label = document.getElementById('status');
+        var link = document.createElement('a');
+        var status = document.createElement('p');
+        var message = document.createTextNode(text);
+
+            link.title = tab.title;
+            link.href = tab.url;
+            link.innerHTML = tab.title;
+
+            status.appendChild(message);
+            status.appendChild(link);
+            label.appendChild(status);
+            label.removeAttribute('class', 'hidden');
     },
 
     assembleForm: function ( tabs, options ){

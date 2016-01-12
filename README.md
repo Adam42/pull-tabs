@@ -10,6 +10,7 @@ tabs and offer options to save them to disk.
 - [x] Save tabs by file group type [ 'application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown' ]
 - [x] Save to Pocket
 - [x] Google Chrome extension
+- [x] Simple and advanced views
 
 ###Planned features
 - [ ] Save tabs by file type [ e.g. .html, .pdf, .png etc.]

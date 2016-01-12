@@ -7,6 +7,8 @@ pullTabs = {
 
     layout: '',
 
+    linksWatched: false,
+
     init: function(  ) {
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
@@ -55,7 +57,9 @@ pullTabs = {
 
                 if(pullTabs.layout.simple){
                     this.watchButtons();
-                    this.watchLinks();
+                    if(!this.linksWatched){
+                        this.watchLinks();
+                    }
 
                 }
                 else{
@@ -76,8 +80,9 @@ pullTabs = {
                             this.watchCheckBoxes(numFormTabs);
                             this.watchMutateCheck();
                             this.setActions();
-                            this.watchLinks();
-
+                            if(!this.linksWatched){
+                                this.watchLinks();
+                            }
                         }
                         else{
                             window.setTimeout( this.init, 50);
@@ -119,7 +124,7 @@ pullTabs = {
 
     setNumTabs: function(tabs){
         var numTabs = document.getElementById('numTabs');
-        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Save all tabs to:';
+        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Do this action to all tabs:';
     },
 
     createForm: function (tabs) {
@@ -379,7 +384,6 @@ pullTabs = {
     processButton: function(action){
         switch(action) {
             case "download":
-                console.log('downloading');
                 Browser.downloadUrls(pullTabs.tabs);
                 break;
 
@@ -518,6 +522,21 @@ pullTabs = {
            pullTabs.showMainContent();
             return;
         });
+
+        var creditLinks = document.getElementById('about-credits').getElementsByTagName('a');
+        var i;
+        var len = creditLinks.length;
+
+        for(i = 0; i < len; i++){
+            creditLinks[i].addEventListener('click', function (e) {
+                chrome.tabs.create({
+                    'url': e.target.href,
+                    'active': false
+                });
+            });
+        }
+
+        this.linksWatched = true;
 
 /*
         var navLinks = document.getElementById("main-nav");

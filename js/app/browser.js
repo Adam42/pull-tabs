@@ -110,7 +110,12 @@ var DevBrowse = {
 var PTChrome = {
     downloadUrls: function (tabs) {
         tabs.forEach(function(tab){
-            var label = document.getElementById('label-tab-' + tab.labelTabId);
+
+            //advanced mode
+            if(tab.labelTabId !== undefined && tab.labelTabId !== null){
+                var label = document.getElementById('label-tab-' + tab.labelTabId);
+                var status = document.getElementById('status');
+            }
 
             var file = {
                 "url": tab.url,
@@ -119,11 +124,22 @@ var PTChrome = {
 
             chrome.downloads.download(file, function(e){
                 if(e === undefined){
-                    label.setAttribute('class', label.className + ' failed');
+                    if(label){
+                        label.setAttribute('class', label.className + ' failed');
+                    }
+                    Form.updateStatus(tab,'Failed downloading ');
                     return;
                 }
-                label.setAttribute('class', label.className + ' successful');
-                chrome.tabs.remove(tab.id);
+                if(label){
+                    label.setAttribute('class', label.className + ' successful');
+                }
+                    Form.updateStatus(tab,'Downloading ');
+
+                    //@to-do check preferences to see if user chose to auto-close tabs upon successful action
+                    if(tab.active !== true){
+                        chrome.tabs.remove(tab.id);
+                    }
+
             });
         });
     },
@@ -200,7 +216,10 @@ var PTChrome = {
         };
 
         chrome.bookmarks.create(bookmark, function(savedMark) {
-            Form.setLabelStatus(tab, 'successful');
+
+            Form.updateStatus(tab, 'Successfuly bookmarked ');
+
+            Form.setLabelStatus(tab, "successful");
       });
     },
 
