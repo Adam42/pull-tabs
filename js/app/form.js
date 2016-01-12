@@ -54,7 +54,10 @@ var Form = {
         var label = document.createElement('label');
             label.setAttribute('class','list-group-item ' + active);
             label.setAttribute('id','label-tab-' + tab.index);
-            label.innerHTML = '<p>Title: ' + tab.title + '</p><p> Type: ' + type + '</p>';
+            label.innerHTML = '<p>Title: ' + tab.title + '</p>';
+            //if Full Mime Type add mimetype
+            //label.innerHTML = label.innerHTML + "<p> Type: " + type + "</p>";
+
             if(type.split("/").shift() === 'image'){
                 label.innerHTML += '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' + tab.url + '/>';
             }
