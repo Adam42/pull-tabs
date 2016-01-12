@@ -11,14 +11,22 @@ input[type="checkbox"]{
     /*display: none;*/
 }
 
+#layout-options input[type="checkbox"] {
+    top: 15px;
+}
+
 button { width: 100%; margin: 10px auto;}
+
+#default button { width: 120px;}
+#default button img { margin-right: 5px;}
+#default label { width: 140px; float: left;}
 
 label{display: block;z-index: 10; }
 label.list-group-item { padding-left: 40px;}
 label.list-group-item p { margin-right: 20px; margin-left: 50px; }
 label.preferences {display: inline; padding: 10px;}
 label.preferences input { margin: 0 10px }
-
+form#default{ margin-left: 40px;}
 .list-group-item.successful { background-color: green;}
 .list-group-item.failed { background-color: red;}
 
@@ -40,7 +48,7 @@ label.preferences input { margin: 0 10px }
 #options h4 {margin: 0; padding: 10px 0; text-align: center;}
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
-.container[role="main"] form {min-height: 400px; }
+.container[role="main"] form { }
 #setup {margin-top: 100px; min-height: 400px; }
 .container[role="complementary"] a {padding-top: 20px;}
 
