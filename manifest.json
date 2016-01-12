@@ -19,7 +19,6 @@
 
     "web_accessible_resources": [
         "pocket.html"
-
     ],
 
     "browser_action": {

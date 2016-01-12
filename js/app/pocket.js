@@ -6,7 +6,7 @@ var Pocket = {
     },
 
     init: function(  ) {
-        if(localStorage[this.pocketKey.user_name] !== 'user_name'){
+        if(localStorage[this.pocketKey.user_name] !== 'user_name' && typeof(localStorage[this.pocketKey.user_name]) !== 'undefined'){
             this.isAuthorized();
             return;
         }
@@ -19,7 +19,7 @@ var Pocket = {
         var status = document.getElementById('pocket-status');
         if(status !== null){
             status.href = '#pocket-logout';
-            status.textContent = 'You are signed in as ' + localStorage[this.pocketKey.user_name] + ' Click to log out.';
+            status.textContent = 'You are signed in as ' + decodeURIComponent(localStorage[this.pocketKey.user_name])+ ' Click to log out.';
         }
     },
 
@@ -67,7 +67,6 @@ var Pocket = {
     saveTabToPocket: function ( tab) {
         var url = tab.url;
         var id = tab.id;
-        var label = document.getElementById('label-tab-' + tab.labelTabId);
 
         var pocket_data = {
             "url": url,
@@ -86,19 +85,29 @@ var Pocket = {
                 if (xhr.readyState === 4 && xhr.status !== 200) {
                     console.log( xhr.status + " response from Pocket: ");
                     console.log(xhr.responseText);
-                    label.setAttribute('class', label.className + ' failed');
+                    Form.setLabelStatus(tab, 'failed');
                     return false;
                 }
                 else if (xhr.readyState === 4 && xhr.status === 200){
-                    label.setAttribute('class', label.className + ' successful');
+                    Form.setLabelStatus(tab, 'successful');
                     console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
-                    chrome.tabs.remove(tab.id);
+
+                    //if we remove the tab that the popup was invoked on the popup
+                    //goes away, ideally we should move to event scripts
+                    //so the popup isn't dependent on a tab being open
+                    chrome.tabs.query({ active: true, lastFocusedWindow: true }, function (tabs) {
+                        if(tab.id !== tabs[0].id){
+                            chrome.tabs.remove(tab.id);
+                        }
+                    });
+
+
                     return true;
                 }
             };
 
             xhr.onerror = function (e) {
-                label.setAttribute('class', label.className + ' failed');
+                Form.setLabelStatus(tab, 'failed');
 
                 console.error("saveTabToPocket error: " + xhr.statusText);
                 return;
@@ -109,7 +118,7 @@ var Pocket = {
         catch (e) {
             console.log("saveTabToPocket Exception: ");
             console.log(e);
-            label.setAttribute('class', label.className + ' failed');
+            Form.setLabelStatus(tab, 'failed');
             return false;
         }
 

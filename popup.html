@@ -27,26 +27,40 @@
          <div id="status"></div>
         <div id="content">
             <div id="main" class="container" role="main">
-                <h3 class="page-header">Choose files to download</h3>
+                <div id="simple">
+                    <h3 class="page-header">Save all tabs</h3>
 
-                <p id="numTabs"></p>
+                    <p id="numTabs"></p>
 
-                <a href="#resources" class="btn btn-primary" data-toggle="checkboxes" data-action="check">Check all</a>
-                <a href="#resources" class="btn btn-link" data-toggle="checkboxes" data-action="uncheck">Reset</a>
+                    <form id="default" action="" method="post">
+                        <label ><button id="download"><img height="20px" width="20px" src="img/download.svg">Download</button></label>
+                        <label ><button id="pocket"><img height="20px" width="12px" src="img/simple-icons/icons/pocket.svg">Pocket</button></label>
+                        <label ><button id="bookmark"><img height="20px" width="24px" src="img/bookmark.svg">Bookmark</button></label>
+                        <label ><button id="ignore"><img height="20px" width="16px" src="img/ignore.svg">Ignore</button></label>
+                        <label ><button id="close"><img height="20px" width="16px" src="img/close.svg">Close</button></label>
+                    </form>
+                </div>
 
-                <form id="list" action="" method="post">
+                <div id="advanced" class="hidden">
+                    <h3 class="page-header">Choose files to download</h3>
 
-                    <div id="resources">
-                    </div>
+                    <a href="#resources" class="btn btn-primary" data-toggle="checkboxes" data-action="check">Check all</a>
+                    <a href="#resources" class="btn btn-link" data-toggle="checkboxes" data-action="uncheck">Reset</a>
 
-                    <button class="btn btn-large">Submit</button>
+                    <form id="list" action="" method="post">
 
-                </form>
+                        <div id="resources">
+                        </div>
+
+                        <button class="btn btn-large">Submit</button>
+
+                    </form>
+                </div>
             </div>
-            <div id="setup" class="container" role="complementary">
-                <p id="setup-message" class="hidden">This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.</p>
+            <div id="setup" class="hidden container" role="complementary">
+                <p id="setup-message">This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.</p>
             </div>
-            <div id="about" class="container" role="complementary">
+            <div id="about-credits" class="hidden container" role="complementary">
                 <A href="#about"><h3 class="page-header">About & Credits</h3></a>
                 <p>Pull Tabs - <a href="http://the42ndestate.com/">The 42nd Estate</a></p>
                 <p>Developed by: <a href="http://adamp.com/">Adam Pieniazek</a></p>
@@ -56,6 +70,6 @@
 
         <script src="/js/vendors/jquery.js"></script>
         <script src="/js/vendors/bootstrap.js"></script>
-        <script src="/js/vendors/jquery.checkboxes-1.0.5.min.js"></script>
+        <script src="/js/vendors/jquery.checkboxes.js"></script>
     </body>
 </html>

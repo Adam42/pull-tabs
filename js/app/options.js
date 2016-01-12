@@ -9,6 +9,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     opt.numOfmimeTypes = opt.mimeTypes.length;
 
     opt.mimeSettings = {};
+    opt.layout = {};
 
     //list of available actions to apply to a tab
     opt.tabActions = ['ignore', 'download', 'pocket', 'bookmark', 'close'];
@@ -24,6 +25,11 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         opt.mimeTypes.forEach(function(element){
             opt.mimeSettings[element] = this.tabActions[0];
         }, opt);
+    }
+
+    function setDefaultLayout() {
+        opt.layout.simple = true;
+        opt.layout.advanced = false;
     }
 
     opt.getMimeSettings = function(){
@@ -85,13 +91,18 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     function bindUIActions() {
         document.getElementById('settings').addEventListener('submit', opt.saveOptions);
         document.getElementById('pocket-status').addEventListener('click', Pocket.checkLink);
+        document.getElementById('simple').addEventListener('click', opt.saveLayout);
+        document.getElementById('advanced').addEventListener('click', opt.saveLayout);
+
     }
 
     opt.init = function(){
         bindUIActions();
         setDefaultMimeTypes();
-                createForm();
+        createForm();
         this.restoreOptions(opt.setSettings);
+        setDefaultLayout();
+        this.getLayout(opt.setLayout);
     };
 
     opt.getMimeTypes = function(){
@@ -127,6 +138,69 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
                }
            }
         }
+    };
+
+    opt.setLayout = function ( layout ) {
+        var simple = document.getElementById('simple');
+        var advanced = document.getElementById('advanced');
+        if(layout.simple === true){
+            simple.checked = true;
+        }
+        else{
+            simple.checked = false;
+        }
+
+        if(layout.advanced === true){
+            advanced.checked = true;
+        }
+        else{
+            advanced.checked = false;
+        }
+
+    };
+
+    opt.saveLayout = function ( layout ){
+        var simpleLayout = document.getElementById("simple");
+        var advancedLayout = document.getElementById('advanced');
+
+        if(simpleLayout.checked === true){
+            opt.layout.simple = true;
+        }
+        else{
+            opt.layout.simple = false;
+        }
+
+        if(advancedLayout.checked === true){
+            opt.layout.advanced = true;
+        }
+        else{
+            opt.layout.advanced = false;
+        }
+
+        try{
+            chrome.storage.sync.set(opt.layout , function () {
+               var status = document.getElementById('status');
+               status.textContent = 'Layout saved.';
+               setTimeout( function () {
+                  status.textContent = '';
+               }, 1500);
+            });
+        }
+        catch(e){
+            console.log("Chrome storage sync set Exception: ");
+            console.log(e);
+            return false;
+        }
+
+        return true;
+
+    };
+
+
+    opt.getLayout = function (callback) {
+        chrome.storage.sync.get(opt.layout, function ( layout ) {
+            callback( layout );
+        });
     };
 
     /*
