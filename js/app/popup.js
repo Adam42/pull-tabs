@@ -5,8 +5,9 @@ pullTabs = {
 
     prefs: '',
 
-    init: function(  ) {
+    layout: '',
 
+    init: function(  ) {
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
             localStorage.initialSetup = 'yes';
@@ -47,18 +48,44 @@ pullTabs = {
     continueLoad: function( ) {
         if(this.tabs){
             this.setNumTabs(this.tabs);
-            this.getOptions(this.setOptions);
-            if(pullTabs.prefs){
-                this.createForm(this.tabs);
-                var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
-                if(numFormTabs.length === this.tabs.length){
-                    this.watchCheckBoxes(numFormTabs);
-                    this.watchMutateCheck();
-                    this.setActions();
+
+            this.getLayout(this.setLayout);
+
+            if(pullTabs.layout){
+
+                if(pullTabs.layout.simple){
+                    this.watchButtons();
                     this.watchLinks();
+
                 }
                 else{
-                    window.setTimeout( this.init, 50);
+                    var simple = document.getElementById('simple');
+                    simple.classList.add('hidden');
+
+                }
+
+                if(pullTabs.layout.advanced){
+                    var advanced = document.getElementById('advanced');
+                    advanced.classList.remove('hidden');
+
+                    this.getOptions(this.setOptions);
+                    if(pullTabs.prefs){
+                        this.createForm(this.tabs);
+                        var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+                        if(numFormTabs.length === this.tabs.length){
+                            this.watchCheckBoxes(numFormTabs);
+                            this.watchMutateCheck();
+                            this.setActions();
+                            this.watchLinks();
+
+                        }
+                        else{
+                            window.setTimeout( this.init, 50);
+                        }
+                    }
+                    else{
+                        window.setTimeout( this.init, 50);
+                    }
                 }
             }
             else{
@@ -92,7 +119,7 @@ pullTabs = {
 
     setNumTabs: function(tabs){
         var numTabs = document.getElementById('numTabs');
-        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs.';
+        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Save all tabs to:';
     },
 
     createForm: function (tabs) {
@@ -105,9 +132,12 @@ pullTabs = {
     },
 
     assembleForm: function ( tabs, prefs ){
+
+        var group = document.getElementById('group');
+
         var resources = document.getElementById('resources');
 
-        var fullMimeType = true;
+        var fullMimeType = false;
         tabs.forEach(function(tab) {
 
             var type,pref, fullType;
@@ -216,6 +246,19 @@ pullTabs = {
     },
 */
 
+    setLayout: function ( layout ) {
+        pullTabs.layout = layout;
+    },
+
+    getLayout: function( callback ) {
+        chrome.storage.sync.get({
+            simple: 'true',
+            advanced: 'false'
+        }, function ( layout ) {
+            callback ( layout );
+        });
+    },
+
     getOptions: function ( callback ) {
         chrome.storage.sync.get({
             application: 'download',
@@ -322,26 +365,101 @@ pullTabs = {
         pullTabs.getTabStatus();
     },
 
+    processGroup: function (evt) {
+        evt.preventDefault();
+        var destination = document.getElementById('default');
+
+    },
+
+    doAction: function(evt) {
+        evt.preventDefault();
+        pullTabs.processButton(this.id);
+    },
+
+    processButton: function(action){
+        switch(action) {
+            case "download":
+                console.log('downloading');
+                Browser.downloadUrls(pullTabs.tabs);
+                break;
+
+            case "pocket":
+                Pocket.saveTabsToPocket(pullTabs.tabs);
+                break;
+
+            case "bookmark":
+                Browser.bookmarkTabs(pullTabs.tabs);
+                break;
+
+            case "close":
+                Browser.closeTabs(pullTabs.tabs);
+                break;
+
+            default:
+                console.log(this);
+                break;
+        }
+    },
+
+    watchButtons: function () {
+        var download = document.getElementById('download');
+        download.addEventListener('click', this.doAction);
+
+        var pocket = document.getElementById('pocket');
+        pocket.addEventListener('click',this.doAction);
+
+        var bookmark = document.getElementById('bookmark');
+        bookmark.addEventListener('click', this.doAction);
+
+        var close = document.getElementById('close');
+        close.addEventListener('click', this.doAction);
+
+        var ignore = document.getElementById('ignore');
+        ignore.addEventListener('click', this.doAction);
+
+    },
+
     watchSubmit: function () {
+        var group = document.getElementById('default');
+        group.addEventListener('submit', this.processGroup);
+
         var checked = document.getElementById('list');
         checked.addEventListener('submit', this.process);
     },
 
     showMainContent: function ( ) {
         var mainContent = document.getElementById('main');
+        var aboutContent = document.getElementById('about-credits');
+
             mainContent.classList.remove('bounce');
+
+            if(!aboutContent.classList.contains('hidden')){
+                aboutContent.classList.add('hidden');
+            }
 
         return;
     },
 
     swapMainContent: function ( ) {
         var mainContent = document.getElementById('main');
+        var aboutContent = document.getElementById('about-credits');
+
         if(mainContent.classList.contains('bounce')){
             mainContent.classList.remove('bounce');
+
+            if(!aboutContent.classList.contains('hidden')){
+                aboutContent.classList.add('hidden');
+            }
+
             return;
         }
         if(!mainContent.classList.contains('bounce')){
             mainContent.classList.add('bounce');
+
+            if(aboutContent.classList.contains('hidden')){
+                aboutContent.classList.remove('hidden');
+            }
+
             return;
         }
     },

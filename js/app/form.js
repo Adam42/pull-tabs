@@ -128,6 +128,10 @@ var Form = {
         });
     },
 
+    getSelectedGroup: function () {
+        var group =  document.getElementById();
+    },
+
     getSelectedTabs: function (tabs) {
         var inputs = tabs.length;
         var downloadURLs = [];
