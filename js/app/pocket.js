@@ -90,7 +90,7 @@ var Pocket = {
                 }
                 else if (xhr.readyState === 4 && xhr.status === 200){
                     Form.setLabelStatus(tab, 'successful');
-                    console.log(url + ' from browser-tab ' + id + ' saved to Pocket');
+                    Form.updateStatus(tab, 'Saved this tab to pocket: ');
 
                     //if we remove the tab that the popup was invoked on the popup
                     //goes away, ideally we should move to event scripts

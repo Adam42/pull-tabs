@@ -384,7 +384,6 @@ pullTabs = {
     processButton: function(action){
         switch(action) {
             case "download":
-                console.log('downloading');
                 Browser.downloadUrls(pullTabs.tabs);
                 break;
 
@@ -525,7 +524,7 @@ pullTabs = {
         });
 
         var creditLinks = document.getElementById('about-credits').getElementsByTagName('a');
-        console.log(creditLinks);var i;
+        var i;
         var len = creditLinks.length;
 
         for(i = 0; i < len; i++){

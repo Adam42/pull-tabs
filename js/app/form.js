@@ -87,6 +87,23 @@ var Form = {
             label.setAttribute('class', label.className + ' ' + status);
     },
 
+    updateStatus: function (tab, text){
+
+        var label = document.getElementById('status');
+        var link = document.createElement('a');
+        var status = document.createElement('p');
+        var message = document.createTextNode(text);
+
+            link.title = tab.title;
+            link.href = tab.url;
+            link.innerHTML = tab.title;
+
+            status.appendChild(message);
+            status.appendChild(link);
+            label.appendChild(status);
+            label.removeAttribute('class', 'hidden');
+    },
+
     assembleForm: function ( tabs, options ){
         var resources = document.getElementById('resources');
 
