@@ -124,7 +124,7 @@ pullTabs = {
 
     setNumTabs: function(tabs){
         var numTabs = document.getElementById('numTabs');
-        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Save all tabs to:';
+        numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Do this action to all tabs:';
     },
 
     createForm: function (tabs) {
