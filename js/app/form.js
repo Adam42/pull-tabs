@@ -56,6 +56,7 @@ var Form = {
             label.setAttribute('id','label-tab-' + tab.index);
             label.innerHTML = '<p>Title: ' + tab.title + '</p>';
             //if Full Mime Type add mimetype
+            //@to-do Pull the setting from Options page
             //label.innerHTML = label.innerHTML + "<p> Type: " + type + "</p>";
 
             if(type.split("/").shift() === 'image'){

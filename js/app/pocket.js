@@ -85,11 +85,17 @@ var Pocket = {
                 if (xhr.readyState === 4 && xhr.status !== 200) {
                     console.log( xhr.status + " response from Pocket: ");
                     console.log(xhr.responseText);
-                    Form.setLabelStatus(tab, 'failed');
+                    if(tab.labelTabId !== undefined && tab.labelTabId !== null){
+                        Form.setLabelStatus(tab, 'failed');
+                    }
+                    Form.updateStatus(tab, "Failed saving this tab to pocket: ");
                     return false;
                 }
                 else if (xhr.readyState === 4 && xhr.status === 200){
-                    Form.setLabelStatus(tab, 'successful');
+
+                    if(tab.labelTabId !== undefined && tab.labelTabId !== null){
+                        Form.setLabelStatus(tab, 'successful');
+                    }
                     Form.updateStatus(tab, 'Saved this tab to pocket: ');
 
                     //if we remove the tab that the popup was invoked on the popup
@@ -173,19 +179,19 @@ var Pocket = {
 
     getStoredCredentials: function (callback) {
         if(chrome.storage.local){
-        chrome.storage.local.get({
-            access_token: 'access_token',
-            user_name: 'user_name',
-        }, function ( items ) {
-                if(items.user_name !== 'user_name'){
-                    Pocket.isAuthorized( items );
-                }
-                else{
-                    Pocket.isNotAuthorized( );
-                }
-                return;
-        });
-    }
+            chrome.storage.local.get({
+                access_token: 'access_token',
+                user_name: 'user_name',
+            }, function ( items ) {
+                    if(items.user_name !== 'user_name'){
+                        Pocket.isAuthorized( items );
+                    }
+                    else{
+                        Pocket.isNotAuthorized( );
+                    }
+                    return;
+            });
+        }
     },
 
     setStoredCredentials: function (credentials) {

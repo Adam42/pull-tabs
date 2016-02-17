@@ -32,10 +32,6 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         opt.layout.advanced = false;
     }
 
-    opt.getMimeSettings = function(){
-        return opt.mimeSettings;
-    };
-
     function setDefaultTabActions() {
         opt.tabActions.forEach(function(element){
             tabSettings[element] = this.tabOptions[0];
@@ -106,6 +102,10 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     };
 
     opt.getMimeTypes = function(){
+        return opt.mimeSettings;
+    };
+
+    opt.getMimeSettings = function(){
         return opt.mimeSettings;
     };
 
