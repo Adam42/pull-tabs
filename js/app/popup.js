@@ -62,7 +62,6 @@ pullTabs = {
                     if(!this.linksWatched){
                         this.watchLinks();
                     }
-
                 }
                 else{
                     var simple = document.getElementById('simple');
@@ -71,33 +70,38 @@ pullTabs = {
                 }
 
                 if(pullTabs.layout.advanced){
-                    var advanced = document.getElementById('advanced');
-                    advanced.classList.remove('hidden');
-
-                    this.getOptions(this.setOptions);
-                    if(pullTabs.prefs){
-                        this.createForm(this.tabs);
-                        var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
-                        if(numFormTabs.length === this.tabs.length){
-                            this.watchCheckBoxes(numFormTabs);
-                            this.watchMutateCheck();
-                            this.setActions();
-                            if(!this.linksWatched){
-                                this.watchLinks();
-                            }
-                        }
-                        else{
-                            window.setTimeout( this.init, 50);
-                        }
-                    }
-                    else{
-                        window.setTimeout( this.init, 50);
-                    }
+                    this.setAdvancedLayout();
                 }
             }
             else{
                 window.setTimeout( this.init, 50);
             }
+        }
+    },
+
+    setAdvancedLayout: function () {
+
+        var advanced = document.getElementById('advanced');
+        advanced.classList.remove('hidden');
+
+        this.getOptions(this.setOptions);
+        if(pullTabs.prefs){
+            this.createForm(this.tabs);
+            var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+            if(numFormTabs.length === this.tabs.length){
+                this.watchCheckBoxes(numFormTabs);
+                this.watchMutateCheck();
+                this.setActions();
+                if(!this.linksWatched){
+                    this.watchLinks();
+                }
+            }
+            else{
+                window.setTimeout( this.init, 50);
+            }
+        }
+        else{
+            window.setTimeout( this.init, 50);
         }
     },
 
