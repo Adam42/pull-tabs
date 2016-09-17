@@ -14,6 +14,7 @@ var Browser = {
 
     init: function () {
         this.ENV = pullTabsApp.Config.configuration.mode;
+        this.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
         this.setBrowser();
         if(typeof(localStorage['pullTabsFolderId']) === 'undefined'){
             this.getBookmarks();
@@ -31,6 +32,12 @@ var Browser = {
         else{
             this.browser = DevBrowse;
         }
+    },
+
+    isFile: function(pathname) {
+        return pathname
+            .split('/').pop()
+            .split('.').length > 1;
     },
 
     getTabs: function (callback) {
@@ -74,6 +81,14 @@ var Browser = {
     save: function ( key, object ) {
         this.browser.save( key, object );
     },
+
+    retrieve: function( key, callback ) {
+        this.browser.retrieve( key, callback );
+    },
+
+    createTab: function ( tabKey ) {
+        this.browser.createTab( tabKey );
+    }
 };
 
 /*
@@ -118,29 +133,47 @@ var PTChrome = {
             }
 
             var file = {
-                "url": tab.url,
-                "method": "GET"
+                "url": tab.url
             };
 
-            chrome.downloads.download(file, function(e){
-                if(e === undefined){
+            if(!Browser.isFirefox){
+                file.method = 'GET';
+            }
+
+            //Chrome handles downloads well but Firefox saves URLs without extension endings
+            //with a generic download(x) filename
+            if(Browser.isFirefox){
+                if(!Browser.isFile(tab.url)){
+                    file.filename = tab.title + '.html';
+                }
+            }
+
+            try{
+                chrome.downloads.download(file, function(e){
+                    if(e === undefined){
+                        if(label){
+                            label.setAttribute('class', label.className + ' failed');
+                        }
+                        Form.updateStatus(tab,'Failed downloading ');
+                        return;
+                    }
                     if(label){
-                        label.setAttribute('class', label.className + ' failed');
+                        label.setAttribute('class', label.className + ' successful');
                     }
-                    Form.updateStatus(tab,'Failed downloading ');
-                    return;
-                }
-                if(label){
-                    label.setAttribute('class', label.className + ' successful');
-                }
-                    Form.updateStatus(tab,'Downloading ');
+                        Form.updateStatus(tab,'Downloading ');
 
-                    //@to-do check preferences to see if user chose to auto-close tabs upon successful action
-                    if(tab.active !== true){
-                        chrome.tabs.remove(tab.id);
-                    }
+                        //@to-do check preferences to see if user chose to auto-close tabs upon successful action
+                        if(tab.active !== true){
+                            chrome.tabs.remove(tab.id);
+                        }
 
-            });
+                });
+            }
+            catch(e){
+                Form.updateStatus(tab, 'Error downloading ');
+                console.log(e);
+            }
+
         });
     },
 
@@ -258,6 +291,52 @@ var PTChrome = {
         }
     },
 
+    retrieve: function ( key, callback ) {
+        var storageType;
+
+        if(Browser.isFirefox){
+            if(typeof(chrome.storage.local) !== 'undefined' && typeof(chrome.storage.local.get) !== 'undefined' ){
+                storageType = chrome.storage.local;
+            }
+            else{
+                console.log("Browser is Firefox but chrome.storage.local is unavailable, returning default key value");
+                callback(key);
+                return;
+            }
+        }
+        else if ( ( typeof(chrome.storage.sync) !== 'undefined' && typeof(chrome.storage.sync.get) !== 'undefined' ) ){
+            storageType = chrome.storage.sync;
+        }
+        else{
+            console.log("Storage unavailable, returning default key value");
+            callback(key);
+            return;
+        }
+
+        storageType.get(key, function ( value ) {
+            callback ( value );
+        });
+    },
+
+    createTab: function ( tabKey ) {
+        if( typeof(chrome.tabs.create) !== 'undefined' ) {
+           chrome.tabs.create( tabKey );
+           return;
+       }
+
+       console.log('Unable to create this tab: ');
+       console.dir(tabKey);
+       return;
+    },
+
+    extensionGetURL: function ( url ) {
+        if( typeof( chrome.extension.getURL ) !== 'undefined' ) {
+            return chrome.extension.getURL( url );
+        }
+
+        console.log("Unable to get extension relative URL as absolute URL");
+        return false;
+    }
 };
 
 //Browser.init();

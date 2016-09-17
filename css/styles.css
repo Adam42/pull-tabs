@@ -45,11 +45,11 @@ form#default{ margin-left: 40px;}
 #options input { margin: 0 10px 0 0;}
 #file-type-destinations { padding: 10px 20px;}
 #options label { margin: 0; padding: 10px 20px; }
-#options h4 {margin: 0; padding: 10px 0; text-align: center;}
+#options h4 {margin: 0; padding: 10px 0; }
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
 .container[role="main"] form { }
-#setup {margin-top: 100px; min-height: 400px; }
+#setup {margin-top: 100px; }
 .container[role="complementary"] a {padding-top: 20px;}
 
 .bounce{margin-left: -9999px; height: 0;}

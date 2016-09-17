@@ -32,7 +32,9 @@ pullTabs = {
                 mainDiv.setAttribute('class', 'hidden');
 
             var optionsLink = document.createElement('a');
-                optionsLink.href = chrome.extension.getURL('options.html');
+                //Browser is not instantiated at this point
+                //optionsLink.href = Browser.extensionGetURL('options.html');
+                optionsLink.href = chrome.extension.getURL( 'options.html' );
                 optionsLink.textContent = " Setup PullTabs with your preferences.";
 
             var setupDiv = document.getElementById('setup');
@@ -256,16 +258,16 @@ pullTabs = {
     },
 
     getLayout: function( callback ) {
-        chrome.storage.sync.get({
+        var key = {
             simple: 'true',
             advanced: 'false'
-        }, function ( layout ) {
-            callback ( layout );
-        });
+        };
+
+        Browser.retrieve(key, callback);
     },
 
     getOptions: function ( callback ) {
-        chrome.storage.sync.get({
+        var key = {
             application: 'download',
             image: 'download',
             message: 'ignore',
@@ -274,9 +276,9 @@ pullTabs = {
             text: 'download',
             video: 'download',
             unknown: 'ignore'
-        }, function ( items ) {
-            callback( items );
-        });
+        };
+
+        Browser.retrieve( key, callback );
 
         return;
     },
@@ -529,10 +531,12 @@ pullTabs = {
 
         for(i = 0; i < len; i++){
             creditLinks[i].addEventListener('click', function (e) {
-                chrome.tabs.create({
+                var tabKey = {
                     'url': e.target.href,
                     'active': false
-                });
+                };
+
+                Browser.createTab( tabKey );
             });
         }
 
