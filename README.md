@@ -11,7 +11,7 @@ tabs and offer options to save them to disk.
 - [x] Save to Pocket
 - [x] Google Chrome extension
 - [x] Simple and advanced views
+- [x] Mozilla Firefox extension
 
 ###Planned features
 - [ ] Save tabs by file type [ e.g. .html, .pdf, .png etc.]
-- [ ] Mozilla Firefox extension
