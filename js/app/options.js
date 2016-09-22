@@ -85,7 +85,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     }
 
     function bindUIActions() {
-        document.getElementById('settings').addEventListener('submit', opt.saveOptions);
+        document.getElementById('settings').addEventListener('submit', opt.saveMimeSettings);
         document.getElementById('pocket-status').addEventListener('click', Pocket.checkLink);
         document.getElementById('simple').addEventListener('click', opt.saveLayout);
         document.getElementById('advanced').addEventListener('click', opt.saveLayout);
@@ -96,7 +96,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         bindUIActions();
         setDefaultMimeTypes();
         createForm();
-        this.restoreOptions(opt.setSettings);
+        this.restoreMimeSettings(opt.setSettings);
         setDefaultLayout();
         this.getLayout(opt.setLayout);
     };
@@ -109,10 +109,8 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         return opt.mimeSettings;
     };
 
-    opt.restoreOptions = function (callback) {
-        chrome.storage.sync.get(opt.mimeSettings, function ( items ) {
-            callback( items );
-        });
+    opt.restoreMimeSettings = function (callback) {
+        Browser.retrieve( opt.mimeSettings, callback );
     };
 
     /*
@@ -196,11 +194,8 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     };
 
-
     opt.getLayout = function (callback) {
-        chrome.storage.sync.get(opt.layout, function ( layout ) {
-            callback( layout );
-        });
+        Browser.retrieve( opt.layout, callback );
     };
 
     /*
@@ -211,7 +206,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
      *
      */
 
-    opt.saveOptions = function (evt) {
+    opt.saveMimeSettings = function (evt) {
         evt.preventDefault();
 
         for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
@@ -225,9 +220,18 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }
 
         try{
-            chrome.storage.sync.set(opt.mimeSettings , function () {
+            var storageType;
+
+            if(Browser.isFirefox){
+                storageType = chrome.storage.local;
+            }
+            else{
+                storageType = chrome.storage.sync;
+            }
+
+            storageType.set(opt.mimeSettings , function () {
                 var status = document.getElementById('status');
-                status.textContent = 'Options saved.';
+                status.textContent = 'Mime Settings saved.';
                 setTimeout( function () {
                     status.textContent = '';
                 }, 1500);
