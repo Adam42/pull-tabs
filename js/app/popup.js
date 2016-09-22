@@ -13,7 +13,7 @@ pullTabs = {
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
             localStorage.initialSetup = 'yes';
-            this.doInitialSetup();
+            pullTabs.doInitialSetup();
             return;
         }
 
@@ -28,24 +28,31 @@ pullTabs = {
 
     doInitialSetup: function () {
         if(localStorage.initialSetup === 'yes'){
-            var mainDiv = document.getElementById('main');
-                mainDiv.setAttribute('class', 'hidden');
+            if(document.getElementById('setup') === null){
+                var optionsLink = document.createElement('a');
+                    //Browser is not instantiated at this point
+                    //optionsLink.href = Browser.extensionGetURL('options.html');
+                    optionsLink.href = chrome.extension.getURL( 'options.html' );
+                    optionsLink.id = 'initial-load';
+                    optionsLink.textContent = " Setup PullTabs with your preferences.";
 
-            var optionsLink = document.createElement('a');
-                //Browser is not instantiated at this point
-                //optionsLink.href = Browser.extensionGetURL('options.html');
-                optionsLink.href = chrome.extension.getURL( 'options.html' );
-                optionsLink.textContent = " Setup PullTabs with your preferences.";
+                var setupMessage = document.createElement('p');
+                    setupMessage.classList.add('alert', 'alert-info');
+                    setupMessage.textContent = 'This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.';
+                    setupMessage.id = 'setup';
+                    setupMessage.appendChild(optionsLink);
 
-            var setupDiv = document.getElementById('setup');
-                setupDiv.classList.remove('hidden');
+                var parent = document.getElementById('simple').parentNode;
+                var simple = document.getElementById('simple');
 
-            var setupMessage = document.getElementById('setup-message');
-                setupMessage.appendChild(optionsLink);
+                parent.insertBefore(setupMessage, simple);
 
-                setupMessage.addEventListener('click', function () {
+                setupMessage.addEventListener('click', function (e) {
+                    e.preventDefault();
                     localStorage.initialSetup = 'no';
+                    chrome.runtime.openOptionsPage();
                 });
+            }
         }
     },
 
@@ -59,6 +66,7 @@ pullTabs = {
 
                 if(pullTabs.layout.simple){
                     this.watchButtons();
+
                     if(!this.linksWatched){
                         this.watchLinks();
                     }
