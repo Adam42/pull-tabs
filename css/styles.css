@@ -12,7 +12,9 @@ input[type="checkbox"]{
 }
 
 #layout-options input[type="checkbox"] {
-    top: 15px;
+    position: relative;
+    right: 10px;
+    top: 0px;
 }
 
 button { width: 100%; margin: 10px auto;}
@@ -36,11 +38,12 @@ form#default{ margin-left: 40px;}
 .panel-body { padding: 0;}
 .panel-body label {float: left;}
 
-
-.page-header{margin:100px 0 20px;}
+#content { margin-top: 40px;}
+.page-header{margin:35px 0 5px 0; }
 .container { width: 800px;}
 #options { margin: 0 auto;}
-#options .container { width: 800px;}
+#options #content {margin-top: 0px;}
+#options .container { width: 800px; }
 #options .list-group-item { margin: 5px 10px; float: left; padding: 0;}
 #options input { margin: 0 10px 0 0;}
 #file-type-destinations { padding: 10px 20px;}
@@ -49,8 +52,10 @@ form#default{ margin-left: 40px;}
 
 #main-nav a { margin: 0 20px; padding: 10px 20px;}
 .container[role="main"] form { }
-#setup {margin-top: 100px; }
+#setup {margin-top: 20px; }
 .container[role="complementary"] a {padding-top: 20px;}
+
+#status {position: fixed; top: 0; left: 45%; width: 100%; z-index: 0;}
 
 .bounce{margin-left: -9999px; height: 0;}
 
