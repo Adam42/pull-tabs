@@ -88,6 +88,14 @@ var Browser = {
 
     createTab: function ( tabKey ) {
         this.browser.createTab( tabKey );
+    },
+
+    store: function ( key, callback ) {
+        this.browser.store( key, callback );
+    },
+
+    getStorageType: function (){
+        this.browser.getStorageType();
     }
 };
 
@@ -270,6 +278,51 @@ var PTChrome = {
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
             Pocket.getAccessToken(pocket);
         });
+    },
+
+    /*
+     * Figure out if Firefox, Chrome or other, if Chrome use sync
+     * otherwise use local
+     */
+    getStorageType: function () {
+        if(!Browser.isFirefox){
+            if ( ( typeof(chrome.storage.sync) !== 'undefined' && typeof(chrome.storage.sync.get) !== 'undefined' ) ){
+                Browser.storageType = chrome.storage.sync;
+                return Browser.storageType;
+            }
+        }
+        else if(typeof(chrome.storage.local) !== 'undefined' && typeof(chrome.storage.local.get) !== 'undefined' ){
+                Browser.storageType = chrome.storage.local;
+                return Browser.storageType;
+        }
+
+        //@to-do revert to localStorage
+        console.log("chrome.storage is unavailable.");
+        return;
+    },
+
+    /*
+     * Only chrome has sync, if sync is available use it
+     * otherwise reverts to using local storage
+     * @to-do add a localStorage fallback for browsers that
+     * don't recognize chrome.storage
+     */
+    store: function ( key, callback ) {
+        Browser.getStorageType();
+
+        if(typeof(Browser.storageType) === 'undefined'){
+            console.log("No storage available");
+            callback();
+            return;
+        }
+
+        try{
+            Browser.storageType.set( key , callback );
+        }
+        catch(e){
+            console.log(e);
+            return;
+        }
     },
 
     save: function ( key, object ) {
