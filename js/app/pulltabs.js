@@ -1,0 +1,1 @@
+var pullTabs = pullTabs || {};
