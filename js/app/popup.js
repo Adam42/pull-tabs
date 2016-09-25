@@ -1,5 +1,5 @@
-var
-pullTabs = {
+var pullTabs = pullTabs || {};
+pullTabs.App = pullTabs.App ||  {
 
     tabs: '',
 
@@ -10,16 +10,17 @@ pullTabs = {
     linksWatched: false,
 
     init: function(  ) {
+
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
             localStorage.initialSetup = 'yes';
-            pullTabs.doInitialSetup();
+            pullTabs.App.doInitialSetup();
             return;
         }
 
         if(!this.tabs){
-            var callback = pullTabs.setTabs();
-            Browser.getTabs(callback);
+            var callback = pullTabs.App.setTabs();
+            pullTabs.Browser.getTabs(callback);
             return;
         }
 
@@ -62,9 +63,9 @@ pullTabs = {
 
             this.getLayout(this.setLayout);
 
-            if(pullTabs.layout){
+            if(pullTabs.App.layout){
 
-                if(pullTabs.layout.simple){
+                if(pullTabs.App.layout.simple){
                     this.watchButtons();
 
                     if(!this.linksWatched){
@@ -77,7 +78,7 @@ pullTabs = {
 
                 }
 
-                if(pullTabs.layout.advanced){
+                if(pullTabs.App.layout.advanced){
                     this.setAdvancedLayout();
                 }
             }
@@ -93,7 +94,7 @@ pullTabs = {
         advanced.classList.remove('hidden');
 
         this.getOptions(this.setOptions);
-        if(pullTabs.prefs){
+        if(pullTabs.App.prefs){
             this.createForm(this.tabs);
             var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
             if(numFormTabs.length === this.tabs.length){
@@ -142,7 +143,7 @@ pullTabs = {
     },
 
     createForm: function (tabs) {
-        if(pullTabs.prefs){
+        if(pullTabs.App.prefs){
             this.assembleForm( tabs, pullTabs.prefs );
         }
 
@@ -162,7 +163,7 @@ pullTabs = {
             var type,pref, fullType;
 
             if(fullMimeType){
-                pullTabs.getContentType(tab.url, function(response){
+                pullTabs.App.getContentType(tab.url, function(response){
                     this.mType = response;
                 });
             }
@@ -211,19 +212,19 @@ pullTabs = {
             this.tabs = Form.getSelectedTabs(this.tabs);
 
             if(this.tabs.downloads.length > 0){
-                Browser.downloadUrls(this.tabs.downloads);
+                pullTabs.Browser.downloadUrls(this.tabs.downloads);
             }
 
             if(this.tabs.pockets.length > 0){
-                Pocket.saveTabsToPocket(this.tabs.pockets);
+                pullTabs.Pocket.saveTabsToPocket(this.tabs.pockets);
             }
 
             if(this.tabs.closes.length > 0){
-                Browser.closeTabs(this.tabs.closes);
+                pullTabs.Browser.closeTabs(this.tabs.closes);
             }
 
             if(this.tabs.bookmarks.length > 0){
-                Browser.bookmarkTabs(this.tabs.bookmarks);
+                pullTabs.Browser.bookmarkTabs(this.tabs.bookmarks);
             }
 
             return;
@@ -266,7 +267,7 @@ pullTabs = {
 */
 
     setLayout: function ( layout ) {
-        pullTabs.layout = layout;
+        pullTabs.App.layout = layout;
     },
 
     getLayout: function( callback ) {
@@ -275,7 +276,7 @@ pullTabs = {
             advanced: 'false'
         };
 
-        Browser.retrieve(key, callback);
+        pullTabs.Browser.retrieve(key, callback);
     },
 
     getOptions: function ( callback ) {
@@ -290,19 +291,19 @@ pullTabs = {
             unknown: 'ignore'
         };
 
-        Browser.retrieve( key, callback );
+        pullTabs.Browser.retrieve( key, callback );
 
         return;
     },
 
     setOptions: function ( items ) {
-        pullTabs.prefs = items;
+        pullTabs.App.prefs = items;
     },
 
     setActions: function (){
         var actions = {
-            check: function() {pullTabs.setAllActive();},
-            uncheck: function() {pullTabs.setAllInactive();},
+            check: function() {pullTabs.App.setAllActive();},
+            uncheck: function() {pullTabs.App.setAllInactive();},
         };
 
         //Here be the only piece of jQuery code in this extension's
@@ -381,7 +382,7 @@ pullTabs = {
 
     process: function (evt) {
         evt.preventDefault();
-        pullTabs.getTabStatus();
+        pullTabs.App.getTabStatus();
     },
 
     processGroup: function (evt) {
@@ -392,25 +393,25 @@ pullTabs = {
 
     doAction: function(evt) {
         evt.preventDefault();
-        pullTabs.processButton(this.id);
+        pullTabs.App.processButton(this.id);
     },
 
     processButton: function(action){
         switch(action) {
             case "download":
-                Browser.downloadUrls(pullTabs.tabs);
+                pullTabs.Browser.downloadUrls(pullTabs.App.tabs);
                 break;
 
             case "pocket":
-                Pocket.saveTabsToPocket(pullTabs.tabs);
+                pullTabs.Pocket.saveTabsToPocket(pullTabs.App.tabs);
                 break;
 
             case "bookmark":
-                Browser.bookmarkTabs(pullTabs.tabs);
+                pullTabs.Browser.bookmarkTabs(pullTabs.App.tabs);
                 break;
 
             case "close":
-                Browser.closeTabs(pullTabs.tabs);
+                pullTabs.Browser.closeTabs(pullTabs.App.tabs);
                 break;
 
             default:
@@ -484,7 +485,7 @@ pullTabs = {
 
     swapContent: function ( link, content ) {
         if(!content){
-            pullTabs.getContent( link, pullTabs.swapContent );
+            pullTabs.App.getContent( link, pullTabs.App.swapContent );
             return;
         }
 
@@ -527,13 +528,13 @@ pullTabs = {
     watchLinks: function () {
         var aboutLink = document.getElementById('about');
         aboutLink.addEventListener('click', function(){
-           pullTabs.swapMainContent();
+           pullTabs.App.swapMainContent();
             return;
         });
 
         var homeLink = document.getElementById('home');
         homeLink.addEventListener('click', function(){
-           pullTabs.showMainContent();
+           pullTabs.App.showMainContent();
             return;
         });
 
@@ -548,7 +549,7 @@ pullTabs = {
                     'active': false
                 };
 
-                Browser.createTab( tabKey );
+                pullTabs.Browser.createTab( tabKey );
             });
         }
 
@@ -562,10 +563,10 @@ pullTabs = {
 
         for (i=0; i < numLinks; i++) {
             var link = links[i];
-            //links[i].addEventListener('click', function(){pullTabs.swapContent(link);});
+            //links[i].addEventListener('click', function(){pullTabs.App.swapContent(link);});
             //link = document.getElementById();
             link.addEventListener('click', function(){
-                pullTabs.swapContent(link);
+                pullTabs.App.swapContent(link);
                 return;
             });
         }*/
@@ -573,7 +574,7 @@ pullTabs = {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-    pullTabs.init();
+    pullTabs.App.init();
 });
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
