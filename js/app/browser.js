@@ -6,14 +6,15 @@
  * as possible.
  *
  */
-var Browser = {
+var pullTabs = pullTabs || {};
+pullTabs.Browser = pullTabs.Browser || {
 
     ENV: '',
 
     browser: function(){},
 
     init: function () {
-        this.ENV = pullTabsApp.Config.configuration.mode;
+        this.ENV = pullTabs.Config.configuration.mode;
         this.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
         this.setBrowser();
         if(typeof(localStorage['pullTabsFolderId']) === 'undefined'){
@@ -144,14 +145,14 @@ var PTChrome = {
                 "url": tab.url
             };
 
-            if(!Browser.isFirefox){
+            if(!pullTabs.Browser.isFirefox){
                 file.method = 'GET';
             }
 
             //Chrome handles downloads well but Firefox saves URLs without extension endings
             //with a generic download(x) filename
-            if(Browser.isFirefox){
-                if(!Browser.isFile(tab.url)){
+            if(pullTabs.Browser.isFirefox){
+                if(!pullTabs.Browser.isFile(tab.url)){
                     file.filename = tab.title + '.html';
                 }
             }
@@ -188,7 +189,7 @@ var PTChrome = {
     getTabs: function ( callback ) {
         var info = {currentWindow: true};
         chrome.tabs.query(info,function(e){
-            pullTabs.setTabs(e);
+            pullTabs.App.setTabs(e);
         });
     },
 
@@ -278,6 +279,7 @@ var PTChrome = {
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
             Pocket.getAccessToken(pocket);
         });
+
     },
 
     /*
@@ -285,15 +287,15 @@ var PTChrome = {
      * otherwise use local
      */
     getStorageType: function () {
-        if(!Browser.isFirefox){
+        if(!pullTabs.Browser.isFirefox){
             if ( ( typeof(chrome.storage.sync) !== 'undefined' && typeof(chrome.storage.sync.get) !== 'undefined' ) ){
-                Browser.storageType = chrome.storage.sync;
-                return Browser.storageType;
+                pullTabs.Browser.storageType = chrome.storage.sync;
+                return pullTabs.Browser.storageType;
             }
         }
         else if(typeof(chrome.storage.local) !== 'undefined' && typeof(chrome.storage.local.get) !== 'undefined' ){
-                Browser.storageType = chrome.storage.local;
-                return Browser.storageType;
+                pullTabs.Browser.storageType = chrome.storage.local;
+                return pullTabs.Browser.storageType;
         }
 
         //@to-do revert to localStorage
@@ -308,16 +310,16 @@ var PTChrome = {
      * don't recognize chrome.storage
      */
     store: function ( key, callback ) {
-        Browser.getStorageType();
+        pullTabs.Browser.getStorageType();
 
-        if(typeof(Browser.storageType) === 'undefined'){
+        if(typeof(pullTabs.Browser.storageType) === 'undefined'){
             console.log("No storage available");
             callback();
             return;
         }
 
         try{
-            Browser.storageType.set( key , callback );
+            pullTabs.Browser.storageType.set( key , callback );
         }
         catch(e){
             console.log(e);
@@ -347,7 +349,7 @@ var PTChrome = {
     retrieve: function ( key, callback ) {
         var storageType;
 
-        if(Browser.isFirefox){
+        if(pullTabs.Browser.isFirefox){
             if(typeof(chrome.storage.local) !== 'undefined' && typeof(chrome.storage.local.get) !== 'undefined' ){
                 storageType = chrome.storage.local;
             }
@@ -392,9 +394,9 @@ var PTChrome = {
     }
 };
 
-//Browser.init();
-if(typeof(Browser.ENV !== 'undefined') && Browser.ENV === 'DEVELOPMENT'){
+//pullTabs.Browser.init();
+if(typeof(pullTabs.Browser.ENV !== 'undefined') && pullTabs.Browser.ENV === 'DEVELOPMENT'){
 
-    console.log("DEFAULT TABS: " + Browser.getTabs());
+    console.log("DEFAULT TABS: " + pullTabs.Browser.getTabs());
 }
-Browser.init();
+pullTabs.Browser.init(pullTabs);

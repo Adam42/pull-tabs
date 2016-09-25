@@ -1,6 +1,6 @@
 //Change this filename to config.js and fill in the details below
-var pullTabsApp = pullTabsApp || {};
-pullTabsApp.Config = pullTabsApp.Config || (function () {
+var pullTabs = pullTabs || {};
+pullTabs.Config = pullTabs.Config || (function () {
 
     var setup = {
         "credentials" : {
@@ -23,4 +23,4 @@ pullTabsApp.Config = pullTabsApp.Config || (function () {
 
     return setup;
 
-}(pullTabsApp));
+}(pullTabs));

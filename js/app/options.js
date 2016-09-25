@@ -1,5 +1,5 @@
-var pullTabsApp = pullTabsApp || {};
-pullTabsApp.Options = pullTabsApp.Options || (function () {
+var pullTabs = pullTabs || {};
+pullTabs.Options = pullTabs.Options || (function () {
 
     var tabSettings = {},
         opt = {};
@@ -91,7 +91,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     function bindUIActions() {
         document.getElementById('settings').addEventListener('submit', opt.saveMimeSettings);
-        document.getElementById('pocket-status').addEventListener('click', Pocket.checkLink);
+        document.getElementById('pocket-status').addEventListener('click', pullTabs.Pocket.checkLink);
         document.getElementById('full-mime-types').addEventListener('click', opt.saveFullMimeType);
         document.getElementById('simple').addEventListener('click', opt.saveLayout);
         document.getElementById('advanced').addEventListener('click', opt.saveLayout);
@@ -117,7 +117,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     };
 
     opt.restoreMimeSettings = function (callback) {
-        Browser.retrieve( opt.mimeSettings, callback );
+        pullTabs.Browser.retrieve( opt.mimeSettings, callback );
     };
 
     /*
@@ -184,7 +184,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }
 
         try{
-            Browser.store( opt.layout , opt.updateStatusMessage('Layout saved.') );
+            pullTabs.Browser.store( opt.layout , opt.updateStatusMessage('Layout saved.') );
         }
         catch(e){
             console.log("Chrome storage sync set Exception: ");
@@ -218,7 +218,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }
 
         try{
-            Browser.store( opt.fullMimeType, opt.updateStatusMessage('Full mime type saved.') );
+            pullTabs.Browser.store( opt.fullMimeType, opt.updateStatusMessage('Full mime type saved.') );
         }
         catch(e){
             console.log("Chrome storage sync set Exception: ");
@@ -244,11 +244,11 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
     };
 
     opt.getFullMimeType = function (callback) {
-        Browser.retrieve( opt.fullMimeType, callback );
+        pullTabs.Browser.retrieve( opt.fullMimeType, callback );
     };
 
     opt.getLayout = function (callback) {
-        Browser.retrieve( opt.layout, callback );
+        pullTabs.Browser.retrieve( opt.layout, callback );
     };
 
     /*
@@ -271,7 +271,7 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
         }
 
         try{
-            Browser.store(opt.mimeSettings , opt.updateStatusMessage('Mime settings saved') );
+            pullTabs.Browser.store(opt.mimeSettings , opt.updateStatusMessage('Mime settings saved') );
         }
         catch(e){
             console.log("Chrome storage sync set Exception: ");
@@ -285,6 +285,6 @@ pullTabsApp.Options = pullTabsApp.Options || (function () {
 
     return opt;
 
-}(pullTabsApp));
+}(pullTabs));
 
-pullTabsApp.Options.init();
+pullTabs.Options.init();
