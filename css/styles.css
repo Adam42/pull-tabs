@@ -55,7 +55,7 @@ form#default{ margin-left: 40px;}
 #setup {margin-top: 20px; }
 .container[role="complementary"] a {padding-top: 20px;}
 
-#status {position: fixed; top: 0; left: 45%; width: 100%; z-index: 0;}
+#options #status {position: fixed; top: 0; left: 45%; width: 100%; z-index: 0;}
 
 .bounce{margin-left: -9999px; height: 0;}
 
