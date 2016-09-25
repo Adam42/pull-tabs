@@ -9,7 +9,7 @@ var Form = {
     createForm: function (tabs) {
         this.getOptions(function(options){
 
-            pullTabs.assembleForm( tabs, options );
+            pullTabs.App.assembleForm( tabs, options );
             return;
         });
 
@@ -110,7 +110,7 @@ var Form = {
 
         tabs.forEach(function(tab) {
 
-            pullTabs.getContentType(tab.url, function(response){
+            pullTabs.App.getContentType(tab.url, function(response){
                 this.mType = response;
             });
 
@@ -126,18 +126,18 @@ var Form = {
                 active = 'active';
             }
 
-            var input = pullTabs.createCheckbox ( tab, type, checked );
+            var input = pullTabs.App.createCheckbox ( tab, type, checked );
 
 
             if(pref === 'download'){
 
             }
-            var radioDown = pullTabs.createRadioInput ( tab, 'download', pref );
-            var radioPocket = pullTabs.createRadioInput ( tab, 'pocket', pref );
-            var radioIgnore = pullTabs.createRadioInput ( tab, 'ignore', pref );
+            var radioDown = pullTabs.App.createRadioInput ( tab, 'download', pref );
+            var radioPocket = pullTabs.App.createRadioInput ( tab, 'pocket', pref );
+            var radioIgnore = pullTabs.App.createRadioInput ( tab, 'ignore', pref );
 
 
-            var label = pullTabs.createLabel ( tab, type, active );
+            var label = pullTabs.App.createLabel ( tab, type, active );
 
             label.appendChild(input);
             label.appendChild(radioDown);
