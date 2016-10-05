@@ -1,3 +1,4 @@
+"use strict";
 var pullTabs = pullTabs || {};
 pullTabs.Options = pullTabs.Options || (function () {
 
@@ -9,8 +10,16 @@ pullTabs.Options = pullTabs.Options || (function () {
     opt.numOfmimeTypes = opt.mimeTypes.length;
 
     opt.mimeSettings = {};
-    opt.fullMimeType = {};
-    opt.layout = {};
+    opt.fullMimeType = {
+        'active' : false
+    };
+    opt.layout = {
+        'simple' : true,
+        'advanced' : false
+    };
+    opt.autoClose = {
+        'active' : false
+    };
 
     //list of available actions to apply to a tab
     opt.tabActions = ['ignore', 'download', 'pocket', 'bookmark', 'close'];
@@ -26,15 +35,6 @@ pullTabs.Options = pullTabs.Options || (function () {
         opt.mimeTypes.forEach(function(element){
             opt.mimeSettings[element] = this.tabActions[0];
         }, opt);
-    }
-
-    function setDefaultLayout() {
-        opt.layout.simple = true;
-        opt.layout.advanced = false;
-    }
-
-    function setDefaultFullMimeType(){
-        opt.fullMimeType.active = true;
     }
 
     function setDefaultTabActions() {
@@ -95,17 +95,22 @@ pullTabs.Options = pullTabs.Options || (function () {
         document.getElementById('full-mime-types').addEventListener('click', opt.saveFullMimeType);
         document.getElementById('simple').addEventListener('click', opt.saveLayout);
         document.getElementById('advanced').addEventListener('click', opt.saveLayout);
+        document.getElementById('autoclose').addEventListener('click',opt.saveAutoClose);
     }
 
     opt.init = function(){
         bindUIActions();
         setDefaultMimeTypes();
         createForm();
-        this.restoreMimeSettings(opt.setSettings);
-        setDefaultLayout();
-        this.getLayout(opt.setLayout);
-        setDefaultFullMimeType();
-        this.getFullMimeType(opt.setFullMimeType);
+        this.restoreMimeSettings().then( opt.setSettings );
+        this.getLayout().then( pullTabs.Options.setLayout );
+        this.getAutoClose().then( pullTabs.Options.setAutoClose );
+
+        this.getFullMimeType().then( function( fullMimeType ) {
+            pullTabs.Options.setFullMimeType( fullMimeType );
+        }).catch( function(e){
+            console.log(e);
+        });
     };
 
     opt.getMimeTypes = function(){
@@ -117,7 +122,7 @@ pullTabs.Options = pullTabs.Options || (function () {
     };
 
     opt.restoreMimeSettings = function (callback) {
-        pullTabs.Browser.retrieve( opt.mimeSettings, callback );
+        return pullTabs.Browser.retrieve( opt.mimeSettings, callback );
     };
 
     /*
@@ -163,6 +168,33 @@ pullTabs.Options = pullTabs.Options || (function () {
             advanced.checked = false;
         }
 
+    };
+
+    opt.setAutoClose = function( autoclose ) {
+        var autoCloseButton = document.getElementById('autoclose');
+
+        if (autoclose.active === true){
+            autoCloseButton.checked = true;
+        }
+    };
+
+    opt.saveAutoClose = function(){
+        var autoCloseButton = document.getElementById('autoclose');
+
+        if(autoCloseButton.checked === true){
+            opt.autoClose.active = true;
+        }
+        else{
+            opt.autoClose.active = false;
+        }
+
+        try{
+            pullTabs.Browser.store( opt.autoClose, opt.updateStatusMessage('Autoclose saved.'));
+        }
+        catch(e){
+            console.log(e);
+            return false;
+        }
     };
 
     opt.saveLayout = function (){
@@ -243,12 +275,16 @@ pullTabs.Options = pullTabs.Options || (function () {
         }, 1500);
     };
 
-    opt.getFullMimeType = function (callback) {
-        pullTabs.Browser.retrieve( opt.fullMimeType, callback );
+    opt.getFullMimeType = function () {
+        return pullTabs.Browser.retrieve( opt.fullMimeType );
     };
 
-    opt.getLayout = function (callback) {
-        pullTabs.Browser.retrieve( opt.layout, callback );
+    opt.getLayout = function () {
+        return pullTabs.Browser.retrieve( opt.layout );
+    };
+
+    opt.getAutoClose = function () {
+        return pullTabs.Browser.retrieve( opt.autoClose );
     };
 
     /*
