@@ -1,4 +1,5 @@
-var Form = {
+var pullTabs = pullTabs || {};
+pullTabs.Form = pullTabs.Form || {
 
     options: '',
 
@@ -7,13 +8,13 @@ var Form = {
     },
 
     createForm: function (tabs) {
-        this.getOptions(function(options){
+        pullTabs.App.getOptions(function(options){
 
             pullTabs.App.assembleForm( tabs, options );
             return;
         });
 
-        this.watchSubmit(tabs);
+        pullTabs.App.watchSubmit(tabs);
         return;
     },
 
