@@ -1,3 +1,4 @@
+"use strict";
 var pullTabs = pullTabs || {};
 pullTabs.Form = pullTabs.Form || {
 
