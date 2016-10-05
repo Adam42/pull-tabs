@@ -9,8 +9,7 @@
         <link rel="stylesheet" href="/css/styles.css" />
     </head>
 
-    <body id="options">
-
+    <body id="pocket">
         <div class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div id="main-nav" class="navbar-header">
@@ -22,6 +21,7 @@
             <div class="container" role="main">
                 <h3 class="page-header">Pocket API</h3>
                 <div id="status"></div>
+                    <a id="pocket-status" href="#pocket-login">Check pocket login status</a>
 
                 <a class="hidden" id="pocket" href="#pocket">Pocket</a>
 
@@ -29,12 +29,12 @@
                     <input type="hidden" name="pocket-login" value="ignore" />
                     <button>Login</button>
                 </form>
-
-
             </div>
         </div>
+        <script src="/js/app/pulltabs.js"></script>
         <script src="/js/app/config.js"></script>
         <script src="/js/app/pocket.js"></script>
+        <script src="/js/app/auth.js"></script>
         <script src="/js/vendors/jquery.js"></script>
         <script src="/js/vendors/bootstrap.js"></script>
     </body>
