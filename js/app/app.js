@@ -1,3 +1,4 @@
+"use strict";
 var pullTabs = pullTabs || {};
 pullTabs.App = pullTabs.App ||  {
 
@@ -10,7 +11,6 @@ pullTabs.App = pullTabs.App ||  {
     linksWatched: false,
 
     init: function(  ) {
-
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
             localStorage.initialSetup = 'yes';
@@ -18,58 +18,127 @@ pullTabs.App = pullTabs.App ||  {
             return;
         }
 
-        if(!this.tabs){
-            var callback = pullTabs.App.setTabs();
-            pullTabs.Browser.getTabs(callback);
+        if(!pullTabs.App.tabs){
+            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent');
+            pullTabs.Browser.getTabs().then( function (tabs) {
+                    pullTabs.App.tabs = tabs;
+                    pullTabs.App.removeStatusMessage(msgID);
+                return;
+            }).then(pullTabs.App.continueLoad.bind(pullTabs)).catch(function ( e ){
+                console.log( e );
+            });
+
             return;
         }
+    },
 
-        this.continueLoad();
+    updateStatusMessage: function (message, duration) {
+        var status = document.getElementById('status');
+        var statusMessage = document.createElement('p');
+        var elementIDName = 'status-message-';
+
+
+        statusMessage.classList.add('alert','alert-success');
+        status.classList.remove('hidden');
+        status.style.top = 0;
+        statusMessage.textContent = message;
+
+       //test if it's a DOM element instead of just a string
+        if(typeof(message) === 'object' && (message instanceof HTMLElement)){
+            statusMessage.textContent = '';
+            statusMessage.appendChild(message);
+        }
+
+        statusMessage.id = elementIDName + status.children.length;
+
+        //if there are children then get the id of the last child
+        //and bump it to avoid colliding with an older message
+        //that hasn't yet been removed
+        if(status.children.length > 0){
+            var lastChildID = status.lastChild.id;
+            lastChildID = lastChildID.replace(elementIDName,'');
+            lastChildID = parseInt(lastChildID) + 1;
+            statusMessage.id = elementIDName + lastChildID;
+        }
+
+        status.appendChild(statusMessage);
+
+        switch(duration){
+
+            case 'short':
+                setTimeout( pullTabs.App.removeStatusMessage, 2000, statusMessage.id );
+                break;
+
+            case 'long':
+                setTimeout( pullTabs.App.removeStatusMessage, 8000, statusMessage.id );
+                break;
+
+            case 'dependent':
+                return statusMessage.id;
+
+            case 'restack':
+                break;
+
+            default:
+                console.log('Default');
+                setTimeout( pullTabs.App.removeStatusMessage, 3000, statusMessage.id );
+                break;
+        }
+    },
+
+    removeStatusMessage: function (id) {
+            if(typeof(id) === null){
+                id = 'status-message-0';
+            }
+            var status = document.getElementById(id);
+            var parent = status.parentNode;
+            status.remove();
+
+            if(parent.children.length <= 0){
+                parent.classList.add('hidden');
+            }
     },
 
     doInitialSetup: function () {
-        if(localStorage.initialSetup === 'yes'){
-            if(document.getElementById('setup') === null){
-                var optionsLink = document.createElement('a');
-                    //Browser is not instantiated at this point
-                    //optionsLink.href = Browser.extensionGetURL('options.html');
-                    optionsLink.href = chrome.extension.getURL( 'options.html' );
-                    optionsLink.id = 'initial-load';
-                    optionsLink.textContent = " Setup PullTabs with your preferences.";
+        if(document.getElementById('setup') === null){
+            var optionsLink = document.createElement('a');
+                //Browser is not instantiated at this point
+                //optionsLink.href = Browser.extensionGetURL('options.html');
+                optionsLink.href = chrome.extension.getURL( 'options.html' );
+                optionsLink.id = 'initial-load';
+                optionsLink.textContent = " Setup PullTabs with your preferences.";
 
-                var setupMessage = document.createElement('p');
-                    setupMessage.classList.add('alert', 'alert-info');
-                    setupMessage.textContent = 'This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.';
-                    setupMessage.id = 'setup';
-                    setupMessage.appendChild(optionsLink);
+            var setupMessage = document.createElement('p');
+                setupMessage.classList.add('alert', 'alert-info');
+                setupMessage.textContent = 'This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.';
+                setupMessage.id = 'setup';
+                setupMessage.appendChild(optionsLink);
 
-                var parent = document.getElementById('simple').parentNode;
-                var simple = document.getElementById('simple');
+            var parent = document.getElementById('simple').parentNode;
+            var simple = document.getElementById('simple');
 
-                parent.insertBefore(setupMessage, simple);
+            parent.insertBefore(setupMessage, simple);
 
-                setupMessage.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    localStorage.initialSetup = 'no';
-                    chrome.runtime.openOptionsPage();
-                });
-            }
+            setupMessage.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.initialSetup = 'no';
+                chrome.runtime.openOptionsPage();
+            });
         }
     },
 
     continueLoad: function( ) {
-        if(this.tabs){
-            this.setNumTabs(this.tabs);
+        this.App.tabs = pullTabs.App.tabs;
 
-            this.getLayout(this.setLayout);
+            this.App.setNumTabs(pullTabs.App.tabs);
 
-            if(pullTabs.App.layout){
+            pullTabs.App.getLayout().then(function( layout ) {
 
-                if(pullTabs.App.layout.simple){
-                    this.watchButtons();
+                if(layout.simple){
+                    pullTabs.App.watchButtons();
 
-                    if(!this.linksWatched){
-                        this.watchLinks();
+                    if(!pullTabs.App.linksWatched){
+                        pullTabs.App.watchLinks();
                     }
                 }
                 else{
@@ -78,49 +147,35 @@ pullTabs.App = pullTabs.App ||  {
 
                 }
 
-                if(pullTabs.App.layout.advanced){
-                    this.setAdvancedLayout();
+                if(layout.advanced){
+                    pullTabs.App.setAdvancedLayout();
                 }
-            }
-            else{
-                window.setTimeout( this.init, 50);
-            }
-        }
+            });
     },
 
     setAdvancedLayout: function () {
-
         var advanced = document.getElementById('advanced');
         advanced.classList.remove('hidden');
 
-        this.getOptions(this.setOptions);
-        if(pullTabs.App.prefs){
-            this.createForm(this.tabs);
+        this.getOptions().then(function(prefs){
+            pullTabs.App.prefs = prefs;
+            pullTabs.App.createForm(pullTabs.App.tabs);
             var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
-            if(numFormTabs.length === this.tabs.length){
-                this.watchCheckBoxes(numFormTabs);
-                this.watchMutateCheck();
-                this.setActions();
-                if(!this.linksWatched){
-                    this.watchLinks();
+                pullTabs.App.watchCheckBoxes(numFormTabs);
+                pullTabs.App.watchMutateCheck();
+                pullTabs.App.setActions();
+                if(!pullTabs.App.linksWatched){
+                    pullTabs.App.watchLinks();
                 }
-            }
-            else{
-                window.setTimeout( this.init, 50);
-            }
-        }
-        else{
-            window.setTimeout( this.init, 50);
-        }
+        });
     },
 
     watchCheckBoxes: function (numFormTabs) {
         var i;
         for(i=0;i<numFormTabs.length; i++){
-            Form.toggleLabels(numFormTabs[i]);
+            pullTabs.Form.toggleLabels(numFormTabs[i]);
         }
     },
-
 
     getUrls: function (tabs) {
         var urls = [];
@@ -168,9 +223,9 @@ pullTabs.App = pullTabs.App ||  {
                 });
             }
 
-            if(this.mType){
-                fullType = this.mType.split(";").shift();
-                type = this.mType.split("/").shift().toLowerCase();
+            if(pullTabs.App.mType){
+                fullType = pullTabs.App.mType.split(";").shift();
+                type = pullTabs.App.mType.split("/").shift().toLowerCase();
                 pref = prefs[type] ? prefs[type] : 'ignore';
 
             }
@@ -187,7 +242,7 @@ pullTabs.App = pullTabs.App ||  {
                 checked = 'checked';
                 active = 'active';
             }
-
+            var Form = pullTabs.Form;
             var input = Form.createCheckbox ( tab, fullType, checked );
 
             var radioDown = Form.createRadioInput ( tab, 'download', pref );
@@ -209,7 +264,7 @@ pullTabs.App = pullTabs.App ||  {
     },
 
     getTabStatus: function(){
-            this.tabs = Form.getSelectedTabs(this.tabs);
+            this.tabs = pullTabs.Form.getSelectedTabs(this.tabs);
 
             if(this.tabs.downloads.length > 0){
                 pullTabs.Browser.downloadUrls(this.tabs.downloads);
@@ -270,14 +325,25 @@ pullTabs.App = pullTabs.App ||  {
         pullTabs.App.layout = layout;
     },
 
-    getLayout: function( callback ) {
+
+    getLayout: function( ) {
         var key = {
             simple: 'true',
             advanced: 'false'
         };
 
-        pullTabs.Browser.retrieve(key, callback);
+        return pullTabs.Browser.retrieve(key).then( function ( value ) {
+            pullTabs.App.layout = value;
+            return value;
+        }).catch(pullTabs.App.doError);
     },
+
+    doError: function( error ){
+        console.log('Error: ');
+        console.log(error);
+        return;
+    },
+
 
     getOptions: function ( callback ) {
         var key = {
@@ -291,9 +357,7 @@ pullTabs.App = pullTabs.App ||  {
             unknown: 'ignore'
         };
 
-        pullTabs.Browser.retrieve( key, callback );
-
-        return;
+        return pullTabs.Browser.retrieve( key, callback );
     },
 
     setOptions: function ( items ) {
