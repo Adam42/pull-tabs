@@ -32,13 +32,13 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
-    updateStatusMessage: function (message, duration) {
+    updateStatusMessage: function (message, duration, styleClasses) {
         var status = document.getElementById('status');
         var statusMessage = document.createElement('p');
         var elementIDName = 'status-message-';
-
-
-        statusMessage.classList.add('alert','alert-success');
+        if(typeof(styleClasses) !== 'undefined'){
+            statusMessage.classList.add('alert','alert-success');
+        }
         status.classList.remove('hidden');
         status.style.top = 0;
         statusMessage.textContent = message;
