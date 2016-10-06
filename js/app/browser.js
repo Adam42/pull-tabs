@@ -1,3 +1,4 @@
+"use strict";
 /*
  * Browser
  *
@@ -41,14 +42,8 @@ pullTabs.Browser = pullTabs.Browser || {
             .split('.').length > 1;
     },
 
-    getTabs: function (callback) {
-        var result = this.browser.getTabs(callback);
-        if(result !== 'undefined'){
-            return result;
-        }
-        else{
-            return;
-        }
+    getTabs: function () {
+        return this.browser.getTabs();
     },
 
     getBookmarks: function ( callback ){
@@ -84,7 +79,7 @@ pullTabs.Browser = pullTabs.Browser || {
     },
 
     retrieve: function( key, callback ) {
-        this.browser.retrieve( key, callback );
+        return this.browser.retrieve( key, callback );
     },
 
     createTab: function ( tabKey ) {
@@ -163,33 +158,53 @@ var PTChrome = {
                         if(label){
                             label.setAttribute('class', label.className + ' failed');
                         }
-                        Form.updateStatus(tab,'Failed downloading ');
+                        pullTabs.Form.updateStatus(tab,'Failed downloading ');
                         return;
                     }
                     if(label){
                         label.setAttribute('class', label.className + ' successful');
                     }
-                        Form.updateStatus(tab,'Downloading ');
 
-                        //@to-do check preferences to see if user chose to auto-close tabs upon successful action
-                        if(tab.active !== true){
-                            chrome.tabs.remove(tab.id);
-                        }
+                    var span = document.createElement('span');
+                    var link = document.createElement('a');
+                    var message = document.createTextNode('Downloaded ');
+
+                    link.title = tab.title;
+                    link.href = tab.url;
+                    link.innerHTML = tab.title;
+
+                    span.appendChild(message);
+                    span.appendChild(link);
+                    pullTabs.App.updateStatusMessage(span, 'dependent');
+
+                    //@to-do check preferences to see if user chose to auto-close tabs upon successful action
+                    var autoClose = false;
+                    if(tab.active !== true && autoClose === true){
+                        chrome.tabs.remove(tab.id);
+                    }
 
                 });
             }
             catch(e){
-                Form.updateStatus(tab, 'Error downloading ');
+                pullTabs.Form.updateStatus(tab, 'Error downloading ');
                 console.log(e);
             }
 
         });
     },
 
-    getTabs: function ( callback ) {
-        var info = {currentWindow: true};
-        chrome.tabs.query(info,function(e){
-            pullTabs.App.setTabs(e);
+    getTabs: function () {
+        return new Promise(function(resolve, reject) {
+
+            var info = {currentWindow: true};
+            chrome.tabs.query(info,function(e){
+                if(typeof(e) === 'object'){
+                    resolve(e);
+                    return;
+                }
+                reject(Error("Couldnt get tabs"));
+//                pullTabs.App.setTabs(e);
+            });
         });
     },
 
@@ -259,9 +274,9 @@ var PTChrome = {
 
         chrome.bookmarks.create(bookmark, function(savedMark) {
 
-            Form.updateStatus(tab, 'Successfuly bookmarked ');
+            pullTabs.Form.updateStatus(tab, 'Successfuly bookmarked ');
 
-            Form.setLabelStatus(tab, "successful");
+            pullTabs.Form.setLabelStatus(tab, "successful");
       });
     },
 
@@ -355,8 +370,8 @@ var PTChrome = {
             }
             else{
                 console.log("Browser is Firefox but chrome.storage.local is unavailable, returning default key value");
-                callback(key);
-                return;
+            //    callback(key);
+             //   return;
             }
         }
         else if ( ( typeof(chrome.storage.sync) !== 'undefined' && typeof(chrome.storage.sync.get) !== 'undefined' ) ){
@@ -364,12 +379,18 @@ var PTChrome = {
         }
         else{
             console.log("Storage unavailable, returning default key value");
-            callback(key);
-            return;
+           // callback(key);
+           // return;
         }
 
-        storageType.get(key, function ( value ) {
-            callback ( value );
+        return new Promise(function(resolve, reject) {
+            storageType.get(key, function ( value ) {
+                if(typeof(value) !== 'undefined'){
+                    resolve(value);
+                    return value;
+                }
+                reject(Error("Couldn't retrieve key"));
+            });
         });
     },
 
