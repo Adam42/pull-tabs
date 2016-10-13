@@ -8,6 +8,8 @@ pullTabs.App = pullTabs.App ||  {
 
     layout: '',
 
+    mimeTypesMap: {},
+
     linksWatched: false,
 
     init: function(  ) {
@@ -19,7 +21,7 @@ pullTabs.App = pullTabs.App ||  {
         }
 
         if(!pullTabs.App.tabs){
-            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent');
+            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
             pullTabs.Browser.getTabs().then( function (tabs) {
                     pullTabs.App.tabs = tabs;
                     pullTabs.App.removeStatusMessage(msgID);
@@ -32,13 +34,13 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
-    updateStatusMessage: function (message, duration, styleClasses) {
+    updateStatusMessage: function (message, duration, type) {
         var status = document.getElementById('status');
         var statusMessage = document.createElement('p');
         var elementIDName = 'status-message-';
-        if(typeof(styleClasses) !== 'undefined'){
-            statusMessage.classList.add('alert','alert-success');
-        }
+
+        var alertType = 'alert-' + type;
+        statusMessage.classList.add('alert',alertType);
         status.classList.remove('hidden');
         status.style.top = 0;
         statusMessage.textContent = message;
@@ -69,6 +71,10 @@ pullTabs.App = pullTabs.App ||  {
                 setTimeout( pullTabs.App.removeStatusMessage, 2000, statusMessage.id );
                 break;
 
+           case 'medium':
+                setTimeout( pullTabs.App.removeStatusMessage, 4000, statusMessage.id );
+                break;
+
             case 'long':
                 setTimeout( pullTabs.App.removeStatusMessage, 8000, statusMessage.id );
                 break;
@@ -80,7 +86,6 @@ pullTabs.App = pullTabs.App ||  {
                 break;
 
             default:
-                console.log('Default');
                 setTimeout( pullTabs.App.removeStatusMessage, 3000, statusMessage.id );
                 break;
         }
@@ -325,7 +330,6 @@ pullTabs.App = pullTabs.App ||  {
         pullTabs.App.layout = layout;
     },
 
-
     getLayout: function( ) {
         var key = {
             simple: 'true',
@@ -343,7 +347,6 @@ pullTabs.App = pullTabs.App ||  {
         console.log(error);
         return;
     },
-
 
     getOptions: function ( callback ) {
         var key = {
@@ -479,7 +482,6 @@ pullTabs.App = pullTabs.App ||  {
                 break;
 
             default:
-                console.log(this);
                 break;
         }
     },
@@ -617,7 +619,7 @@ pullTabs.App = pullTabs.App ||  {
             });
         }
 
-        this.linksWatched = true;
+        pullTabs.App.linksWatched = true;
 
 /*
         var navLinks = document.getElementById("main-nav");

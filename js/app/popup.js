@@ -1,3 +1,4 @@
+"use strict";
 var pullTabs = pullTabs || {};
 pullTabs.App = pullTabs.App ||  {
 
@@ -7,10 +8,11 @@ pullTabs.App = pullTabs.App ||  {
 
     layout: '',
 
+    mimeTypesMap: {},
+
     linksWatched: false,
 
     init: function(  ) {
-
         //Force user to go to options page on initial load
         if(localStorage.initialSetup !== 'no'){
             localStorage.initialSetup = 'yes';
@@ -18,13 +20,95 @@ pullTabs.App = pullTabs.App ||  {
             return;
         }
 
-        if(!this.tabs){
-            var callback = pullTabs.App.setTabs();
-            pullTabs.Browser.getTabs(callback);
+        if(!pullTabs.App.tabs){
+            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
+            pullTabs.Browser.getTabs().then( function (tabs) {
+                    pullTabs.App.tabs = tabs;
+                    pullTabs.App.removeStatusMessage(msgID);
+                    return tabs;
+             }).then( function ( tabs ) {
+                pullTabs.App.setNumTabs(tabs);
+            }).then(
+                pullTabs.App.getLayout().then( function( layout ) {
+                    pullTabs.App.setLayout(layout);
+                    pullTabs.App.displayLayout();
+                })
+            ).catch(function(e) {
+                console.log(e);
+            });
+
             return;
         }
+    },
 
-        this.continueLoad();
+    updateStatusMessage: function (message, duration, type) {
+        var status = document.getElementById('status');
+        var statusMessage = document.createElement('p');
+        var elementIDName = 'status-message-';
+
+        var alertType = 'alert-' + type;
+        statusMessage.classList.add('alert',alertType);
+        status.classList.remove('hidden');
+        status.style.top = 0;
+        statusMessage.textContent = message;
+
+       //test if it's a DOM element instead of just a string
+        if(typeof(message) === 'object' && (message instanceof HTMLElement)){
+            statusMessage.textContent = '';
+            statusMessage.appendChild(message);
+        }
+
+        statusMessage.id = elementIDName + status.children.length;
+
+        //if there are children then get the id of the last child
+        //and bump it to avoid colliding with an older message
+        //that hasn't yet been removed
+        if(status.children.length > 0){
+            var lastChildID = status.lastChild.id;
+            lastChildID = lastChildID.replace(elementIDName,'');
+            lastChildID = parseInt(lastChildID) + 1;
+            statusMessage.id = elementIDName + lastChildID;
+        }
+
+        status.appendChild(statusMessage);
+
+        switch(duration){
+
+            case 'short':
+                setTimeout( pullTabs.App.removeStatusMessage, 2000, statusMessage.id );
+                break;
+
+           case 'medium':
+                setTimeout( pullTabs.App.removeStatusMessage, 4000, statusMessage.id );
+                break;
+
+            case 'long':
+                setTimeout( pullTabs.App.removeStatusMessage, 8000, statusMessage.id );
+                break;
+
+            case 'dependent':
+                return statusMessage.id;
+
+            case 'restack':
+                break;
+
+            default:
+                setTimeout( pullTabs.App.removeStatusMessage, 3000, statusMessage.id );
+                break;
+        }
+    },
+
+    removeStatusMessage: function (id) {
+            if(typeof(id) === null){
+                id = 'status-message-0';
+            }
+            var status = document.getElementById(id);
+            var parent = status.parentNode;
+            status.remove();
+
+            if(parent.children.length <= 0){
+                parent.classList.add('hidden');
+            }
     },
 
     doInitialSetup: function () {
@@ -55,67 +139,80 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
-    continueLoad: function( ) {
-        if(this.tabs){
-            this.setNumTabs(this.tabs);
+    displayLayout: function( ) {
+        if(pullTabs.App.layout.simple){
+            pullTabs.App.watchButtons();
 
-            this.getLayout(this.setLayout);
-
-            if(pullTabs.App.layout){
-
-                if(pullTabs.App.layout.simple){
-                    this.watchButtons();
-
-                    if(!this.linksWatched){
-                        this.watchLinks();
-                    }
-                }
-                else{
-                    var simple = document.getElementById('simple');
-                    simple.classList.add('hidden');
-
-                }
-
-                if(pullTabs.App.layout.advanced){
-                    this.setAdvancedLayout();
-                }
-            }
-            else{
-                window.setTimeout( this.init, 50);
-            }
-        }
-    },
-
-    setAdvancedLayout: function () {
-
-        var advanced = document.getElementById('advanced');
-        advanced.classList.remove('hidden');
-
-        this.getOptions(this.setOptions);
-        if(pullTabs.App.prefs){
-            this.createForm(this.tabs);
-            var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
-            if(numFormTabs.length === this.tabs.length){
-                this.watchCheckBoxes(numFormTabs);
-                this.watchMutateCheck();
-                this.setActions();
-                if(!this.linksWatched){
-                    this.watchLinks();
-                }
-            }
-            else{
-                window.setTimeout( this.init, 50);
+            if(!pullTabs.App.linksWatched){
+                pullTabs.App.watchLinks();
             }
         }
         else{
-            window.setTimeout( this.init, 50);
+            var simple = document.getElementById('simple');
+            simple.classList.add('hidden');
         }
+
+        if(pullTabs.App.layout.advanced){
+            pullTabs.App.displayAdvancedLayout();
+        }
+    },
+
+    addMimeTypeToTabs: function () {
+        return pullTabs.App.tabs.map(function (tab) {
+
+  //          var tabObj = pullTabs.App.tabs.filter(function( tabObj ) {
+  //            return tabObj.id == tab.id;
+   //         })['0'];
+
+            pullTabs.App.getContentType(tab.url).then(function (mimeType) {
+                var id = 'tab' + tab.id.toString();
+                pullTabs.App.setMimeTypesMap(id,mimeType);
+//                pullTabs.App.mimeTypesMap[id] = mimeType;
+//                tabObj.mimeType = mimeType;
+            }).catch( function( e ) {
+                console.log( e );
+            });
+        });
+    },
+
+    setMimeTypesMap: function (id, mimeType) {
+        pullTabs.App.mimeTypesMap[id] = mimeType;
+    },
+
+    displayAdvancedLayout: function () {
+
+        var advanced = document.getElementById('advanced');
+        advanced.classList.remove('hidden');
+        this.getOptions().then( function(value){
+            pullTabs.App.setOptions(value);
+        }).then(
+            pullTabs.App.getFullMimeType().then(
+                function (fullMimeType) {
+                    if(fullMimeType.retrieveFullMimeType){
+                        Promise.all(pullTabs.App.addMimeTypeToTabs).then( function() {
+                            pullTabs.App.assembleForm( pullTabs.App.tabs, pullTabs.App.pref, pullTabs.App.mimeTypesMap) ;
+                        });
+                    }
+                    else{
+                       pullTabs.App.assembleForm(pullTabs.App.tabs, pullTabs.App.pref, pullTabs.App.mimeTypesMap);
+                }
+            }).then(
+            function () {
+                pullTabs.App.watchSubmit(pullTabs.App.tabs);
+
+                var numFormTabs = document.getElementById('resources').getElementsByClassName('list-group-item');
+
+                pullTabs.App.watchCheckBoxes(numFormTabs);
+                pullTabs.App.watchMutateCheck();
+                pullTabs.App.setActions();
+                pullTabs.App.watchLinks();
+        }));
     },
 
     watchCheckBoxes: function (numFormTabs) {
         var i;
         for(i=0;i<numFormTabs.length; i++){
-            Form.toggleLabels(numFormTabs[i]);
+            pullTabs.Form.toggleLabels(numFormTabs[i]);
         }
     },
 
@@ -131,7 +228,6 @@ pullTabs.App = pullTabs.App ||  {
 
     setTabs: function(tabs){
         this.tabs = tabs;
-        this.continueLoad();
     },
 
     setNumTabs: function(tabs){
@@ -139,123 +235,128 @@ pullTabs.App = pullTabs.App ||  {
         numTabs.innerHTML = 'This window has ' + tabs.length + ' tabs. Do this action to all tabs:';
     },
 
-    createForm: function (tabs) {
-        if(pullTabs.App.prefs){
-            this.assembleForm( tabs, pullTabs.prefs );
-        }
-
-        this.watchSubmit();
-        return;
+    getFullMimeType: function ( ) {
+        return pullTabs.Browser.retrieve(pullTabs.Options.fullMimeType);
     },
 
-    assembleForm: function ( tabs, prefs ){
-
-        var group = document.getElementById('group');
-
-        var resources = document.getElementById('resources');
-
-        var fullMimeType = false;
+    assembleForm: function ( tabs, prefs, mimeTypes ){
         tabs.forEach(function(tab) {
+            if(mimeTypes.length > 0 ){
+//            var mT = mimeTypes.filter(function(item) { return item.name === 'tab-2196'; });
 
-            var type,pref, fullType;
-
-            if(fullMimeType){
-                pullTabs.App.getContentType(tab.url, function(response){
-                    this.mType = response;
-                });
             }
 
-            if(this.mType){
+            pullTabs.App.displayDefaultAdvancedLayout(tab);
+
+/*
+            if(fullMimeType){
+                pullTabs.App.getContentType().then(function ( value ) {
+                    console.log(value);
+                }).catch(function(e){
+                    console.log(e);
+                });
+                //tab.url, function(response){
+                 //   this.mType = response;
+               // });
+            }
+
+/*            if(typeof(this.mType) !== 'undefined'){
                 fullType = this.mType.split(";").shift();
                 type = this.mType.split("/").shift().toLowerCase();
                 pref = prefs[type] ? prefs[type] : 'ignore';
 
             }
             else{
-                fullType = 'unknown';
-                type = 'unknown';
-                pref = 'ignore';
-            }
+  */
 
-            var checked = '';
-            var active = '';
 
-            if( (pref !== 'ignore') ){
-                checked = 'checked';
-                active = 'active';
-            }
 
-            var input = Form.createCheckbox ( tab, fullType, checked );
-
-            var radioDown = Form.createRadioInput ( tab, 'download', pref );
-            var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
-            var radioBookmark = Form.createRadioInput( tab, 'bookmark', pref);
-            var radioClose = Form.createRadioInput( tab, 'close', pref);
-
-            var label = Form.createLabel ( tab, fullType, active );
-
-            label.appendChild(input);
-            label.appendChild(radioDown);
-            label.appendChild(radioPocket);
-            label.appendChild(radioBookmark);
-            label.appendChild(radioClose);
-
-            resources.appendChild(label);
 
         });
     },
 
-    getTabStatus: function(){
-            this.tabs = Form.getSelectedTabs(this.tabs);
+    displayDefaultAdvancedLayout: function(tab){
+        var resources = document.getElementById('resources');
+        var fullType = 'unknown';
+        var pref = 'ignore';
+        var checked = '';
+        var active = '';
 
-            if(this.tabs.downloads.length > 0){
-                pullTabs.Browser.downloadUrls(this.tabs.downloads);
-            }
+        if( (pref !== 'ignore') ){
+            checked = 'checked';
+            active = 'active';
+        }
+        var Form = pullTabs.Form;
+        var input = Form.createCheckbox ( tab, fullType, checked );
 
-            if(this.tabs.pockets.length > 0){
-                pullTabs.Pocket.saveTabsToPocket(this.tabs.pockets);
-            }
+        var radioDown = Form.createRadioInput ( tab, 'download', pref );
+        var radioPocket = Form.createRadioInput ( tab, 'pocket', pref );
+        var radioBookmark = Form.createRadioInput( tab, 'bookmark', pref);
+        var radioClose = Form.createRadioInput( tab, 'close', pref);
 
-            if(this.tabs.closes.length > 0){
-                pullTabs.Browser.closeTabs(this.tabs.closes);
-            }
+        var label = Form.createLabel ( tab, fullType, active );
 
-            if(this.tabs.bookmarks.length > 0){
-                pullTabs.Browser.bookmarkTabs(this.tabs.bookmarks);
-            }
+        label.appendChild(input);
+        label.appendChild(radioDown);
+        label.appendChild(radioPocket);
+        label.appendChild(radioBookmark);
+        label.appendChild(radioClose);
 
-            return;
+        resources.appendChild(label);
     },
 
-    getContentType: function(url, callback){
+    getTabStatus: function(){
+        this.tabs = pullTabs.Form.getSelectedTabs(this.tabs);
 
-        try{
+        if(this.tabs.downloads.length > 0){
+            pullTabs.Browser.downloadUrls(this.tabs.downloads);
+        }
+
+        if(this.tabs.pockets.length > 0){
+            pullTabs.Pocket.saveTabsToPocket(this.tabs.pockets);
+        }
+
+        if(this.tabs.closes.length > 0){
+            pullTabs.Browser.closeTabs(this.tabs.closes);
+        }
+
+        if(this.tabs.bookmarks.length > 0){
+            pullTabs.Browser.bookmarkTabs(this.tabs.bookmarks);
+        }
+
+        return;
+    },
+
+    getContentType: function(url){
+
+        return new Promise( function( resolve, reject ) {
             var xhr = new XMLHttpRequest();
-            xhr.open("HEAD", url, false);
-            xhr.onload =  function(e) {
-                if (xhr.readyState === 4) {
+            xhr.onload = function() {
                     if(xhr.status === 200) {
-                        callback(xhr.getResponseHeader("Content-Type"));
+
+                    var contentType = xhr.getResponseHeader("Content-Type");
+
+                        //strip off everything but the first part of the Content-Type
+                        //unless it is null which is often due to internal tabs
+                        //like for instance a chrome-extension:// tab
+                        if(contentType !== null){
+                            resolve(contentType.split(";").shift().split("/").shift().toLowerCase());
+                        }
+                        else{
+                            resolve('unknown');
+//                            reject("Content-Type unavailable");
+                        }
                     }
-                    else{
-                        callback('Unknown');
-                        console.error(xhr.statusText);
-                        return;
-                    }
-                }
+                    reject(Error(xhr.statusText) );
             };
 
-            xhr.onerror = function (e) {
-                console.error(xhr.statusText);
-                return;
+            xhr.onerror = function () {
+                reject(Error(xhr.statusText));
             };
 
+            xhr.open("HEAD", url );
             xhr.send();
-        }
-        catch (e) {
-            callback('Unknown');
-            console.log('Did not retrieve ' + url + ' Error: ' + e);
-        }
+        });
     },
 
 /*  getExtension: function(url){
@@ -267,13 +368,24 @@ pullTabs.App = pullTabs.App ||  {
         pullTabs.App.layout = layout;
     },
 
-    getLayout: function( callback ) {
+    //returns a Promise
+    getLayout: function(  ) {
         var key = {
             simple: 'true',
             advanced: 'false'
         };
+        var msgID = pullTabs.App.updateStatusMessage('Loading layout', 'dependent', 'info');
 
-        pullTabs.Browser.retrieve(key, callback);
+        return pullTabs.Browser.retrieve(key).then( function ( value ) {
+            pullTabs.App.removeStatusMessage(msgID);
+            return value;
+        });
+    },
+
+    doError: function( error ){
+        console.log('Error: ');
+        console.log(error);
+        return;
     },
 
     getOptions: function ( callback ) {
@@ -288,9 +400,7 @@ pullTabs.App = pullTabs.App ||  {
             unknown: 'ignore'
         };
 
-        pullTabs.Browser.retrieve( key, callback );
-
-        return;
+        return pullTabs.Browser.retrieve( key, callback );
     },
 
     setOptions: function ( items ) {
@@ -412,7 +522,6 @@ pullTabs.App = pullTabs.App ||  {
                 break;
 
             default:
-                console.log(this);
                 break;
         }
     },
@@ -550,7 +659,7 @@ pullTabs.App = pullTabs.App ||  {
             });
         }
 
-        this.linksWatched = true;
+        pullTabs.App.linksWatched = true;
 
 /*
         var navLinks = document.getElementById("main-nav");

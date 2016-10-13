@@ -4,3 +4,10 @@ config.json
 node_modules
 npm-debug.log
 tests
+js/app/test.js
+test.html
+.jshintrc
+admin.html
+js/app/admin.js
+buildsteps
+gulpfile.js
