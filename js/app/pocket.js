@@ -1,3 +1,5 @@
+"use strict";
+
 var pullTabs = pullTabs || {};
 pullTabs.Pocket = pullTabs.Pocket || {
 
@@ -7,7 +9,17 @@ pullTabs.Pocket = pullTabs.Pocket || {
     },
 
     init: function(  ) {
-        if(localStorage[this.pocketKey.user_name] !== 'user_name' && typeof(localStorage[this.pocketKey.user_name]) !== 'undefined'){
+        if(typeof(localStorage[this.pocketKey.user_name]) !== 'undefined' && localStorage[this.pocketKey.user_name] !== 'user_name' ){
+            this.isAuthorized();
+            return;
+        }
+
+        this.isNotAuthorized();
+        return;
+    },
+
+    checkLocalLoginStatus: function(  ) {
+        if(typeof(localStorage[this.pocketKey.user_name]) !== 'undefined' && localStorage[this.pocketKey.user_name] !== 'user_name' ){
             this.isAuthorized();
             return;
         }
@@ -81,39 +93,56 @@ pullTabs.Pocket = pullTabs.Pocket || {
             xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
             xhr.setRequestHeader('X-Accept', 'application/json');
 
+                var link = document.createElement('a');
+                var status = document.createElement('span');
+                var message;
+
+                link.title = tab.title;
+                link.href = tab.url;
+                link.innerHTML = tab.title;
+
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status !== 200) {
-                    console.log( xhr.status + " response from Pocket: ");
-                    console.log(xhr.responseText);
+
                     if(tab.labelTabId !== undefined && tab.labelTabId !== null){
-                        Form.setLabelStatus(tab, 'failed');
+  //                      pullTabs.Form.setLabelStatus(tab, 'failed');
                     }
-                    Form.updateStatus(tab, "Failed saving this tab to pocket: ");
+                    message = document.createTextNode('Failed saving to Pocket ');
+                    status.appendChild(message);
+                    status.appendChild(link);
+                    pullTabs.App.updateStatusMessage(status, 'dependent', 'danger');
+
                     return false;
                 }
                 else if (xhr.readyState === 4 && xhr.status === 200){
-
                     if(tab.labelTabId !== undefined && tab.labelTabId !== null){
-                        Form.setLabelStatus(tab, 'successful');
+//                        pullTabs.Form.setLabelStatus(tab, 'successful');
                     }
-                    Form.updateStatus(tab, 'Saved this tab to pocket: ');
+
+                    message = document.createTextNode('Saved this tab to pocket: ');
+                    status.appendChild(message);
+                    status.appendChild(link);
+                    pullTabs.App.updateStatusMessage(status, 'medium', 'success');
+
 
                     //if we remove the tab that the popup was invoked on the popup
                     //goes away, ideally we should move to event scripts
                     //so the popup isn't dependent on a tab being open
+                    var autoClose;
+                    if(autoClose){
                     chrome.tabs.query({ active: true, lastFocusedWindow: true }, function (tabs) {
                         if(tab.id !== tabs[0].id){
-                            chrome.tabs.remove(tab.id);
+                            //chrome.tabs.remove(tab.id);
                         }
                     });
-
+                    }
 
                     return true;
                 }
             };
 
             xhr.onerror = function (e) {
-                Form.setLabelStatus(tab, 'failed');
+                pullTabs.Form.setLabelStatus(tab, 'failed');
 
                 console.error("saveTabToPocket error: " + xhr.statusText);
                 return;
@@ -124,7 +153,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
         catch (e) {
             console.log("saveTabToPocket Exception: ");
             console.log(e);
-            Form.setLabelStatus(tab, 'failed');
+            pullTabs.Form.setLabelStatus(tab, 'failed');
             return false;
         }
 
@@ -156,6 +185,8 @@ pullTabs.Pocket = pullTabs.Pocket || {
             if (xhr.readyState === 4) {
                 if(xhr.status === 200) {
                     pocket.token = xhr.response.substring(5);
+
+                    localStorage[pullTabs.Pocket.pocketKey.request_token] = pocket.token;
 
                     pocket.auth = 'https://getpocket.com/auth/authorize?request_token=' +
                             pocket.token +
@@ -225,7 +256,10 @@ pullTabs.Pocket = pullTabs.Pocket || {
     },
 
     getAccessToken: function (pocket) {
+        var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/authorize';
+        pocket.key = pullTabs.Config.credentials.consumer_key;
+        pocket.token = localStorage[this.pocketKey.request_token];
         var data = new FormData();
             data.append('consumer_key', pocket.key);
             data.append('code', pocket.token);
@@ -252,4 +286,3 @@ pullTabs.Pocket = pullTabs.Pocket || {
         xhr.send(data);
     },
 };
-pullTabs.Pocket.init();
