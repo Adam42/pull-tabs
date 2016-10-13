@@ -20,8 +20,8 @@ pullTabs.App = pullTabs.App ||  {
             return;
         }
 
-        if(!this.tabs){
-            var msgID = this.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
+        if(!pullTabs.App.tabs){
+            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
             pullTabs.Browser.getTabs().then( function (tabs) {
                     pullTabs.App.tabs = tabs;
                     pullTabs.App.removeStatusMessage(msgID);
@@ -36,6 +36,7 @@ pullTabs.App = pullTabs.App ||  {
             ).catch(function(e) {
                 console.log(e);
             });
+
             return;
         }
     },
@@ -111,31 +112,31 @@ pullTabs.App = pullTabs.App ||  {
     },
 
     doInitialSetup: function () {
-            if(document.getElementById('setup') === null){
-                var optionsLink = document.createElement('a');
-                    //Browser is not instantiated at this point
-                    //optionsLink.href = Browser.extensionGetURL('options.html');
-                    optionsLink.href = chrome.extension.getURL( 'options.html' );
-                    optionsLink.id = 'initial-load';
-                    optionsLink.textContent = " Setup PullTabs with your preferences.";
+        if(document.getElementById('setup') === null){
+            var optionsLink = document.createElement('a');
+                //Browser is not instantiated at this point
+                //optionsLink.href = Browser.extensionGetURL('options.html');
+                optionsLink.href = chrome.extension.getURL( 'options.html' );
+                optionsLink.id = 'initial-load';
+                optionsLink.textContent = " Setup PullTabs with your preferences.";
 
-                var setupMessage = document.createElement('p');
-                    setupMessage.classList.add('alert', 'alert-info');
-                    setupMessage.textContent = 'This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.';
-                    setupMessage.id = 'setup';
-                    setupMessage.appendChild(optionsLink);
+            var setupMessage = document.createElement('p');
+                setupMessage.classList.add('alert', 'alert-info');
+                setupMessage.textContent = 'This appears to be your first time using PullTabs. Please visit the options page to define your preferences and setup any external services you wish to use.';
+                setupMessage.id = 'setup';
+                setupMessage.appendChild(optionsLink);
 
-                var parent = document.getElementById('simple').parentNode;
-                var simple = document.getElementById('simple');
+            var parent = document.getElementById('simple').parentNode;
+            var simple = document.getElementById('simple');
 
-                parent.insertBefore(setupMessage, simple);
+            parent.insertBefore(setupMessage, simple);
 
-                setupMessage.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    localStorage.initialSetup = 'no';
-                    chrome.runtime.openOptionsPage();
-                });
-            }
+            setupMessage.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.initialSetup = 'no';
+                chrome.runtime.openOptionsPage();
+            });
+        }
     },
 
     displayLayout: function( ) {

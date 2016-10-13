@@ -21,7 +21,7 @@ pullTabs.App = pullTabs.App ||  {
         }
 
         if(!pullTabs.App.tabs){
-            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent');
+            var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
             pullTabs.Browser.getTabs().then( function (tabs) {
                     pullTabs.App.tabs = tabs;
                     pullTabs.App.removeStatusMessage(msgID);
@@ -86,7 +86,6 @@ pullTabs.App = pullTabs.App ||  {
                 break;
 
             default:
-                console.log('Default');
                 setTimeout( pullTabs.App.removeStatusMessage, 3000, statusMessage.id );
                 break;
         }
@@ -483,7 +482,6 @@ pullTabs.App = pullTabs.App ||  {
                 break;
 
             default:
-                console.log(this);
                 break;
         }
     },
