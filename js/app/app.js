@@ -8,6 +8,8 @@ pullTabs.App = pullTabs.App ||  {
 
     layout: '',
 
+    mimeTypesMap: {},
+
     linksWatched: false,
 
     init: function(  ) {
@@ -32,13 +34,13 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
-    updateStatusMessage: function (message, duration, styleClasses) {
+    updateStatusMessage: function (message, duration, type) {
         var status = document.getElementById('status');
         var statusMessage = document.createElement('p');
         var elementIDName = 'status-message-';
-        if(typeof(styleClasses) !== 'undefined'){
-            statusMessage.classList.add('alert','alert-success');
-        }
+
+        var alertType = 'alert-' + type;
+        statusMessage.classList.add('alert',alertType);
         status.classList.remove('hidden');
         status.style.top = 0;
         statusMessage.textContent = message;
@@ -67,6 +69,10 @@ pullTabs.App = pullTabs.App ||  {
 
             case 'short':
                 setTimeout( pullTabs.App.removeStatusMessage, 2000, statusMessage.id );
+                break;
+
+           case 'medium':
+                setTimeout( pullTabs.App.removeStatusMessage, 4000, statusMessage.id );
                 break;
 
             case 'long':
@@ -325,7 +331,6 @@ pullTabs.App = pullTabs.App ||  {
         pullTabs.App.layout = layout;
     },
 
-
     getLayout: function( ) {
         var key = {
             simple: 'true',
@@ -343,7 +348,6 @@ pullTabs.App = pullTabs.App ||  {
         console.log(error);
         return;
     },
-
 
     getOptions: function ( callback ) {
         var key = {
@@ -617,7 +621,7 @@ pullTabs.App = pullTabs.App ||  {
             });
         }
 
-        this.linksWatched = true;
+        pullTabs.App.linksWatched = true;
 
 /*
         var navLinks = document.getElementById("main-nav");
