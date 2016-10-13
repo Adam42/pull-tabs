@@ -11,14 +11,14 @@ pullTabs.Options = pullTabs.Options || (function () {
 
     opt.mimeSettings = {};
     opt.fullMimeType = {
-        'active' : false
+        'retrieveFullMimeType' : false
     };
     opt.layout = {
         'simple' : true,
         'advanced' : false
     };
     opt.autoClose = {
-        'active' : false
+        'autoCloseTabs' : false
     };
 
     //list of available actions to apply to a tab
@@ -98,6 +98,19 @@ pullTabs.Options = pullTabs.Options || (function () {
         document.getElementById('autoclose').addEventListener('click',opt.saveAutoClose);
     }
 
+    function checkPocketStatus(){
+        //odd this should be associated with pocketKey?
+        console.log(localStorage[pullTabs.user_name]);
+        if(typeof(localStorage[pullTabs.access_token]) !== 'undefined' && localStorage[pullTabs.access_token] !== 'access_token' ){
+            var pocketStatus = document.getElementById('pocket-status');
+
+            //need to change below to updateAuthStatus as is confusing because not checking
+            //if isAuthrozied but updating pocket-status link
+//            pullTabs.Pocket.isAuthorized();
+            loginStatus = pullTabs.Pocket.checkLocalLoginStatus(); //this actually checks.....
+        }
+    }
+
     opt.init = function(){
         bindUIActions();
         setDefaultMimeTypes();
@@ -111,6 +124,8 @@ pullTabs.Options = pullTabs.Options || (function () {
         }).catch( function(e){
             console.log(e);
         });
+
+        checkPocketStatus();
     };
 
     opt.getMimeTypes = function(){
@@ -173,7 +188,7 @@ pullTabs.Options = pullTabs.Options || (function () {
     opt.setAutoClose = function( autoclose ) {
         var autoCloseButton = document.getElementById('autoclose');
 
-        if (autoclose.active === true){
+        if (autoclose.autoCloseTabs === true){
             autoCloseButton.checked = true;
         }
     };
@@ -182,10 +197,10 @@ pullTabs.Options = pullTabs.Options || (function () {
         var autoCloseButton = document.getElementById('autoclose');
 
         if(autoCloseButton.checked === true){
-            opt.autoClose.active = true;
+            opt.autoClose.autoCloseTabs = true;
         }
         else{
-            opt.autoClose.active = false;
+            opt.autoClose.autoCloseTabs = false;
         }
 
         try{
@@ -230,7 +245,7 @@ pullTabs.Options = pullTabs.Options || (function () {
 
     opt.setFullMimeType = function ( fullMimeType ) {
         var fullMimeTypeElement = document.getElementById('full-mime-types');
-        if(fullMimeType.active === true){
+        if(fullMimeType.retrieveFullMimeType === true){
             fullMimeTypeElement.checked = true;
         }
         else{
@@ -243,10 +258,10 @@ pullTabs.Options = pullTabs.Options || (function () {
         var isChecked = document.getElementById('full-mime-types').checked;
 
         if(isChecked === true){
-            opt.fullMimeType.active = true;
+            opt.fullMimeType.retrieveFullMimeType = true;
         }
         else{
-            opt.fullMimeType.active = false;
+            opt.fullMimeType.retrieveFullMimeType = false;
         }
 
         try{
@@ -323,4 +338,4 @@ pullTabs.Options = pullTabs.Options || (function () {
 
 }(pullTabs));
 
-pullTabs.Options.init();
+//pullTabs.Options.init();
