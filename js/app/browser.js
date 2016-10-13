@@ -7,6 +7,7 @@
  * as possible.
  *
  */
+var chrome = chrome || {}; //appeases jshint
 var pullTabs = pullTabs || {};
 pullTabs.Browser = pullTabs.Browser || {
 
@@ -175,7 +176,7 @@ var PTChrome = {
 
                     span.appendChild(message);
                     span.appendChild(link);
-                    pullTabs.App.updateStatusMessage(span, 'dependent');
+                    pullTabs.App.updateStatusMessage(span, 'short', 'success');
 
                     //@to-do check preferences to see if user chose to auto-close tabs upon successful action
                     var autoClose = false;
@@ -274,14 +275,26 @@ var PTChrome = {
 
         chrome.bookmarks.create(bookmark, function(savedMark) {
 
-            pullTabs.Form.updateStatus(tab, 'Successfuly bookmarked ');
 
-            pullTabs.Form.setLabelStatus(tab, "successful");
+            var link = document.createElement('a');
+            var status = document.createElement('span');
+            var message = document.createTextNode('Successfuly bookmarked ');
+
+            link.title = tab.title;
+            link.href = tab.url;
+            link.innerHTML = tab.title;
+
+            status.appendChild(message);
+            status.appendChild(link);
+
+            pullTabs.App.updateStatusMessage(status, 'short', 'success');
+
+//            pullTabs.Form.setLabelStatus(tab, "successful");
       });
     },
 
     login: function ( pocket ) {
-
+/*
         pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
 
         pocket.interactive = true;
@@ -294,7 +307,10 @@ var PTChrome = {
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
             Pocket.getAccessToken(pocket);
         });
-
+*/
+        var redirect = chrome.extension.getURL('pocket.html');
+        pocket.auth = pocket.auth + encodeURIComponent(redirect);
+        window.open(pocket.auth);
     },
 
     /*
