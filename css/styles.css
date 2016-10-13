@@ -56,7 +56,9 @@ form#default{ margin-left: 40px;}
 .container[role="complementary"] a {padding-top: 20px;}
 
 #options #status {position: fixed; top: 0; left: 45%; width: 100%; z-index: 0;}
-
+#sandbox #status { padding: 10px; }
+.alert-success a {color: #000;}
+.alert-danger a { color: #000;}
 .bounce{margin-left: -9999px; height: 0;}
 
 /* CSS - Cascading Style Sheet */
