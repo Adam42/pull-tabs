@@ -1,5 +1,11 @@
 "use strict";
 var pullTabs = pullTabs || {};
+/**
+ * Settings/preferences interface for a user to save
+ * things like Pocket login, layout options and other settings
+ *
+ * @return {[type]} [description]
+ */
 pullTabs.Options = pullTabs.Options || (function () {
 
     var tabSettings = {},
@@ -146,7 +152,6 @@ pullTabs.Options = pullTabs.Options || (function () {
      * stored preferences to each tab.
      *
     */
-
     opt.setSettings = function( items ) {
         for ( var i=0; i < opt.numOfmimeTypes; i++ ) {
            var settings = document.getElementsByName(opt.mimeTypes[i]);
@@ -166,6 +171,11 @@ pullTabs.Options = pullTabs.Options || (function () {
     };
 
 
+    /**
+     * Set form inputs to match layout enabled/disabled preference
+     *
+     * @param {object} layout - An object representing current layout setting
+     */
     opt.setLayout = function ( layout ) {
         var simple = document.getElementById('simple');
         var advanced = document.getElementById('advanced');
@@ -185,6 +195,10 @@ pullTabs.Options = pullTabs.Options || (function () {
 
     };
 
+    /**
+     * Set form input to match autoclose setting
+     * @param {object} autoclose - Object storing user's autoclose preference
+     */
     opt.setAutoClose = function( autoclose ) {
         var autoCloseButton = document.getElementById('autoclose');
 
@@ -193,6 +207,11 @@ pullTabs.Options = pullTabs.Options || (function () {
         }
     };
 
+    /**
+     * Persist user's autoclose preference to storage
+     *
+     * @return {Promise} Promise represents storage update result
+     */
     opt.saveAutoClose = function(){
         var autoCloseButton = document.getElementById('autoclose');
 
@@ -212,6 +231,10 @@ pullTabs.Options = pullTabs.Options || (function () {
         }
     };
 
+    /**
+     * Persist user's layout preferences to storage
+     * @return {Promise} Promise represents result of storage action
+     */
     opt.saveLayout = function (){
         var simpleLayout = document.getElementById("simple");
         var advancedLayout = document.getElementById('advanced');
@@ -243,6 +266,10 @@ pullTabs.Options = pullTabs.Options || (function () {
 
     };
 
+    /**
+     * Update form input to match user's mimeType preference
+     * @param {object} fullMimeType Object representing user's mimeType preference
+     */
     opt.setFullMimeType = function ( fullMimeType ) {
         var fullMimeTypeElement = document.getElementById('full-mime-types');
         if(fullMimeType.retrieveFullMimeType === true){
@@ -254,6 +281,10 @@ pullTabs.Options = pullTabs.Options || (function () {
         return;
     };
 
+    /**
+     * Persist user's mimeType preference to storage
+     * @return {Promise} Promise represents result of storage action
+     */
     opt.saveFullMimeType = function (){
         var isChecked = document.getElementById('full-mime-types').checked;
 

@@ -1,5 +1,11 @@
 "use strict";
 var pullTabs = pullTabs || {};
+
+/**
+ * Main functionality of pullTabs extension
+ * exposed to user via a popup window
+ * @constructor
+ */
 pullTabs.App = pullTabs.App ||  {
 
     tabs: '',
@@ -20,6 +26,8 @@ pullTabs.App = pullTabs.App ||  {
             return;
         }
 
+
+        //If we don't have any tabs yet then retrieve them
         if(!pullTabs.App.tabs){
             var msgID = pullTabs.App.updateStatusMessage('Gathering your tabs', 'dependent', 'info');
             pullTabs.Browser.getTabs().then( function (tabs) {
@@ -41,6 +49,16 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
+
+    /**
+     * Updates a status element with a message and displays
+     * it for a specified duration
+     *
+     * @param  {string|object} message  Either the text of the message or an element object
+     * @param  {string} duration - short,medium,long, dependent or re-stack
+     * @param  {string} type     The type of message, e.g. success, danger or info
+     * @return {void|number}      A dependent message returns a numeric ID, others void.
+     */
     updateStatusMessage: function (message, duration, type) {
         var status = document.getElementById('status');
         var statusMessage = document.createElement('p');
@@ -98,6 +116,12 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
+
+    /**
+     * Remove a previously created status message from DOM via it's ID
+     * @param  {Number} id The ID of the element being removed
+     * @return {void}    [description]
+     */
     removeStatusMessage: function (id) {
             if(typeof(id) === null){
                 id = 'status-message-0';
@@ -139,6 +163,10 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
+    /**
+     * Determine which layouts are enabled and perform initial setup for those layouts
+     * @return {void} [description]
+     */
     displayLayout: function( ) {
         if(pullTabs.App.layout.simple){
             pullTabs.App.watchButtons();
@@ -216,6 +244,11 @@ pullTabs.App = pullTabs.App ||  {
         }
     },
 
+    /**
+     * Retrieve the URLs represented in tabs collection
+     * @param  {array} tabs Collection of tab objects
+     * @return {array}      Collection of URLs from user's tabs
+     */
     getUrls: function (tabs) {
         var urls = [];
 
@@ -327,6 +360,12 @@ pullTabs.App = pullTabs.App ||  {
         return;
     },
 
+
+    /**
+     * Retrieve content type of a tab/URL
+     * @param  {string} url - URL of a tab
+     * @return {string}     the content type of the resource
+     */
     getContentType: function(url){
 
         return new Promise( function( resolve, reject ) {
@@ -676,7 +715,7 @@ pullTabs.App = pullTabs.App ||  {
                 return;
             });
         }*/
-    },
+    }
 };
 
 document.addEventListener('DOMContentLoaded', function () {

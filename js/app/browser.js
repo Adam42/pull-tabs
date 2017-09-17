@@ -15,16 +15,25 @@ pullTabs.Browser = pullTabs.Browser || {
 
     browser: function(){},
 
+
+    /*
+     * Kickoff browser setup
+     * to wrap around native APIs
+     * Default expectation is around Chrome
+     */
     init: function () {
         this.ENV = pullTabs.Config.configuration.mode;
         this.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
         this.setBrowser();
+        //if a pulltabs bookmark doesn't exist, create one
         if(typeof(localStorage['pullTabsFolderId']) === 'undefined'){
             this.getBookmarks();
         }
         return;
     },
 
+
+    //Check for Chrome existence
     setBrowser: function () {
         if(this.ENV === 'DEVELOPMENT'){
             this.browser = DevBrowse;
@@ -128,6 +137,14 @@ var DevBrowse = {
  *
  */
 var PTChrome = {
+    /**
+     * Download a resource represented via a tab's URL
+     * to local disk either as an HTML file or with
+     * the URL's extension if it has one
+     *
+     * @param  {array} tabs Collection of tab objects
+     * @return {[type]}      [description]
+     */
     downloadUrls: function (tabs) {
         tabs.forEach(function(tab){
 
@@ -146,7 +163,7 @@ var PTChrome = {
             }
 
             //Chrome handles downloads well but Firefox saves URLs without extension endings
-            //with a generic download(x) filename
+            //with a generic download(x) filename so let's add .html to the tab's title instead.
             if(pullTabs.Browser.isFirefox){
                 if(!pullTabs.Browser.isFile(tab.url)){
                     file.filename = tab.title + '.html';
@@ -194,6 +211,11 @@ var PTChrome = {
         });
     },
 
+    /**
+     * Retrieve the current window's tab objects
+     *
+     * @return {Promise} Promise represents collection of tab object
+     */
     getTabs: function () {
         return new Promise(function(resolve, reject) {
 
@@ -209,6 +231,22 @@ var PTChrome = {
         });
     },
 
+     /**
+      * Retrieve's a users bookmarks AND
+      *  searches for a "Pulltabs" folder
+      *  AND if it does not find one then creates one
+      *
+      * @todo  this funtion should be refactored into
+      *        at least three functions -->
+      *          findPulltabsBookmarkFolder()
+      *          createPulltabsBookmarkFolder()
+      *          AND an function to encapsulate the call
+      *          to those two functions as well as getBookmarks
+      *          END TODO
+      *
+      * @param  {Function} callback [description]
+      * @return {[type]}            [description]
+      */
     getBookmarks: function ( callback ) {
         var otherBookmarks;
 
@@ -244,6 +282,13 @@ var PTChrome = {
         }
     },
 
+    /**
+     * For each tab in a collection of tab object's
+     * close that tab
+     *
+     * @param  {array} tabs Collection of tabs
+     * @return {void}
+     */
     closeTabs: function (tabs){
         var numTabs = tabs.length;
         var i;
@@ -252,10 +297,19 @@ var PTChrome = {
         }
     },
 
+    /**
+     * Close an individual tab
+     * @param  {object} tab A browser tab object
+     * @return {void}
+     */
     closeTab: function (tab) {
         chrome.tabs.remove(tab.id);
     },
 
+    /**
+     * Bookmark collection of tabs
+     * @param  {array} tabs Collection of tab objects
+     */
     bookmarkTabs: function (tabs){
 
         var numTabs = tabs.length;
@@ -265,6 +319,12 @@ var PTChrome = {
         }
     },
 
+    /**
+     * Bookmark a single tab
+     * @param  {object}   tab      A browser tab object
+     * @param  {Function} callback [description]
+     * @return {[type]}            [description]
+     */
     bookmarkTab: function (tab, callback) {
 
         var bookmark = {
@@ -293,8 +353,32 @@ var PTChrome = {
       });
     },
 
+    /**
+     * Login to getpocket.com
+     *
+     * @param  {object} pocket [description]
+     * @return {void}        [description]
+     *
+     * @todo should be made generic
+     * @todo  should try to use loginViaWebAuthFlow first & fallback to this method
+     *
+     */
     login: function ( pocket ) {
-/*
+        var redirect = chrome.extension.getURL('pocket.html');
+        pocket.auth = pocket.auth + encodeURIComponent(redirect);
+        window.open(pocket.auth);
+    },
+
+    /**
+     * Use launchWebAuthFlow to perform getpocket.com login
+     * Supported in Chrome and Firefox ( as of version 53 )
+     *
+     * @link https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/identity/launchWebAuthFlow
+     * @param  {object} pocket [description]
+     * @return {[type]}        [description]
+     * @todo  Re-implement using this method instead of window.open
+     */
+    loginViaWebAuthFlow: function ( pocket ) {
         pocket.auth = pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
 
         pocket.interactive = true;
@@ -307,10 +391,6 @@ var PTChrome = {
         chrome.identity.launchWebAuthFlow(auth, function (responseUrl){
             Pocket.getAccessToken(pocket);
         });
-*/
-        var redirect = chrome.extension.getURL('pocket.html');
-        pocket.auth = pocket.auth + encodeURIComponent(redirect);
-        window.open(pocket.auth);
     },
 
     /*
@@ -358,6 +438,13 @@ var PTChrome = {
         }
     },
 
+    /**
+     * Save an object to local storage via a key
+     *
+     * @param  {string} key    Local storage key
+     * @param  {object} object The object to save
+     * @return {[type]}        [description]
+     */
     save: function ( key, object ) {
         console.log(key + ' save ' + object);
         if(typeof(chrome.storage) === 'undefined'){
@@ -377,6 +464,13 @@ var PTChrome = {
         }
     },
 
+    /**
+     * Get an object from local storage
+     *
+     * @param  {string}   key      The name of key in local storage
+     * @param  {Function} callback [description]
+     * @return {Promise}           Promise represents object retrieved from local storage
+     */
     retrieve: function ( key, callback ) {
         var storageType;
 
@@ -410,6 +504,12 @@ var PTChrome = {
         });
     },
 
+    /**
+     * Create a new tab in the current window
+     * @param  {string} tabKey A URL?
+     * @todo  Properly document the tabKey parameter
+     * @return {[type]}        [description]
+     */
     createTab: function ( tabKey ) {
         if( typeof(chrome.tabs.create) !== 'undefined' ) {
            chrome.tabs.create( tabKey );
@@ -421,9 +521,14 @@ var PTChrome = {
        return;
     },
 
-    extensionGetURL: function ( url ) {
+    /**
+     * Convert a path to the fully qualified browser extension URL
+     * @param  {string} path - A string to convert into a full URL
+     * @return {[type]}     [description]
+     */
+    extensionGetURL: function ( path ) {
         if( typeof( chrome.extension.getURL ) !== 'undefined' ) {
-            return chrome.extension.getURL( url );
+            return chrome.extension.getURL( path );
         }
 
         console.log("Unable to get extension relative URL as absolute URL");

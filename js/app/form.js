@@ -1,5 +1,14 @@
 "use strict";
+/**
+ * Common form functionality
+ *
+ */
 var pullTabs = pullTabs || {};
+
+/**
+ * Scope Form to pullTabs object
+ * @constructor
+ */
 pullTabs.Form = pullTabs.Form || {
 
     options: '',
@@ -155,6 +164,14 @@ pullTabs.Form = pullTabs.Form || {
         var group =  document.getElementById();
     },
 
+    /**
+     * For each tab we look for a form input
+     * via it's tab ID and for each action type
+     * push it to a stack of those actions
+     *
+     * @param  {array} tabs Collection of tab objects
+     * @return {array}      Tabs with arrays of actions added
+     */
     getSelectedTabs: function (tabs) {
         var inputs = tabs.length;
         var downloadURLs = [];
@@ -189,7 +206,6 @@ pullTabs.Form = pullTabs.Form || {
                                 closeURLs.push(tabs[i]);
                                 break;
                             default:
-                                console.log("Ignoring" + tabs[i]);
                                 ignoreURLs.push(tabs[i]);
                                 break;
                         }
@@ -210,6 +226,12 @@ pullTabs.Form = pullTabs.Form || {
         return tabs;
     },
 
+
+    /**
+     * Highlight labels when an tab input is clicked
+     *
+     * @return {[type]} [description]
+     */
     watchMutateCheck: function () {
         var form = document.querySelector('#resources');
 

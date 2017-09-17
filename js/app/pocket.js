@@ -1,6 +1,11 @@
 "use strict";
-
 var pullTabs = pullTabs || {};
+
+/**
+ * Integration with getpocket.com allowing
+ * users to save tabs to their Pocket account
+ * @type {[type]}
+ */
 pullTabs.Pocket = pullTabs.Pocket || {
 
     pocketKey: {
@@ -18,6 +23,11 @@ pullTabs.Pocket = pullTabs.Pocket || {
         return;
     },
 
+    /**
+     * Check for user credentials saved in local storage
+     * then update login status element based on results
+     * @return {void} [description]
+     */
     checkLocalLoginStatus: function(  ) {
         if(typeof(localStorage[this.pocketKey.user_name]) !== 'undefined' && localStorage[this.pocketKey.user_name] !== 'user_name' ){
             this.isAuthorized();
@@ -28,6 +38,9 @@ pullTabs.Pocket = pullTabs.Pocket || {
         return;
     },
 
+    /**
+     * Update login status element to a logout link if the element exists
+     */
     isAuthorized: function (  ) {
         var status = document.getElementById('pocket-status');
         if(status !== null){
@@ -36,12 +49,19 @@ pullTabs.Pocket = pullTabs.Pocket || {
         }
     },
 
+    /**
+     * Update login status element to a login link
+     */
     isNotAuthorized: function() {
        var status = document.getElementById('pocket-status');
             status.href = '#pocket-login';
             status.textContent = 'You are not authorized, please sign in.';
     },
 
+    /**
+     * Set user credentials to default values in local storage
+     * @return {Promise} Promise represents result of storage action
+     */
     logOut: function ( ) {
         localStorage[this.pocketKey.user_name] = 'user_name';
         localStorage[this.pocketKey.access_token] = 'access_token';
@@ -56,6 +76,14 @@ pullTabs.Pocket = pullTabs.Pocket || {
         this.isNotAuthorized();
     },
 
+    /**
+     * Determine action to take when pocket status link is clicked
+     * if user is logged in will log out the user
+     * otherwise will attempt to authorize the user to getpocket.com
+     * @param {event} - Click event on pocket status link
+     * @listens event
+     * @return {void|New Window}       Either returns nothing or opens a new window
+     */
     checkLink: function (event) {
         var hash = event.target.href.indexOf("#") + 1;
         var action = event.target.href.substring(hash);
@@ -69,6 +97,12 @@ pullTabs.Pocket = pullTabs.Pocket || {
 
     },
 
+    /**
+     * Kick off process to authorize a user to getpocket.com
+     * by obtaining a request token using our consumer key
+     *
+     * @return {[type]} [description]
+     */
     initLogin: function( ) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/request';
@@ -76,9 +110,13 @@ pullTabs.Pocket = pullTabs.Pocket || {
         pullTabs.Pocket.getRequestToken(pocket);
     },
 
+    /**
+     * Saves a tab's title & URL to getpocket.com
+     * @param  {object} tab - A browser tab object
+     * @return {boolean}     true if successful, false if not
+     */
     saveTabToPocket: function ( tab) {
         var url = tab.url;
-        var id = tab.id;
 
         var pocket_data = {
             "url": url,
@@ -160,7 +198,11 @@ pullTabs.Pocket = pullTabs.Pocket || {
 
     },
 
-
+    /**
+     * Bulk save tabs to getpocket.com
+     * @param  {array} tabs - Collection of browser tab objects
+     * @return {[type]}      [description]
+     */
     saveTabsToPocket: function ( tabs ) {
         var numURLs = tabs.length;
         var i;
@@ -170,6 +212,15 @@ pullTabs.Pocket = pullTabs.Pocket || {
         }
     },
 
+
+    /**
+     * Use the request token to initiate a login request to getpocket.com
+     *
+     * @todo  Rename this function to better represent what it actually does
+     *
+     * @param  {object} pocket An object with key and token
+     * @return {[type]}        [description]
+     */
     getRequestToken: function ( pocket ) {
         var redirectURL = chrome.extension.getURL('pocket.html');
 
@@ -208,6 +259,14 @@ pullTabs.Pocket = pullTabs.Pocket || {
         xhr.send(data);
     },
 
+    /**
+     * Retrieve credentials from local storage and update login status element
+     *
+     * @todo  Refactor to properly pass in is/isNotAuthorized call as a callback
+     *
+     * @param  {Function} callback [description]
+     * @return {[type]}            [description]
+     */
     getStoredCredentials: function (callback) {
         if(chrome.storage.local){
             chrome.storage.local.get({
@@ -225,6 +284,12 @@ pullTabs.Pocket = pullTabs.Pocket || {
         }
     },
 
+    /**
+     * Persist a user's Pocket access token and username to local storage
+     * AND then call function to update login status element
+     *
+     * @param {object} credentials Object with user's access token and username
+     */
     setStoredCredentials: function (credentials) {
         //response = access_token=ACCESS_TOKEN&username=USERNAME
         var accessTokenStart = credentials.search('=') + 1;
@@ -234,10 +299,6 @@ pullTabs.Pocket = pullTabs.Pocket || {
         var accessToken = credentials.substring(accessTokenStart,accessTokenEnd);
         var userName = credentials.substring(userNameStart);
 
-        var pocket = {
-            'access_token': accessToken,
-            'user_name': userName
-        };
         localStorage[this.pocketKey.access_token] = accessToken;
 
         localStorage[this.pocketKey.user_name] =  userName;
@@ -255,6 +316,13 @@ pullTabs.Pocket = pullTabs.Pocket || {
 */
     },
 
+    /**
+     * Authorize a user to getpocket.com and if successful
+     * call function to persist credentials to local storage
+     *
+     * @param  {object} pocket Object with consumer key and request token
+     * @return {Promise|void}        If successful a promise via local storage action
+     */
     getAccessToken: function (pocket) {
         var pocket = {};
         pocket.url = 'https://getpocket.com/v3/oauth/authorize';
