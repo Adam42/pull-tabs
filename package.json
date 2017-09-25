@@ -1,0 +1,37 @@
+{
+  "name": "pulltabs",
+  "version": "0.9.9",
+  "description": "A browser extension to gather the current window's tabs and offer options to save them to disk.",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "del": "^2.2.0",
+    "es6-map": "^0.1.5",
+    "gulp": "^3.9.0",
+    "qunit": "^0.7.6",
+    "xmlhttprequest": "^1.6.0"
+  },
+  "devDependencies": {
+    "laravel-mix": "^1.4.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "NODE_ENV=development webpack --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "hot": "NODE_ENV=development webpack-dev-server --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "production": "NODE_ENV=production webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adam42/pull-tabs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adam42/pull-tabs/issues"
+  },
+  "homepage": "https://github.com/Adam42/pull-tabs#readme"
+}
