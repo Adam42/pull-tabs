@@ -6,6 +6,6 @@ Pull Tabs is a browser extension designed to perform actions on tabs either in b
 
 After installation, click the pulltab icon to initate Pull Tabs. The first time running it will prompt you to check the Options page and authorize GetPocket use.
 
-###Useage
+### Useage
 
 After setup, clicking the pulltab icon will present bulk-action buttons and an advanced view ( if enabled ) allowing to set actions on a per-tab basis. Actions will only be performed on tabs that are checked allowing granular control over each tab.
