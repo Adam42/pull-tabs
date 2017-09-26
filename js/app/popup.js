@@ -15,8 +15,6 @@ pullTabs.App = pullTabs.App || {
 
   mimeTypesMap: {},
 
-  linksWatched: false,
-
   init: function() {
     //Force user to go to options page on initial load
     if (localStorage.initialSetup !== "no") {
@@ -175,9 +173,6 @@ pullTabs.App = pullTabs.App || {
   displayLayout: function() {
     if (pullTabs.App.layout.simple) {
       pullTabs.App.watchButtons();
-      if (!pullTabs.App.linksWatched) {
-        pullTabs.App.watchLinks();
-      }
     } else {
       var simple = document.getElementById("simple");
       simple.classList.add("hidden");
@@ -249,9 +244,6 @@ pullTabs.App = pullTabs.App || {
             pullTabs.App.watchCheckBoxes(numFormTabs);
             pullTabs.App.watchMutateCheck();
             pullTabs.App.setActions();
-            if (!pullTabs.App.linksWatched) {
-              pullTabs.App.watchLinks();
-            }
           })
       );
   },
@@ -639,132 +631,6 @@ pullTabs.App = pullTabs.App || {
 
     var checked = document.getElementById("list");
     checked.addEventListener("submit", this.process);
-  },
-
-  showMainContent: function() {
-    var mainContent = document.getElementById("main");
-    var aboutContent = document.getElementById("about-credits");
-
-    mainContent.classList.remove("bounce");
-
-    if (!aboutContent.classList.contains("hidden")) {
-      aboutContent.classList.add("hidden");
-    }
-
-    return;
-  },
-
-  swapMainContent: function() {
-    var mainContent = document.getElementById("main");
-    var aboutContent = document.getElementById("about-credits");
-
-    if (mainContent.classList.contains("bounce")) {
-      mainContent.classList.remove("bounce");
-
-      if (!aboutContent.classList.contains("hidden")) {
-        aboutContent.classList.add("hidden");
-      }
-
-      return;
-    }
-    if (!mainContent.classList.contains("bounce")) {
-      mainContent.classList.add("bounce");
-
-      if (aboutContent.classList.contains("hidden")) {
-        aboutContent.classList.remove("hidden");
-      }
-
-      return;
-    }
-  },
-
-  swapContent: function(link, content) {
-    if (!content) {
-      pullTabs.App.getContent(link, pullTabs.App.swapContent);
-      return;
-    }
-
-    if (content) {
-      var container = document.getElementById("content");
-      container.innerHTML = content;
-      return;
-    }
-  },
-
-  getContent: function(link, callback) {
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", link.href, false);
-      xhr.onload = function(e) {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            callback(link, xhr.response);
-          } else {
-            console.error(xhr.statusText);
-            return;
-          }
-        }
-      };
-
-      xhr.onerror = function(e) {
-        console.error(xhr.statusText);
-        return;
-      };
-
-      xhr.send();
-    } catch (e) {
-      console.log("getContent Error: ");
-      console.log(e);
-    }
-  },
-
-  watchLinks: function() {
-    var aboutLink = document.getElementById("about");
-    aboutLink.addEventListener("click", function() {
-      pullTabs.App.swapMainContent();
-      return;
-    });
-
-    var homeLink = document.getElementById("home");
-    homeLink.addEventListener("click", function() {
-      pullTabs.App.showMainContent();
-      return;
-    });
-
-    var creditLinks = document
-      .getElementById("about-credits")
-      .getElementsByTagName("a");
-    var i;
-    var len = creditLinks.length;
-
-    for (i = 0; i < len; i++) {
-      creditLinks[i].addEventListener("click", function(e) {
-        var tabKey = {
-          url: e.target.href,
-          active: false
-        };
-
-        pullTabs.Browser.createTab(tabKey);
-      });
-    }
-
-    pullTabs.App.linksWatched = true;
-
-    /*
-        var navLinks = document.getElementById("main-nav");
-        var links = navLinks.children;
-        var numLinks = links.length;
-        var i;
-
-        for (i=0; i < numLinks; i++) {
-            var link = links[i];
-            //links[i].addEventListener('click', function(){pullTabs.App.swapContent(link);});
-            //link = document.getElementById();
-            link.addEventListener('click', function(){
-                pullTabs.App.swapContent(link);
-                return;
-            });
-        }*/
   }
 };
 
