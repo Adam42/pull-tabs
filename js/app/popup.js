@@ -284,7 +284,7 @@ pullTabs.App = pullTabs.App || {
 
   setNumTabs: function(tabs) {
     var numTabs = document.getElementById("numTabs");
-    numTabs.innerHTML =
+    numTabs.textContent =
       "This window has " + tabs.length + " tabs. Do this action to all tabs:";
   },
 

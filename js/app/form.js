@@ -31,29 +31,45 @@ pullTabs.Form = pullTabs.Form || {
     input.type = "checkbox";
     input.id = "tab-" + tab.index;
     input.name = "tabs" + tab.index;
-    input.title = tab.title + type;
-    input.value = tab.url;
+    input.title = tab.title.toString() + type;
+    input.value = tab.url.toString();
     input.checked = checked;
 
     return input;
   },
 
-  createRadioInput: function(tab, value, defaultPref) {
+  /**
+   * Creates radio input form fields and selects the radio button
+   * if it's action matches the user's preferred action
+   *
+   * @param  {object} tab         A browser tab object
+   * @param  {string} action       An action user can perform on the tab
+   * @param  {string} preferrence - User's preferred action
+   * @return {element}             An HTML label element wrapped around a radio input element
+   */
+  createRadioInput: function(tab, action, preferrence) {
+    action = action.toString();
+    preferrence = preferrence.toString();
+
     var checked = "";
-    if (value === defaultPref) {
+
+    if (action === preferrence) {
       checked = "checked";
     }
     var input = document.createElement("input");
     input.type = "radio";
     input.id = "tab-pref-" + tab.index;
     input.name = "tab-pref-" + tab.index;
-    input.value = value;
+    input.value = action;
     input.checked = checked;
 
     var label = document.createElement("label");
     label.setAttribute("class", "preferences");
-    label.innerHTML = "<span>" + value + "</span>";
 
+    var actionSpan = document.createElement("span");
+    actionSpan.textContent = action;
+
+    label.appendChild(actionSpan);
     label.appendChild(input);
 
     return label;
@@ -63,16 +79,20 @@ pullTabs.Form = pullTabs.Form || {
     var label = document.createElement("label");
     label.setAttribute("class", "list-group-item " + active);
     label.setAttribute("id", "label-tab-" + tab.index);
-    label.innerHTML = "<p>Title: " + tab.title + "</p>";
+    var title = document.createElement("p");
+    title.textContent = "Title: " + tab.title.toString();
+    label.appendChild(title);
     //if Full Mime Type add mimetype
     //@to-do Pull the setting from Options page
     //label.innerHTML = label.innerHTML + "<p> Type: " + type + "</p>";
 
+    //Dead code without enabling mime type option in user preferences
     if (type.split("/").shift() === "image") {
-      label.innerHTML +=
-        '<img class="img-thumbnail" style="width: 150px; height: 150px;" src=' +
-        tab.url +
-        "/>";
+      var image = document.createElement("img");
+      image.classList.add("img-thumbnail");
+      image.style = "width: 150px; height: 150px;";
+      image.src = tab.url.toString();
+      label.appendChild(image);
     }
 
     return label;
@@ -105,9 +125,9 @@ pullTabs.Form = pullTabs.Form || {
     var status = document.createElement("p");
     var message = document.createTextNode(text);
 
-    link.title = tab.title;
-    link.href = tab.url;
-    link.innerHTML = tab.title;
+    link.title = tab.title.toString();
+    link.href = tab.url.toString();
+    link.textContent = tab.title.toString();
 
     status.appendChild(message);
     status.appendChild(link);

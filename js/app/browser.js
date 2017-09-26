@@ -162,7 +162,7 @@ var PTChrome = {
       //with a generic download(x) filename so let's add .html to the tab's title instead.
       if (pullTabs.Browser.isFirefox) {
         if (!pullTabs.Browser.isFile(tab.url)) {
-          file.filename = tab.title + ".html";
+          file.filename = tab.title.toString() + ".html";
         }
       }
 
@@ -183,9 +183,9 @@ var PTChrome = {
           var link = document.createElement("a");
           var message = document.createTextNode("Downloaded ");
 
-          link.title = tab.title;
+          link.title = tab.title.toString();
           link.href = tab.url;
-          link.innerHTML = tab.title;
+          link.textContent = tab.title.toString();
 
           span.appendChild(message);
           span.appendChild(link);
@@ -318,7 +318,7 @@ var PTChrome = {
   bookmarkTab: function(tab, callback) {
     var bookmark = {
       parentId: localStorage["pullTabsFolderId"],
-      title: tab.title,
+      title: tab.title.toString(),
       url: tab.url
     };
 
@@ -327,9 +327,9 @@ var PTChrome = {
       var status = document.createElement("span");
       var message = document.createTextNode("Successfuly bookmarked ");
 
-      link.title = tab.title;
+      link.title = tab.title.toString();
       link.href = tab.url;
-      link.innerHTML = tab.title;
+      link.textContent = tab.title.toString();
 
       status.appendChild(message);
       status.appendChild(link);

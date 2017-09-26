@@ -145,9 +145,9 @@ pullTabs.Pocket = pullTabs.Pocket || {
       var status = document.createElement("span");
       var message;
 
-      link.title = tab.title;
+      link.title = tab.title.toString();
       link.href = tab.url;
-      link.innerHTML = tab.title;
+      link.textContent = tab.title.toString();
 
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status !== 200) {
