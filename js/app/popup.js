@@ -467,31 +467,41 @@ pullTabs.App = pullTabs.App || {
     pullTabs.App.prefs = items;
   },
 
+  /**
+   * Sets up event listeners to watch for clicks
+   * on check/uncheck all buttons
+   *
+   * @event click
+   */
   setActions: function() {
-    var actions = {
-      check: function() {
-        pullTabs.App.setAllActive();
-      },
-      uncheck: function() {
-        pullTabs.App.setAllInactive();
-      }
-    };
+    var checkAllButton = document.getElementById("check-all-button");
+    checkAllButton.addEventListener("click", function() {
+      pullTabs.App.setAllActive();
+    });
 
-    //Here be the only piece of jQuery code in this extension's
-    //core files. Maybe one day I'll rewrite this in pure JS
-    //but this gets the job done easier now
-    $("body").on("click", "[data-action]", function() {
-      var action = $(this).data("action");
-      if (action in actions) {
-        actions[action].apply(this, arguments);
-      }
+    var uncheckAllButton = document.getElementById("uncheck-all-button");
+    uncheckAllButton.addEventListener("click", function() {
+      pullTabs.App.setAllInactive();
     });
   },
 
+  /**
+   * Update all checkboxes in the list form and their labels to be active
+   *
+   * @todo  Extract out the form element so any form can be used
+   */
   setAllActive: function() {
     var labels = document.querySelectorAll("#resources > label");
     var numLabels = labels.length;
     var i;
+
+    var checkBoxes = document
+      .getElementById("list")
+      .querySelectorAll("input[type=checkbox]");
+
+    checkBoxes.forEach(function(checkBox) {
+      checkBox.checked = true;
+    });
 
     for (i = 0; i < numLabels; i++) {
       if (!labels[i].classList.contains("active")) {
@@ -500,10 +510,23 @@ pullTabs.App = pullTabs.App || {
     }
   },
 
+  /**
+   * Update all checbox inputs in the list form and their labels to inactive
+   *
+   * @todo  Extract out the form element so any form can be used
+   */
   setAllInactive: function() {
     var labels = document.querySelectorAll("#resources > label");
     var numLabels = labels.length;
     var i;
+
+    var checkBoxes = document
+      .getElementById("list")
+      .querySelectorAll("input[type=checkbox]");
+
+    checkBoxes.forEach(function(checkBox) {
+      checkBox.checked = false;
+    });
 
     for (i = 0; i < numLabels; i++) {
       if (labels[i].classList.contains("active")) {
@@ -512,6 +535,7 @@ pullTabs.App = pullTabs.App || {
     }
   },
 
+  //Unused? Should it be used in setAllActive/Inactive above?
   updateBackground: function(node, label) {
     if (label.classList.contains("active")) {
       if (!node.checked) {
