@@ -1,10 +1,21 @@
 {
     "/dist/all.js": "/dist/all.js",
+    "/dist/options-page.js": "/dist/options-page.js",
+    "/dist/pocket-page.js": "/dist/pocket-page.js",
+    "/dist/about-page.js": "/dist/about-page.js",
+    "/dist/style.css": "/dist/style.css",
+    "/dist/non-responsive-style.css": "/dist/non-responsive-style.css",
     "/dist/img/pocket.svg": "/dist/img/pocket.svg",
     "/dist/img/bookmark.svg": "/dist/img/bookmark.svg",
     "/dist/img/close.svg": "/dist/img/close.svg",
     "/dist/img/download.svg": "/dist/img/download.svg",
     "/dist/img/icon-19.png": "/dist/img/icon-19.png",
     "/dist/img/icon-38.png": "/dist/img/icon-38.png",
-    "/dist/img/ignore.svg": "/dist/img/ignore.svg"
+    "/dist/img/ignore.svg": "/dist/img/ignore.svg",
+    "/dist/about.html": "/dist/about.html",
+    "/dist/manifest.json": "/dist/manifest.json",
+    "/dist/options.html": "/dist/options.html",
+    "/dist/pocket.html": "/dist/pocket.html",
+    "/dist/popup-init.html": "/dist/popup-init.html",
+    "/dist/popup.html": "/dist/popup.html"
 }

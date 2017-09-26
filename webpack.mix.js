@@ -14,23 +14,70 @@ let mix = require("laravel-mix");
 mix
   .combine(
     [
-      "js/app/pulltabs.js",
-      "js/app/config.js",
-      "js/app/form.js",
-      "js/app/options.js",
-      "js/app/popup.js",
-      "js/app/browser.js",
-      "js/app/pocket.js"
+      "src/js/pulltabs.js",
+      "src/js/config.js",
+      "src/js/form.js",
+      "src/js/options.js",
+      "src/js/popup.js",
+      "src/js/browser.js",
+      "src/js/pocket.js"
     ],
     "dist/all.js"
   )
-  .copy("img/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
-  .copy("img/bookmark.svg", "dist/img/bookmark.svg")
-  .copy("img/close.svg", "dist/img/close.svg")
-  .copy("img/download.svg", "dist/img/download.svg")
-  .copy("img/icon-19.png", "dist/img/icon-19.png")
-  .copy("img/icon-38.png", "dist/img/icon-38.png")
-  .copy("img/ignore.svg", "dist/img/ignore.svg");
+  .combine(
+    [
+      "src/js/pulltabs.js",
+      "src/js/config.js",
+      "src/js/browser.js",
+      "src/js/pocket.js",
+      "src/js/options.js",
+      "src/js/options-init.js"
+    ],
+    "dist/options-page.js"
+  )
+  .combine(
+    [
+      "src/js/pulltabs.js",
+      "src/js/config.js",
+      "src/js/pocket.js",
+      "src/js/auth.js"
+    ],
+    "dist/pocket-page.js"
+  )
+  .combine(
+    ["src/js/config.js", "src/js/browser.js", "src/js/about.js"],
+    "dist/about-page.js"
+  )
+  .combine(
+    [
+      "bower_components/bootswatch-dist/css/bootstrap.min.css",
+      "src/css/styles.css"
+    ],
+    "dist/style.css"
+  )
+  .combine(
+    [
+      "bower_components/bootswatch-dist/css/bootstrap.min.css",
+      "bower_components/bootswatch-dist/css/non-responsive-bootstrap.css",
+      "src/css/styles.css"
+    ],
+    "dist/non-responsive-style.css"
+  )
+  //Copy Images
+  .copy("src/img/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
+  .copy("src/img/bookmark.svg", "dist/img/bookmark.svg")
+  .copy("src/img/close.svg", "dist/img/close.svg")
+  .copy("src/img/download.svg", "dist/img/download.svg")
+  .copy("src/img/icon-19.png", "dist/img/icon-19.png")
+  .copy("src/img/icon-38.png", "dist/img/icon-38.png")
+  .copy("src/img/ignore.svg", "dist/img/ignore.svg")
+  //Copy HTML files
+  .copy("src/about.html", "dist/about.html")
+  .copy("src/manifest.json", "dist/manifest.json")
+  .copy("src/options.html", "dist/options.html")
+  .copy("src/pocket.html", "dist/pocket.html")
+  .copy("src/popup-init.html", "dist/popup-init.html")
+  .copy("src/popup.html", "dist/popup.html");
 
 // Full API
 // mix.js(src, output);

@@ -4,11 +4,11 @@ config.json
 node_modules
 npm-debug.log
 tests
-js/app/test.js
+src/js/test.js
 test.html
 .jshintrc
 admin.html
-js/app/admin.js
+src/js/admin.js
 buildsteps
 gulpfile.js
 .idea
