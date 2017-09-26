@@ -175,7 +175,6 @@ pullTabs.App = pullTabs.App || {
   displayLayout: function() {
     if (pullTabs.App.layout.simple) {
       pullTabs.App.watchButtons();
-
       if (!pullTabs.App.linksWatched) {
         pullTabs.App.watchLinks();
       }
@@ -250,7 +249,9 @@ pullTabs.App = pullTabs.App || {
             pullTabs.App.watchCheckBoxes(numFormTabs);
             pullTabs.App.watchMutateCheck();
             pullTabs.App.setActions();
-            pullTabs.App.watchLinks();
+            if (!pullTabs.App.linksWatched) {
+              pullTabs.App.watchLinks();
+            }
           })
       );
   },

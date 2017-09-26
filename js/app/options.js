@@ -124,22 +124,6 @@ pullTabs.Options =
         .addEventListener("click", opt.saveAutoClose);
     }
 
-    function checkPocketStatus() {
-      //odd this should be associated with pocketKey?
-      console.log(localStorage[pullTabs.user_name]);
-      if (
-        typeof localStorage[pullTabs.access_token] !== "undefined" &&
-        localStorage[pullTabs.access_token] !== "access_token"
-      ) {
-        var pocketStatus = document.getElementById("pocket-status");
-
-        //need to change below to updateAuthStatus as is confusing because not checking
-        //if isAuthrozied but updating pocket-status link
-        //            pullTabs.Pocket.isAuthorized();
-        loginStatus = pullTabs.Pocket.checkLocalLoginStatus(); //this actually checks.....
-      }
-    }
-
     opt.init = function() {
       bindUIActions();
       setDefaultMimeTypes();
@@ -156,7 +140,7 @@ pullTabs.Options =
           console.log(e);
         });
 
-      checkPocketStatus();
+      pullTabs.Pocket.checkLocalLoginStatus();
     };
 
     opt.getMimeTypes = function() {
