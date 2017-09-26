@@ -1,4 +1,4 @@
-let mix = require('laravel-mix');
+let mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,18 +11,26 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.combine(
-  [
-    'js/app/pulltabs.js',
-    'js/app/config.js',
-    'js/app/form.js',
-    'js/app/options.js',
-    'js/app/popup.js',
-    'js/app/browser.js',
-    'js/app/pocket.js',
-  ],
-  'dist/all.js'
-);
+mix
+  .combine(
+    [
+      "js/app/pulltabs.js",
+      "js/app/config.js",
+      "js/app/form.js",
+      "js/app/options.js",
+      "js/app/popup.js",
+      "js/app/browser.js",
+      "js/app/pocket.js"
+    ],
+    "dist/all.js"
+  )
+  .copy("img/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
+  .copy("img/bookmark.svg", "dist/img/bookmark.svg")
+  .copy("img/close.svg", "dist/img/close.svg")
+  .copy("img/download.svg", "dist/img/download.svg")
+  .copy("img/icon-19.png", "dist/img/icon-19.png")
+  .copy("img/icon-38.png", "dist/img/icon-38.png")
+  .copy("img/ignore.svg", "dist/img/ignore.svg");
 
 // Full API
 // mix.js(src, output);
