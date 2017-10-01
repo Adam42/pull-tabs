@@ -1,4 +1,8 @@
 "use strict";
+var sanitize = require("sanitize-filename");
+import { messageManager } from "./message.js";
+import { config } from "./config.js";
+
 /*
  * Browser
  *
@@ -7,9 +11,7 @@
  * as possible.
  *
  */
-var chrome = chrome || {}; //appeases jshint
-var pullTabs = pullTabs || {};
-pullTabs.Browser = pullTabs.Browser || {
+export var browser = browser || {
   ENV: "",
 
   browser: function() {},
@@ -20,7 +22,7 @@ pullTabs.Browser = pullTabs.Browser || {
      * Default expectation is around Chrome
      */
   init: function() {
-    this.ENV = pullTabs.Config.configuration.mode;
+    this.ENV = config.configuration.mode;
     this.isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     this.setBrowser();
     //if a pulltabs bookmark doesn't exist, create one
@@ -133,7 +135,7 @@ var DevBrowse = {
  * Should only be automatically called via Browser.
  *
  */
-var PTChrome = {
+export var PTChrome = {
   /**
      * Download a resource represented via a tab's URL
      * to local disk either as an HTML file or with
@@ -154,16 +156,13 @@ var PTChrome = {
         url: tab.url
       };
 
-      if (!pullTabs.Browser.isFirefox) {
-        file.method = "GET";
+      //If the file doesn't have an filename ending save it as an HTML file
+      if (!browser.isFile(tab.url)) {
+        file.filename = sanitize(tab.title.toString()) + ".html";
       }
 
-      //Chrome handles downloads well but Firefox saves URLs without extension endings
-      //with a generic download(x) filename so let's add .html to the tab's title instead.
-      if (pullTabs.Browser.isFirefox) {
-        if (!pullTabs.Browser.isFile(tab.url)) {
-          file.filename = tab.title.toString() + ".html";
-        }
+      if (!browser.isFirefox) {
+        file.method = "GET";
       }
 
       try {
@@ -172,7 +171,10 @@ var PTChrome = {
             if (label) {
               label.setAttribute("class", label.className + " failed");
             }
-            pullTabs.Form.updateStatus(tab, "Failed downloading ");
+            form.updateStatus(
+              tab,
+              "Failed downloading, trying with generic filename "
+            );
             return;
           }
           if (label) {
@@ -189,7 +191,8 @@ var PTChrome = {
 
           span.appendChild(message);
           span.appendChild(link);
-          pullTabs.App.updateStatusMessage(span, "short", "success");
+
+          messageManager.updateStatusMessage(span, "short", "success");
 
           //@to-do check preferences to see if user chose to auto-close tabs upon successful action
           var autoClose = false;
@@ -198,7 +201,7 @@ var PTChrome = {
           }
         });
       } catch (e) {
-        pullTabs.Form.updateStatus(tab, "Error downloading ");
+        form.updateStatus(tab, "Error downloading ");
         console.log(e);
       }
     });
@@ -334,9 +337,7 @@ var PTChrome = {
       status.appendChild(message);
       status.appendChild(link);
 
-      pullTabs.App.updateStatusMessage(status, "short", "success");
-
-      //            pullTabs.Form.setLabelStatus(tab, "successful");
+      messageManager.updateStatusMessage(status, "short", "success");
     });
   },
 
@@ -386,20 +387,20 @@ var PTChrome = {
      * otherwise use local
      */
   getStorageType: function() {
-    if (!pullTabs.Browser.isFirefox) {
+    if (!browser.isFirefox) {
       if (
         typeof chrome.storage.sync !== "undefined" &&
         typeof chrome.storage.sync.get !== "undefined"
       ) {
-        pullTabs.Browser.storageType = chrome.storage.sync;
-        return pullTabs.Browser.storageType;
+        browser.storageType = chrome.storage.sync;
+        return browser.storageType;
       }
     } else if (
       typeof chrome.storage.local !== "undefined" &&
       typeof chrome.storage.local.get !== "undefined"
     ) {
-      pullTabs.Browser.storageType = chrome.storage.local;
-      return pullTabs.Browser.storageType;
+      browser.storageType = chrome.storage.local;
+      return browser.storageType;
     }
 
     //@to-do revert to localStorage
@@ -414,16 +415,16 @@ var PTChrome = {
      * don't recognize chrome.storage
      */
   store: function(key, callback) {
-    pullTabs.Browser.getStorageType();
+    browser.getStorageType();
 
-    if (typeof pullTabs.Browser.storageType === "undefined") {
+    if (typeof browser.storageType === "undefined") {
       console.log("No storage available");
       callback();
       return;
     }
 
     try {
-      pullTabs.Browser.storageType.set(key, callback);
+      browser.storageType.set(key, callback);
     } catch (e) {
       console.log(e);
       return;
@@ -465,7 +466,7 @@ var PTChrome = {
   retrieve: function(key, callback) {
     var storageType;
 
-    if (pullTabs.Browser.isFirefox) {
+    if (browser.isFirefox) {
       if (
         typeof chrome.storage.local !== "undefined" &&
         typeof chrome.storage.local.get !== "undefined"
@@ -507,11 +508,10 @@ var PTChrome = {
      * @return {[type]}        [description]
      */
   createTab: function(tabKey) {
-    if (typeof chrome.tabs.create !== "undefined") {
+    if (typeof chrome.tabs !== "undefined") {
       chrome.tabs.create(tabKey);
       return;
     }
-
     console.log("Unable to create this tab: ");
     console.dir(tabKey);
     return;
@@ -532,11 +532,8 @@ var PTChrome = {
   }
 };
 
-//pullTabs.Browser.init();
-if (
-  typeof (pullTabs.Browser.ENV !== "undefined") &&
-  pullTabs.Browser.ENV === "DEVELOPMENT"
-) {
-  console.log("DEFAULT TABS: " + pullTabs.Browser.getTabs());
+//browser.init();
+if (typeof (browser.ENV !== "undefined") && browser.ENV === "DEVELOPMENT") {
+  console.log("DEFAULT TABS: " + browser.getTabs());
 }
-pullTabs.Browser.init(pullTabs);
+browser.init();

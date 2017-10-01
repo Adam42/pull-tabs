@@ -1,13 +1,15 @@
 "use strict";
-var pullTabs = pullTabs || {};
+import { browser } from "./browser.js";
+import { pocket } from "./pocket.js";
+
 /**
  * Settings/preferences interface for a user to save
  * things like Pocket login, layout options and other settings
  *
  * @return {[type]} [description]
  */
-pullTabs.Options =
-  pullTabs.Options ||
+export var options =
+  options ||
   (function() {
     var tabSettings = {},
       opt = {};
@@ -109,7 +111,7 @@ pullTabs.Options =
         .addEventListener("submit", opt.saveMimeSettings);
       document
         .getElementById("pocket-status")
-        .addEventListener("click", pullTabs.Pocket.checkLink);
+        .addEventListener("click", pocket.checkLink);
       document
         .getElementById("full-mime-types")
         .addEventListener("click", opt.saveFullMimeType);
@@ -129,18 +131,18 @@ pullTabs.Options =
       setDefaultMimeTypes();
       createForm();
       this.restoreMimeSettings().then(opt.setSettings);
-      this.getLayout().then(pullTabs.Options.setLayout);
-      this.getAutoClose().then(pullTabs.Options.setAutoClose);
+      this.getLayout().then(options.setLayout);
+      this.getAutoClose().then(options.setAutoClose);
 
       this.getFullMimeType()
         .then(function(fullMimeType) {
-          pullTabs.Options.setFullMimeType(fullMimeType);
+          options.setFullMimeType(fullMimeType);
         })
         .catch(function(e) {
           console.log(e);
         });
 
-      pullTabs.Pocket.checkLocalLoginStatus();
+      pocket.checkLocalLoginStatus();
     };
 
     opt.getMimeTypes = function() {
@@ -152,7 +154,7 @@ pullTabs.Options =
     };
 
     opt.restoreMimeSettings = function(callback) {
-      return pullTabs.Browser.retrieve(opt.mimeSettings, callback);
+      return browser.retrieve(opt.mimeSettings, callback);
     };
 
     /*
@@ -226,7 +228,7 @@ pullTabs.Options =
       }
 
       try {
-        pullTabs.Browser.store(
+        browser.store(
           opt.autoClose,
           opt.updateStatusMessage("Autoclose saved.")
         );
@@ -257,10 +259,7 @@ pullTabs.Options =
       }
 
       try {
-        pullTabs.Browser.store(
-          opt.layout,
-          opt.updateStatusMessage("Layout saved.")
-        );
+        browser.store(opt.layout, opt.updateStatusMessage("Layout saved."));
       } catch (e) {
         console.log("Chrome storage sync set Exception: ");
         console.log(e);
@@ -298,7 +297,7 @@ pullTabs.Options =
       }
 
       try {
-        pullTabs.Browser.store(
+        browser.store(
           opt.fullMimeType,
           opt.updateStatusMessage("Full mime type saved.")
         );
@@ -325,15 +324,15 @@ pullTabs.Options =
     };
 
     opt.getFullMimeType = function() {
-      return pullTabs.Browser.retrieve(opt.fullMimeType);
+      return browser.retrieve(opt.fullMimeType);
     };
 
     opt.getLayout = function() {
-      return pullTabs.Browser.retrieve(opt.layout);
+      return browser.retrieve(opt.layout);
     };
 
     opt.getAutoClose = function() {
-      return pullTabs.Browser.retrieve(opt.autoClose);
+      return browser.retrieve(opt.autoClose);
     };
 
     /*
@@ -356,7 +355,7 @@ pullTabs.Options =
       }
 
       try {
-        pullTabs.Browser.store(
+        browser.store(
           opt.mimeSettings,
           opt.updateStatusMessage("Mime settings saved")
         );
@@ -370,6 +369,4 @@ pullTabs.Options =
     };
 
     return opt;
-  })(pullTabs);
-
-//pullTabs.Options.init();
+  })();

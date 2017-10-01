@@ -1,7 +1,7 @@
 {
-    "/dist/all.js": "/dist/all.js",
-    "/dist/options-page.js": "/dist/options-page.js",
     "/dist/pocket-page.js": "/dist/pocket-page.js",
+    "/dist/popup-page.js": "/dist/popup-page.js",
+    "/dist/options-page.js": "/dist/options-page.js",
     "/dist/about-page.js": "/dist/about-page.js",
     "/dist/style.css": "/dist/style.css",
     "/dist/non-responsive-style.css": "/dist/non-responsive-style.css",

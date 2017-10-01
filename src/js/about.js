@@ -1,3 +1,7 @@
+"use strict";
+import { watchOptionsLink } from "./watchOptionsLink.js";
+import { browser } from "./browser.js";
+
 var aboutPullTabs = aboutPullTabs || {
   init: function() {
     var creditLinks = document.getElementById("about-credits");
@@ -12,9 +16,12 @@ var aboutPullTabs = aboutPullTabs || {
           active: false
         };
 
-        pullTabs.Browser.createTab(tabKey);
+        browser.createTab(tabKey);
       });
     }
   }
 };
-aboutPullTabs.init();
+document.addEventListener("DOMContentLoaded", function() {
+  watchOptionsLink.init();
+  aboutPullTabs.init();
+});

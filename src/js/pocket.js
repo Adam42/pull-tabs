@@ -1,12 +1,15 @@
 "use strict";
-var pullTabs = pullTabs || {};
+import { messageManager } from "./message.js";
+import { config } from "./config.js";
+import { browser } from "./browser.js";
+import { form } from "./form.js";
 
 /**
  * Integration with getpocket.com allowing
  * users to save tabs to their Pocket account
  * @type {[type]}
  */
-pullTabs.Pocket = pullTabs.Pocket || {
+export var pocket = pocket || {
   pocketKey: {
     access_token: "access_token",
     user_name: "user_name"
@@ -100,11 +103,11 @@ pullTabs.Pocket = pullTabs.Pocket || {
     var action = event.target.href.substring(hash);
 
     if (action === "pocket-logout") {
-      pullTabs.Pocket.logOut();
+      pocket.logOut();
       return;
     }
 
-    pullTabs.Pocket.initLogin();
+    pocket.initLogin();
   },
 
   /**
@@ -114,10 +117,10 @@ pullTabs.Pocket = pullTabs.Pocket || {
      * @return {[type]} [description]
      */
   initLogin: function() {
-    var pocket = {};
-    pocket.url = "https://getpocket.com/v3/oauth/request";
-    pocket.key = pullTabs.Config.credentials.consumer_key;
-    pullTabs.Pocket.getRequestToken(pocket);
+    var pocketRequest = {};
+    pocketRequest.url = "https://getpocket.com/v3/oauth/request";
+    pocketRequest.key = config.credentials.consumer_key;
+    pocket.getRequestToken(pocketRequest);
   },
 
   /**
@@ -130,7 +133,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
 
     var pocket_data = {
       url: url,
-      consumer_key: pullTabs.Config.credentials.consumer_key,
+      consumer_key: config.credentials.consumer_key,
       access_token: localStorage[this.pocketKey.access_token]
     };
 
@@ -157,7 +160,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
           message = document.createTextNode("Failed saving to Pocket ");
           status.appendChild(message);
           status.appendChild(link);
-          pullTabs.App.updateStatusMessage(status, "dependent", "danger");
+          messageManager.updateStatusMessage(status, "dependent", "danger");
 
           return false;
         } else if (xhr.readyState === 4 && xhr.status === 200) {
@@ -168,7 +171,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
           message = document.createTextNode("Saved this tab to pocket: ");
           status.appendChild(message);
           status.appendChild(link);
-          pullTabs.App.updateStatusMessage(status, "medium", "success");
+          messageManager.updateStatusMessage(status, "medium", "success");
 
           //if we remove the tab that the popup was invoked on the popup
           //goes away, ideally we should move to event scripts
@@ -190,7 +193,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
       };
 
       xhr.onerror = function(e) {
-        pullTabs.Form.setLabelStatus(tab, "failed");
+        form.setLabelStatus(tab, "failed");
 
         console.error("saveTabToPocket error: " + xhr.statusText);
         return;
@@ -200,7 +203,7 @@ pullTabs.Pocket = pullTabs.Pocket || {
     } catch (e) {
       console.log("saveTabToPocket Exception: ");
       console.log(e);
-      pullTabs.Form.setLabelStatus(tab, "failed");
+      form.setLabelStatus(tab, "failed");
       return false;
     }
   },
@@ -224,33 +227,32 @@ pullTabs.Pocket = pullTabs.Pocket || {
      *
      * @todo  Rename this function to better represent what it actually does
      *
-     * @param  {object} pocket An object with key and token
+     * @param  {object} pocketRequest An object with key and token
      * @return {[type]}        [description]
      */
-  getRequestToken: function(pocket) {
+  getRequestToken: function(pocketRequest) {
     var redirectURL = chrome.extension.getURL("pocket.html");
 
     var data = new FormData();
-    data.append("consumer_key", pocket.key);
+    data.append("consumer_key", pocketRequest.key);
     data.append("redirect_uri", encodeURIComponent(redirectURL));
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open("POST", pocket.url, true);
+    xhr.open("POST", pocketRequest.url, true);
 
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          pocket.token = xhr.response.substring(5);
+          pocketRequest.token = xhr.response.substring(5);
+          localStorage[pocket.pocketKey.request_token] = pocketRequest.token;
 
-          localStorage[pullTabs.Pocket.pocketKey.request_token] = pocket.token;
-
-          pocket.auth =
+          pocketRequest.auth =
             "https://getpocket.com/auth/authorize?request_token=" +
-            pocket.token +
+            pocketRequest.token +
             "&redirect_uri=";
 
-          pullTabs.Browser.login(pocket);
+          browser.login(pocketRequest);
         } else {
           console.error(xhr.statusText);
         }
@@ -281,9 +283,9 @@ pullTabs.Pocket = pullTabs.Pocket || {
         },
         function(items) {
           if (items.user_name !== "user_name") {
-            pullTabs.Pocket.isAuthorized(items);
+            pocket.isAuthorized(items);
           } else {
-            pullTabs.Pocket.isNotAuthorized();
+            pocket.isNotAuthorized();
           }
           return;
         }
@@ -330,23 +332,23 @@ pullTabs.Pocket = pullTabs.Pocket || {
      * @param  {object} pocket Object with consumer key and request token
      * @return {Promise|void}        If successful a promise via local storage action
      */
-  getAccessToken: function(pocket) {
-    var pocket = {};
-    pocket.url = "https://getpocket.com/v3/oauth/authorize";
-    pocket.key = pullTabs.Config.credentials.consumer_key;
-    pocket.token = localStorage[this.pocketKey.request_token];
+  getAccessToken: function(pocketAuthAttempt) {
+    var pocketAuthAttempt = {};
+    pocketAuthAttempt.url = "https://getpocket.com/v3/oauth/authorize";
+    pocketAuthAttempt.key = config.credentials.consumer_key;
+    pocketAuthAttempt.token = localStorage[this.pocketKey.request_token];
     var data = new FormData();
-    data.append("consumer_key", pocket.key);
-    data.append("code", pocket.token);
+    data.append("consumer_key", pocketAuthAttempt.key);
+    data.append("code", pocketAuthAttempt.token);
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open("POST", pocket.url, true);
+    xhr.open("POST", pocketAuthAttempt.url, true);
 
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          pullTabs.Pocket.setStoredCredentials(xhr.response);
+          pocket.setStoredCredentials(xhr.response);
         } else {
           console.error(xhr.statusText);
         }

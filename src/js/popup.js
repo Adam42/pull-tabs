@@ -1,12 +1,16 @@
 "use strict";
-var pullTabs = pullTabs || {};
+import { browser } from "./browser";
+import { options } from "./options.js";
+import { form } from "./form.js";
+import { messageManager } from "./message.js";
+import { pocket } from "./pocket.js";
 
 /**
  * Main functionality of pullTabs extension
  * exposed to user via a popup window
  * @constructor
  */
-pullTabs.App = pullTabs.App || {
+export var popup = popup || {
   tabs: "",
 
   prefs: "",
@@ -19,31 +23,31 @@ pullTabs.App = pullTabs.App || {
     //Force user to go to options page on initial load
     if (localStorage.initialSetup !== "no") {
       localStorage.initialSetup = "yes";
-      pullTabs.App.doInitialSetup();
+      popup.doInitialSetup();
       return;
     }
-
     //If we don't have any tabs yet then retrieve them
-    if (!pullTabs.App.tabs) {
-      var msgID = pullTabs.App.updateStatusMessage(
+    if (!popup.tabs) {
+      var msgID = messageManager.updateStatusMessage(
         "Gathering your tabs",
         "dependent",
         "info"
       );
-      pullTabs.Browser
+
+      browser
         .getTabs()
         .then(function(tabs) {
-          pullTabs.App.tabs = tabs;
-          pullTabs.App.removeStatusMessage(msgID);
+          popup.tabs = tabs;
+          messageManager.removeStatusMessage(msgID);
           return tabs;
         })
         .then(function(tabs) {
-          pullTabs.App.setNumTabs(tabs);
+          popup.setNumTabs(tabs);
         })
         .then(
-          pullTabs.App.getLayout().then(function(layout) {
-            pullTabs.App.setLayout(layout);
-            pullTabs.App.displayLayout();
+          popup.getLayout().then(function(layout) {
+            popup.setLayout(layout);
+            popup.displayLayout();
           })
         )
         .catch(function(e) {
@@ -51,89 +55,6 @@ pullTabs.App = pullTabs.App || {
         });
 
       return;
-    }
-  },
-
-  /**
-     * Updates a status element with a message and displays
-     * it for a specified duration
-     *
-     * @param  {string|object} message  Either the text of the message or an element object
-     * @param  {string} duration - short,medium,long, dependent or re-stack
-     * @param  {string} type     The type of message, e.g. success, danger or info
-     * @return {void|number}      A dependent message returns a numeric ID, others void.
-     */
-  updateStatusMessage: function(message, duration, type) {
-    var status = document.getElementById("status");
-    var statusMessage = document.createElement("p");
-    var elementIDName = "status-message-";
-
-    var alertType = "alert-" + type;
-    statusMessage.classList.add("alert", alertType);
-    status.classList.remove("hidden");
-    status.style.top = 0;
-    statusMessage.textContent = message;
-
-    //test if it's a DOM element instead of just a string
-    if (typeof message === "object" && message instanceof HTMLElement) {
-      statusMessage.textContent = "";
-      statusMessage.appendChild(message);
-    }
-
-    statusMessage.id = elementIDName + status.children.length;
-
-    //if there are children then get the id of the last child
-    //and bump it to avoid colliding with an older message
-    //that hasn't yet been removed
-    if (status.children.length > 0) {
-      var lastChildID = status.lastChild.id;
-      lastChildID = lastChildID.replace(elementIDName, "");
-      lastChildID = parseInt(lastChildID) + 1;
-      statusMessage.id = elementIDName + lastChildID;
-    }
-
-    status.appendChild(statusMessage);
-
-    switch (duration) {
-      case "short":
-        setTimeout(pullTabs.App.removeStatusMessage, 2000, statusMessage.id);
-        break;
-
-      case "medium":
-        setTimeout(pullTabs.App.removeStatusMessage, 4000, statusMessage.id);
-        break;
-
-      case "long":
-        setTimeout(pullTabs.App.removeStatusMessage, 8000, statusMessage.id);
-        break;
-
-      case "dependent":
-        return statusMessage.id;
-
-      case "restack":
-        break;
-
-      default:
-        setTimeout(pullTabs.App.removeStatusMessage, 3000, statusMessage.id);
-        break;
-    }
-  },
-
-  /**
-     * Remove a previously created status message from DOM via it's ID
-     * @param  {Number} id The ID of the element being removed
-     * @return {void}    [description]
-     */
-  removeStatusMessage: function(id) {
-    if (typeof id === null) {
-      id = "status-message-0";
-    }
-    var status = document.getElementById(id);
-    var parent = status.parentNode;
-    status.remove();
-
-    if (parent.children.length <= 0) {
-      parent.classList.add("hidden");
     }
   },
 
@@ -171,30 +92,30 @@ pullTabs.App = pullTabs.App || {
      * @return {void} [description]
      */
   displayLayout: function() {
-    if (pullTabs.App.layout.simple) {
-      pullTabs.App.watchButtons();
+    if (popup.layout.simple) {
+      popup.watchButtons();
     } else {
       var simple = document.getElementById("simple");
       simple.classList.add("hidden");
     }
 
-    if (pullTabs.App.layout.advanced) {
-      pullTabs.App.displayAdvancedLayout();
+    if (popup.layout.advanced) {
+      popup.displayAdvancedLayout();
     }
   },
 
   addMimeTypeToTabs: function() {
-    return pullTabs.App.tabs.map(function(tab) {
-      //          var tabObj = pullTabs.App.tabs.filter(function( tabObj ) {
+    return popup.tabs.map(function(tab) {
+      //          var tabObj = popup.tabs.filter(function( tabObj ) {
       //            return tabObj.id == tab.id;
       //         })['0'];
 
-      pullTabs.App
+      popup
         .getContentType(tab.url)
         .then(function(mimeType) {
           var id = "tab" + tab.id.toString();
-          pullTabs.App.setMimeTypesMap(id, mimeType);
-          //                pullTabs.App.mimeTypesMap[id] = mimeType;
+          popup.setMimeTypesMap(id, mimeType);
+          //                popup.mimeTypesMap[id] = mimeType;
           //                tabObj.mimeType = mimeType;
         })
         .catch(function(e) {
@@ -204,7 +125,7 @@ pullTabs.App = pullTabs.App || {
   },
 
   setMimeTypesMap: function(id, mimeType) {
-    pullTabs.App.mimeTypesMap[id] = mimeType;
+    popup.mimeTypesMap[id] = mimeType;
   },
 
   displayAdvancedLayout: function() {
@@ -212,38 +133,30 @@ pullTabs.App = pullTabs.App || {
     advanced.classList.remove("hidden");
     this.getOptions()
       .then(function(value) {
-        pullTabs.App.setOptions(value);
+        popup.setOptions(value);
       })
       .then(
-        pullTabs.App
+        popup
           .getFullMimeType()
           .then(function(fullMimeType) {
             if (fullMimeType.retrieveFullMimeType) {
-              Promise.all(pullTabs.App.addMimeTypeToTabs).then(function() {
-                pullTabs.App.assembleForm(
-                  pullTabs.App.tabs,
-                  pullTabs.App.pref,
-                  pullTabs.App.mimeTypesMap
-                );
+              Promise.all(popup.addMimeTypeToTabs).then(function() {
+                popup.assembleForm(popup.tabs, popup.pref, popup.mimeTypesMap);
               });
             } else {
-              pullTabs.App.assembleForm(
-                pullTabs.App.tabs,
-                pullTabs.App.pref,
-                pullTabs.App.mimeTypesMap
-              );
+              popup.assembleForm(popup.tabs, popup.pref, popup.mimeTypesMap);
             }
           })
           .then(function() {
-            pullTabs.App.watchSubmit(pullTabs.App.tabs);
+            popup.watchSubmit(popup.tabs);
 
             var numFormTabs = document
               .getElementById("resources")
               .getElementsByClassName("list-group-item");
 
-            pullTabs.App.watchCheckBoxes(numFormTabs);
-            pullTabs.App.watchMutateCheck();
-            pullTabs.App.setActions();
+            popup.watchCheckBoxes(numFormTabs);
+            popup.watchMutateCheck();
+            popup.setActions();
           })
       );
   },
@@ -251,7 +164,7 @@ pullTabs.App = pullTabs.App || {
   watchCheckBoxes: function(numFormTabs) {
     var i;
     for (i = 0; i < numFormTabs.length; i++) {
-      pullTabs.Form.toggleLabels(numFormTabs[i]);
+      form.toggleLabels(numFormTabs[i]);
     }
   },
 
@@ -281,7 +194,7 @@ pullTabs.App = pullTabs.App || {
   },
 
   getFullMimeType: function() {
-    return pullTabs.Browser.retrieve(pullTabs.Options.fullMimeType);
+    return browser.retrieve(options.fullMimeType);
   },
 
   assembleForm: function(tabs, prefs, mimeTypes) {
@@ -290,11 +203,11 @@ pullTabs.App = pullTabs.App || {
         //            var mT = mimeTypes.filter(function(item) { return item.name === 'tab-2196'; });
       }
 
-      pullTabs.App.displayDefaultAdvancedLayout(tab);
+      popup.displayDefaultAdvancedLayout(tab);
 
       /*
             if(fullMimeType){
-                pullTabs.App.getContentType().then(function ( value ) {
+                popup.getContentType().then(function ( value ) {
                     console.log(value);
                 }).catch(function(e){
                     console.log(e);
@@ -326,15 +239,13 @@ pullTabs.App = pullTabs.App || {
       checked = "checked";
       active = "active";
     }
-    var Form = pullTabs.Form;
-    var input = Form.createCheckbox(tab, fullType, checked);
 
-    var radioDown = Form.createRadioInput(tab, "download", pref);
-    var radioPocket = Form.createRadioInput(tab, "pocket", pref);
-    var radioBookmark = Form.createRadioInput(tab, "bookmark", pref);
-    var radioClose = Form.createRadioInput(tab, "close", pref);
-
-    var label = Form.createLabel(tab, fullType, active);
+    var input = form.createCheckbox(tab, fullType, checked);
+    var radioDown = form.createRadioInput(tab, "download", pref);
+    var radioPocket = form.createRadioInput(tab, "pocket", pref);
+    var radioBookmark = form.createRadioInput(tab, "bookmark", pref);
+    var radioClose = form.createRadioInput(tab, "close", pref);
+    var label = form.createLabel(tab, fullType, active);
 
     label.appendChild(input);
     label.appendChild(radioDown);
@@ -346,22 +257,22 @@ pullTabs.App = pullTabs.App || {
   },
 
   getTabStatus: function() {
-    this.tabs = pullTabs.Form.getSelectedTabs(this.tabs);
+    this.tabs = form.getSelectedTabs(this.tabs);
 
     if (this.tabs.downloads.length > 0) {
-      pullTabs.Browser.downloadUrls(this.tabs.downloads);
+      browser.downloadUrls(this.tabs.downloads);
     }
 
     if (this.tabs.pockets.length > 0) {
-      pullTabs.Pocket.saveTabsToPocket(this.tabs.pockets);
+      pocket.saveTabsToPocket(this.tabs.pockets);
     }
 
     if (this.tabs.closes.length > 0) {
-      pullTabs.Browser.closeTabs(this.tabs.closes);
+      browser.closeTabs(this.tabs.closes);
     }
 
     if (this.tabs.bookmarks.length > 0) {
-      pullTabs.Browser.bookmarkTabs(this.tabs.bookmarks);
+      browser.bookmarkTabs(this.tabs.bookmarks);
     }
 
     return;
@@ -414,7 +325,7 @@ pullTabs.App = pullTabs.App || {
 */
 
   setLayout: function(layout) {
-    pullTabs.App.layout = layout;
+    popup.layout = layout;
   },
 
   //returns a Promise
@@ -423,14 +334,14 @@ pullTabs.App = pullTabs.App || {
       simple: "true",
       advanced: "false"
     };
-    var msgID = pullTabs.App.updateStatusMessage(
+    var msgID = messageManager.updateStatusMessage(
       "Loading layout",
       "dependent",
       "info"
     );
 
-    return pullTabs.Browser.retrieve(key).then(function(value) {
-      pullTabs.App.removeStatusMessage(msgID);
+    return browser.retrieve(key).then(function(value) {
+      messageManager.removeStatusMessage(msgID);
       return value;
     });
   },
@@ -453,11 +364,11 @@ pullTabs.App = pullTabs.App || {
       unknown: "ignore"
     };
 
-    return pullTabs.Browser.retrieve(key, callback);
+    return browser.retrieve(key, callback);
   },
 
   setOptions: function(items) {
-    pullTabs.App.prefs = items;
+    popup.prefs = items;
   },
 
   /**
@@ -469,12 +380,12 @@ pullTabs.App = pullTabs.App || {
   setActions: function() {
     var checkAllButton = document.getElementById("check-all-button");
     checkAllButton.addEventListener("click", function() {
-      pullTabs.App.setAllActive();
+      popup.setAllActive();
     });
 
     var uncheckAllButton = document.getElementById("uncheck-all-button");
     uncheckAllButton.addEventListener("click", function() {
-      pullTabs.App.setAllInactive();
+      popup.setAllInactive();
     });
   },
 
@@ -572,7 +483,7 @@ pullTabs.App = pullTabs.App || {
 
   process: function(evt) {
     evt.preventDefault();
-    pullTabs.App.getTabStatus();
+    popup.getTabStatus();
   },
 
   processGroup: function(evt) {
@@ -582,25 +493,25 @@ pullTabs.App = pullTabs.App || {
 
   doAction: function(evt) {
     evt.preventDefault();
-    pullTabs.App.processButton(this.id);
+    popup.processButton(this.id);
   },
 
   processButton: function(action) {
     switch (action) {
       case "download":
-        pullTabs.Browser.downloadUrls(pullTabs.App.tabs);
+        browser.downloadUrls(popup.tabs);
         break;
 
       case "pocket":
-        pullTabs.Pocket.saveTabsToPocket(pullTabs.App.tabs);
+        pocket.saveTabsToPocket(popup.tabs);
         break;
 
       case "bookmark":
-        pullTabs.Browser.bookmarkTabs(pullTabs.App.tabs);
+        browser.bookmarkTabs(popup.tabs);
         break;
 
       case "close":
-        pullTabs.Browser.closeTabs(pullTabs.App.tabs);
+        browser.closeTabs(popup.tabs);
         break;
 
       default:
@@ -633,23 +544,3 @@ pullTabs.App = pullTabs.App || {
     checked.addEventListener("submit", this.process);
   }
 };
-
-document.addEventListener("DOMContentLoaded", function() {
-  pullTabs.App.init();
-});
-
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  for (var key in changes) {
-    if (changes.hasOwnProperty("key")) {
-      var storageChange = changes[key];
-      console.log(
-        'Storage key "%s" in namespace "%s" changed. ' +
-          'Old value was "%s", new value is "%s".',
-        key,
-        namespace,
-        storageChange.oldValue,
-        storageChange.newValue
-      );
-    }
-  }
-});

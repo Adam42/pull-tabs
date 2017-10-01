@@ -1,7 +1,7 @@
+"use strict";
 //Change this filename to config.js and fill in the details below
-var pullTabs = pullTabs || {};
-pullTabs.Config =
-  pullTabs.Config ||
+export var config =
+  config ||
   (function() {
     var setup = {
       credentials: {
@@ -23,4 +23,4 @@ pullTabs.Config =
     };
 
     return setup;
-  })(pullTabs);
+  })();

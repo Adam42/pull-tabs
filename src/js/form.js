@@ -1,15 +1,10 @@
 "use strict";
+import { popup } from "./popup.js";
 /**
  * Common form functionality
- *
- */
-var pullTabs = pullTabs || {};
-
-/**
- * Scope Form to pullTabs object
  * @constructor
  */
-pullTabs.Form = pullTabs.Form || {
+export var form = form || {
   options: "",
 
   init: function(values) {
@@ -17,12 +12,12 @@ pullTabs.Form = pullTabs.Form || {
   },
 
   createForm: function(tabs) {
-    pullTabs.App.getOptions(function(options) {
-      pullTabs.App.assembleForm(tabs, options);
+    popup.getOptions(function(options) {
+      popup.assembleForm(tabs, options);
       return;
     });
 
-    pullTabs.App.watchSubmit(tabs);
+    popup.watchSubmit(tabs);
     return;
   },
 
@@ -139,7 +134,7 @@ pullTabs.Form = pullTabs.Form || {
     var resources = document.getElementById("resources");
 
     tabs.forEach(function(tab) {
-      pullTabs.App.getContentType(tab.url, function(response) {
+      popup.getContentType(tab.url, function(response) {
         this.mType = response;
       });
 
@@ -158,15 +153,15 @@ pullTabs.Form = pullTabs.Form || {
         active = "active";
       }
 
-      var input = pullTabs.App.createCheckbox(tab, type, checked);
+      var input = popup.createCheckbox(tab, type, checked);
 
       if (pref === "download") {
       }
-      var radioDown = pullTabs.App.createRadioInput(tab, "download", pref);
-      var radioPocket = pullTabs.App.createRadioInput(tab, "pocket", pref);
-      var radioIgnore = pullTabs.App.createRadioInput(tab, "ignore", pref);
+      var radioDown = popup.createRadioInput(tab, "download", pref);
+      var radioPocket = popup.createRadioInput(tab, "pocket", pref);
+      var radioIgnore = popup.createRadioInput(tab, "ignore", pref);
 
-      var label = pullTabs.App.createLabel(tab, type, active);
+      var label = popup.createLabel(tab, type, active);
 
       label.appendChild(input);
       label.appendChild(radioDown);

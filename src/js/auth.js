@@ -1,3 +1,6 @@
 /*Callback for Pocket Oauth response*/
-var pullTabs = pullTabs || {};
-pullTabs.Pocket.getAccessToken();
+
+"use strict";
+import { pocket } from "./pocket.js";
+
+pocket.getAccessToken();

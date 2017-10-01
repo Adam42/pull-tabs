@@ -12,42 +12,11 @@ let mix = require("laravel-mix");
  */
 
 mix
-  .combine(
-    [
-      "src/js/pulltabs.js",
-      "src/js/config.js",
-      "src/js/form.js",
-      "src/js/options.js",
-      "src/js/popup.js",
-      "src/js/browser.js",
-      "src/js/pocket.js"
-    ],
-    "dist/all.js"
-  )
-  .combine(
-    [
-      "src/js/pulltabs.js",
-      "src/js/config.js",
-      "src/js/browser.js",
-      "src/js/pocket.js",
-      "src/js/options.js",
-      "src/js/options-init.js"
-    ],
-    "dist/options-page.js"
-  )
-  .combine(
-    [
-      "src/js/pulltabs.js",
-      "src/js/config.js",
-      "src/js/pocket.js",
-      "src/js/auth.js"
-    ],
-    "dist/pocket-page.js"
-  )
-  .combine(
-    ["src/js/config.js", "src/js/browser.js", "src/js/about.js"],
-    "dist/about-page.js"
-  )
+  //For popup.html
+  .js(["src/js/pulltabs.js", "src/js/config.js"], "dist/popup-page.js")
+  .js(["src/js/options-init.js"], "dist/options-page.js")
+  .js(["src/js/pulltabs.js", "src/js/auth.js"], "dist/pocket-page.js")
+  .js(["src/js/config.js", "src/js/about.js"], "dist/about-page.js")
   .combine(
     [
       "bower_components/bootswatch-dist/css/bootstrap.min.css",
