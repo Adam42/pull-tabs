@@ -1,6 +1,6 @@
 ## Pull Tabs!
 
-Pull Tabs is a browser extension designed to perform actions on tabs either in bulk or on a per-tab basis. Currently available in the [Google Chrome Web Store](https://chrome.google.com/webstore/detail/pull-tabs/bimplhlpceccnolgbbedbiedkecophnn) with a version for Mozilla Firefox's Extension store in progress.
+Pull Tabs is a browser extension designed to perform actions on tabs either in bulk or on a per-tab basis. Currently available in the [Google Chrome Web Store](https://chrome.google.com/webstore/detail/pull-tabs/bimplhlpceccnolgbbedbiedkecophnn) and as a [Mozilla Firefox Extension](https://addons.mozilla.org/en-US/firefox/addon/pull-tabs/).
 
 ### Setup
 
