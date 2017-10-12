@@ -1,7 +1,7 @@
 "use strict";
 import { messageManager } from "./message.js";
 import { config } from "./config.js";
-import { browser } from "./browser.js";
+import { browserUtils } from "./browser.js";
 import { form } from "./form.js";
 
 /**
@@ -155,17 +155,17 @@ export var pocket = pocket || {
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status !== 200) {
           if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-            //                      pullTabs.Form.setLabelStatus(tab, 'failed');
+            form.setLabelStatus(tab, "failed");
           }
           message = document.createTextNode("Failed saving to Pocket ");
           status.appendChild(message);
           status.appendChild(link);
-          messageManager.updateStatusMessage(status, "dependent", "danger");
+          messageManager.updateStatusMessage(status, "long", "danger");
 
           return false;
         } else if (xhr.readyState === 4 && xhr.status === 200) {
           if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-            //                        pullTabs.Form.setLabelStatus(tab, 'successful');
+            form.setLabelStatus(tab, "successful");
           }
 
           message = document.createTextNode("Saved this tab to pocket: ");
@@ -252,7 +252,7 @@ export var pocket = pocket || {
             pocketRequest.token +
             "&redirect_uri=";
 
-          browser.login(pocketRequest);
+          browserUtils.login(pocketRequest);
         } else {
           console.error(xhr.statusText);
         }
@@ -314,7 +314,7 @@ export var pocket = pocket || {
 
     this.isAuthorized();
     /*
-        //pullTabs.Browser.save('Pocket', pocket );
+        //pullTabs.browserUtils.save('Pocket', pocket );
          chrome.storage.local.set( pocket , function () {
             var status = document.getElementById('status');
             status.textContent = pocket.key + ' saved.';

@@ -1,6 +1,7 @@
 "use strict";
-import { browser } from "./browser.js";
+import { browserUtils } from "./browser.js";
 import { pocket } from "./pocket.js";
+import { messageManager } from "./message.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -153,8 +154,8 @@ export var options =
       return opt.mimeSettings;
     };
 
-    opt.restoreMimeSettings = function(callback) {
-      return browser.retrieve(opt.mimeSettings, callback);
+    opt.restoreMimeSettings = function() {
+      return browserUtils.retrieve(opt.mimeSettings);
     };
 
     /*
@@ -227,15 +228,23 @@ export var options =
         opt.autoClose.autoCloseTabs = false;
       }
 
-      try {
-        browser.store(
-          opt.autoClose,
-          opt.updateStatusMessage("Autoclose saved.")
-        );
-      } catch (e) {
-        console.log(e);
-        return false;
-      }
+      browserUtils
+        .store(opt.autoClose)
+        .then(function(value) {
+          messageManager.updateStatusMessage(
+            "Autoclose saved.",
+            "short",
+            "success"
+          );
+        })
+        .catch(err => {
+          messageManager.updateStatusMessage(
+            "Error:" + err.message,
+            "medium",
+            "danger"
+          );
+          console.log(err.message);
+        });
     };
 
     /**
@@ -258,15 +267,23 @@ export var options =
         opt.layout.advanced = false;
       }
 
-      try {
-        browser.store(opt.layout, opt.updateStatusMessage("Layout saved."));
-      } catch (e) {
-        console.log("Chrome storage sync set Exception: ");
-        console.log(e);
-        return false;
-      }
-
-      return true;
+      browserUtils
+        .store(opt.layout)
+        .then(function(value) {
+          messageManager.updateStatusMessage(
+            "Layouts saved.",
+            "short",
+            "success"
+          );
+        })
+        .catch(err => {
+          messageManager.updateStatusMessage(
+            "Error:" + err.message,
+            "medium",
+            "danger"
+          );
+          console.log(err.message);
+        });
     };
 
     /**
@@ -296,43 +313,34 @@ export var options =
         opt.fullMimeType.retrieveFullMimeType = false;
       }
 
-      try {
-        browser.store(
-          opt.fullMimeType,
-          opt.updateStatusMessage("Full mime type saved.")
-        );
-      } catch (e) {
-        console.log("Chrome storage sync set Exception: ");
-        console.log(e);
-        return false;
-      }
-    };
-
-    opt.updateStatusMessage = function(message) {
-      var status = document.getElementById("status");
-
-      status.classList.add("alert", "alert-success");
-      status.classList.remove("hidden");
-      status.textContent = message;
-      status.style.top = 0;
-
-      setTimeout(function() {
-        status.textContent = "";
-        status.classList.remove("alert", "alert-success");
-        status.classList.add("hidden");
-      }, 1500);
+      browserUtils
+        .store(opt.fullMimeType)
+        .then(
+          messageManager.updateStatusMessage(
+            "Full mime type saved.",
+            "short",
+            "success"
+          )
+        )
+        .catch(err => {
+          messageManager.updateStatusMessage(
+            "Error:" + err.message,
+            "medium",
+            "danger"
+          );
+        });
     };
 
     opt.getFullMimeType = function() {
-      return browser.retrieve(opt.fullMimeType);
+      return browserUtils.retrieve(opt.fullMimeType);
     };
 
     opt.getLayout = function() {
-      return browser.retrieve(opt.layout);
+      return browserUtils.retrieve(opt.layout);
     };
 
     opt.getAutoClose = function() {
-      return browser.retrieve(opt.autoClose);
+      return browserUtils.retrieve(opt.autoClose);
     };
 
     /*
@@ -354,18 +362,22 @@ export var options =
         }
       }
 
-      try {
-        browser.store(
-          opt.mimeSettings,
-          opt.updateStatusMessage("Mime settings saved")
-        );
-      } catch (e) {
-        console.log("Chrome storage sync set Exception: ");
-        console.log(e);
-        return false;
-      }
-
-      return true;
+      browserUtils
+        .store(opt.mimeSettings)
+        .then(
+          messageManager.updateStatusMessage(
+            "Mime settings saved",
+            "short",
+            "success"
+          )
+        )
+        .catch(err => {
+          messageManager.updateStatusMessage(
+            "Error:" + err.message,
+            "medium",
+            "danger"
+          );
+        });
     };
 
     return opt;

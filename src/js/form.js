@@ -12,11 +12,10 @@ export var form = form || {
   },
 
   createForm: function(tabs) {
-    popup.getOptions(function(options) {
+    popup.getOptions.then(function(options) {
       popup.assembleForm(tabs, options);
       return;
     });
-
     popup.watchSubmit(tabs);
     return;
   },
@@ -266,8 +265,8 @@ export var form = form || {
       });
     });
 
-    var config = { attributes: true, childList: true, characterData: true };
+    var formConfig = { attributes: true, childList: true, characterData: true };
 
-    observer.observe(form, config);
+    observer.observe(form, formConfig);
   }
 };

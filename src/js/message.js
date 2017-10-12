@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Accepts an HTML element to add a text message to
  * or searches for a "status" element and appends to that element

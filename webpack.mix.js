@@ -48,6 +48,13 @@ mix
   .copy("src/popup-init.html", "dist/popup-init.html")
   .copy("src/popup.html", "dist/popup.html");
 
+//errors copying this file into the dist directory
+//for now will place the polyfill into dist manually
+//  .copy(
+//    "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+//    "dist/browser-polyfill.min.js"
+//  );
+
 // Full API
 // mix.js(src, output);
 // mix.react(src, output); <-- Identical to mix.js(), but registers React Babel compilation.

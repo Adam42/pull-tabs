@@ -2,7 +2,15 @@
 var sanitize = require("sanitize-filename");
 import { messageManager } from "./message.js";
 import { config } from "./config.js";
+import { form } from "./form.js";
 
+//Make sure the browser namespace is set to something
+//supported msBrowser is Edge, browser is Firefox/W3C, chrome is Google Chrome
+//if("undefined"==typeof browser){
+//  window.browser = (function() {
+//  return window.msBrowser || window.browser || window.chrome;
+//})();
+//}
 /*
  * Browser
  *
@@ -11,35 +19,21 @@ import { config } from "./config.js";
  * as possible.
  *
  */
-export var browser = browser || {
-  ENV: "",
-
-  browser: function() {},
-
+export var browserUtils = {
   /*
      * Kickoff browser setup
      * to wrap around native APIs
      * Default expectation is around Chrome
      */
   init: function() {
-    this.ENV = config.configuration.mode;
     this.isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-    this.setBrowser();
-    //if a pulltabs bookmark doesn't exist, create one
+    //if we don't have pulltabs bookmark id saved, search for an existing one
     if (typeof localStorage["pullTabsFolderId"] === "undefined") {
-      this.getBookmarks();
-    }
-    return;
-  },
+      var gettingTree = browser.bookmarks.getTree();
 
-  //Check for Chrome existence
-  setBrowser: function() {
-    if (this.ENV === "DEVELOPMENT") {
-      this.browser = DevBrowse;
-    } else if (typeof chrome !== "undefined") {
-      this.browser = PTChrome;
-    } else {
-      this.browser = DevBrowse;
+      gettingTree.then(tree => {
+        this.findPulltabsBookmarkFolder(tree);
+      });
     }
   },
 
@@ -52,159 +46,162 @@ export var browser = browser || {
     );
   },
 
-  getTabs: function() {
-    return this.browser.getTabs();
+  /**
+   * [updateUI description]
+   * @param  {object} tab     Browser tab object
+   * @param  {string} message - a message describing the action result
+   * @param  {string} status  corresponds to UI context
+   */
+  updateUI: function(tab, message, status) {
+    if (status === "fail") {
+      browserUtils.updateSimpleUI(tab, message, "danger");
+      browserUtils.updateAdvancedUI(tab, "failed");
+      return;
+    } else {
+      browserUtils.updateAdvancedUI(tab, "successful");
+    }
+
+    browserUtils.updateSimpleUI(tab, message, status);
   },
 
-  getBookmarks: function(callback) {
-    this.browser.getBookmarks(callback);
+  updateSimpleUI: function(tab, messageText, status) {
+    var span = document.createElement("span");
+    var link = document.createElement("a");
+    var message = document.createTextNode(messageText);
+
+    link.title = tab.title.toString();
+    link.href = tab.url;
+    link.textContent = tab.title.toString();
+
+    span.appendChild(message);
+    span.appendChild(link);
+
+    var duration = "short";
+    if (status === "danger") {
+      duration = "long";
+    }
+
+    messageManager.updateStatusMessage(span, duration, status);
   },
 
-  closeTabs: function(tabs) {
-    this.browser.closeTabs(tabs);
+  //Update the advanced UI after an action
+  updateAdvancedUI: function(tab, message) {
+    if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
+      form.setLabelStatus(tab, message);
+    }
   },
 
-  closeTab: function() {
-    this.browser.closeTab(tab);
+  /**
+   * Setup up a listener to watch for changes to DownloadItem
+   * @return {[type]} [description]
+   */
+  watchDownloads: function(tab) {
+    browser.downloads.onChanged.addListener(browserUtils.handleChanged);
   },
 
-  bookmarkTabs: function(tabs) {
-    this.browser.bookmarkTabs(tabs);
+  /**
+   * Trigger UI updates when downloads reach a final state
+   * @param  {object} delta Changes to the downloadItem object
+   */
+  handleChanged: function(delta) {
+    //retrieve the map of downloadItem IDs to tab objects
+    browser.storage.local
+      .get({
+        downloadItemToTabMap: ""
+      })
+      .then(function(result) {
+        //get the tab object corresponding to this downloadItem ID
+        let tabPendingDownload = result["downloadItemToTabMap"][delta.id];
+
+        if (delta.state && delta.state.current === "complete") {
+          browserUtils.updateUI(
+            tabPendingDownload,
+            "Completed downloading ",
+            "success"
+          );
+        }
+
+        if (delta.state && delta.state.current === "interrupted") {
+          browserUtils.updateUI(
+            tabPendingDownload,
+            "Error: failed downloading ",
+            "fail"
+          );
+        }
+      });
   },
 
-  bookmarkTab: function() {
-    this.browser.bookmarkTab(tab);
-  },
-
-  downloadUrls: function(tabs) {
-    this.browser.downloadUrls(tabs);
-  },
-
-  login: function(pocket) {
-    this.browser.login(pocket);
-  },
-
-  save: function(key, object) {
-    this.browser.save(key, object);
-  },
-
-  retrieve: function(key, callback) {
-    return this.browser.retrieve(key, callback);
-  },
-
-  createTab: function(tabKey) {
-    this.browser.createTab(tabKey);
-  },
-
-  store: function(key, callback) {
-    this.browser.store(key, callback);
-  },
-
-  getStorageType: function() {
-    this.browser.getStorageType();
-  }
-};
-
-/*
- * Development Browser
- *
- * Stub in sample API results when in
- * development.
- *
- */
-var DevBrowse = {
-  downloadUrls: function(tabs) {
-    tabs.forEach(function(tab) {
-      var file = {
-        url: tab.url,
-        method: "GET"
-      };
-      console.log("Dev downloaded " + file);
-    });
-  },
-
-  getTabs: function() {
-    return '[{"active":false,"height":779,"highlighted":false,"id":71,"incognito":false,"index":0,"pinned":false,"selected":false,"status":"complete","title":"Dot Boston: Apple, Bicycles, Boston, Dot and Web Media","url":"http://adamp.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":83,"incognito":false,"index":1,"pinned":false,"selected":false,"status":"complete","title":"Is It Boston? Find out if your area is part of Boston.","url":"http://isitboston.com/","width":1440,"windowId":68},{"active":false,"height":779,"highlighted":false,"id":85,"incognito":false,"index":2,"pinned":false,"selected":false,"status":"complete","title":"amiacylon.com","url":"http://amiacylon.com/","width":1440,"windowId":68},{"active":true,"height":779,"highlighted":true,"id":91,"incognito":false,"index":3,"pinned":false,"selected":true,"status":"complete","title":"3571814663_5c742efc65_b.jpg (1024×768)","url":"https://c4.staticflickr.com/4/3322/3571814663_5c742efc65_b.jpg","width":1440,"windowId":68}]';
-  }
-};
-
-/*
- * PullTabs Chrome
- *
- * Wrapper around Google Chrome API.
- * Should only be automatically called via Browser.
- *
- */
-export var PTChrome = {
   /**
      * Download a resource represented via a tab's URL
      * to local disk either as an HTML file or with
      * the URL's extension if it has one
      *
+     * Note that the promise is resolved when a download is
+     * started, DownloadItem's state will change to either
+     * "complete" when the download is successful or to "interrupted"
+     * if something prevented the download from completing
+     * thus we must watch for changes to DownloadItem
+     * to check status
+     *
      * @param  {array} tabs Collection of tab objects
      * @return {[type]}      [description]
      */
   downloadUrls: function(tabs) {
+    this.watchDownloads();
+
+    var tabMap = { downloadItemToTabMap: {} };
+
     tabs.forEach(function(tab) {
-      //advanced mode
-      if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-        var label = document.getElementById("label-tab-" + tab.labelTabId);
-        var status = document.getElementById("status");
+      //Internal Firefox pages will halt all downloading
+      //so we'll skip any URLs that start with "about:"
+      if (tab.url.substring(0, 6) === "about:") {
+        return;
       }
 
-      var file = {
-        url: tab.url
-      };
+      this.downloadUrl(tab)
+        .then(e => {
+          //create a mapping of downloadItem ID to tab object
+          tab.downloadItemId = e;
+          tabMap.downloadItemToTabMap[e] = tab;
 
-      //If the file doesn't have an filename ending save it as an HTML file
-      if (!browser.isFile(tab.url)) {
-        file.filename = sanitize(tab.title.toString()) + ".html";
-      }
+          browser.storage.local.set(tabMap);
 
-      if (!browser.isFirefox) {
-        file.method = "GET";
-      }
-
-      try {
-        chrome.downloads.download(file, function(e) {
-          if (e === undefined) {
-            if (label) {
-              label.setAttribute("class", label.className + " failed");
-            }
-            form.updateStatus(
-              tab,
-              "Failed downloading, trying with generic filename "
-            );
-            return;
-          }
-          if (label) {
-            label.setAttribute("class", label.className + " successful");
-          }
-
-          var span = document.createElement("span");
-          var link = document.createElement("a");
-          var message = document.createTextNode("Downloaded ");
-
-          link.title = tab.title.toString();
-          link.href = tab.url;
-          link.textContent = tab.title.toString();
-
-          span.appendChild(message);
-          span.appendChild(link);
-
-          messageManager.updateStatusMessage(span, "short", "success");
-
-          //@to-do check preferences to see if user chose to auto-close tabs upon successful action
-          var autoClose = false;
-          if (tab.active !== true && autoClose === true) {
-            chrome.tabs.remove(tab.id);
-          }
+          //Display a message that the download has begun
+          this.updateUI(tab, "Started downloading ", "info");
+        })
+        .catch(e => {
+          this.updateUI(tab, "fail");
+          console.log(e);
         });
-      } catch (e) {
-        form.updateStatus(tab, "Error downloading ");
-        console.log(e);
+
+      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
+      var autoClose = false;
+      if (tab.active !== true && autoClose === true) {
+        browser.tabs.remove(tab.id);
       }
-    });
+    }, this);
+  },
+
+  /**
+   * Download a single URL
+   * @param  {object} tab A browser tab object
+   * @return {Promise}     Promise representing whether download started
+   */
+  downloadUrl: function(tab) {
+    var file = {
+      url: tab.url
+    };
+
+    //If the file doesn't have an filename ending save it as an HTML file
+    if (!browserUtils.isFile(tab.url)) {
+      file.filename = sanitize(tab.title.toString()) + ".html";
+    }
+
+    if (!browserUtils.isFirefox) {
+      file.method = "GET";
+    }
+
+    return browser.downloads.download(file);
   },
 
   /**
@@ -231,49 +228,52 @@ export var PTChrome = {
       *  searches for a "Pulltabs" folder
       *  AND if it does not find one then creates one
       *
-      * @todo  this funtion should be refactored into
-      *        at least three functions -->
-      *          findPulltabsBookmarkFolder()
-      *          createPulltabsBookmarkFolder()
-      *          AND an function to encapsulate the call
-      *          to those two functions as well as getBookmarks
-      *          END TODO
-      *
-      * @param  {Function} callback [description]
+      * @param  {object} tree -  array representing tree of bookmarks
       * @return {[type]}            [description]
       */
-  getBookmarks: function(callback) {
-    var otherBookmarks;
+  findPulltabsBookmarkFolder: function(tree) {
+    let bookmarks = tree[0].children[1];
 
-    callback = function(tree) {
-      //other bookmarks folder
-      otherBookmarks = tree[0].children[1];
+    var count = bookmarks.children.length;
+    var i;
 
-      var count = otherBookmarks.children.length;
-      var i;
-      var logIt = function(newFolder) {
-        console.log(newFolder.title);
-      };
-
-      for (i = 0; i < count; i++) {
-        if (otherBookmarks.children[i].title === "Pulltabs") {
-          break;
-        }
-        if (i == count - 1) {
-          var folder = {
-            parentId: otherBookmarks.id,
-            title: "Pulltabs"
-          };
-          chrome.bookmarks.create(folder, logIt);
-        }
+    //look for an existing bookmark folder called Pulltabs
+    for (i = 0; i < count; i++) {
+      //We already have a bookmark folder created
+      //so just save that folder id
+      if (bookmarks.children[i].title === "Pulltabs") {
+        this.saveBookmarkFolder(bookmarks.children[i].id);
+        break;
       }
-
-      localStorage["pullTabsFolderId"] = otherBookmarks.children[i].id;
-    };
-
-    if (typeof localStorage["pullTabsFolderId"] === "undefined") {
-      chrome.bookmarks.getTree(callback);
+      //We've reached the end of the bookmark folders
+      //and did not find an existing pulltabs folder
+      if (i == count - 1) {
+        var folder = {
+          parentId: bookmarks.id,
+          title: "Pulltabs"
+        };
+        this.createPulltabsBookmarkFolder(folder);
+      }
     }
+  },
+
+  createPulltabsBookmarkFolder: function(folder) {
+    browser.bookmarks
+      .create(folder)
+      .then(result => {
+        this.saveBookmarkFolder(result.id);
+      })
+      .catch(err => {
+        console.log("Creating bookmark failed" + err.message);
+      });
+  },
+
+  /**
+   * Save the id of the "pulltabs" folder to local storage
+   * @param  {integer} id - Numeric id
+   */
+  saveBookmarkFolder: function(id) {
+    localStorage["pullTabsFolderId"] = id;
   },
 
   /**
@@ -297,7 +297,7 @@ export var PTChrome = {
      * @return {void}
      */
   closeTab: function(tab) {
-    chrome.tabs.remove(tab.id);
+    browser.tabs.remove(tab.id);
   },
 
   /**
@@ -315,17 +315,18 @@ export var PTChrome = {
   /**
      * Bookmark a single tab
      * @param  {object}   tab      A browser tab object
-     * @param  {Function} callback [description]
      * @return {[type]}            [description]
      */
-  bookmarkTab: function(tab, callback) {
+  bookmarkTab: function(tab) {
     var bookmark = {
       parentId: localStorage["pullTabsFolderId"],
       title: tab.title.toString(),
       url: tab.url
     };
 
-    chrome.bookmarks.create(bookmark, function(savedMark) {
+    var createBookmark = browser.bookmarks.create(bookmark);
+
+    createBookmark.then(function(savedMark) {
       var link = document.createElement("a");
       var status = document.createElement("span");
       var message = document.createTextNode("Successfuly bookmarked ");
@@ -337,7 +338,8 @@ export var PTChrome = {
       status.appendChild(message);
       status.appendChild(link);
 
-      messageManager.updateStatusMessage(status, "short", "success");
+      browserUtils.updateAdvancedUI(tab, "successful");
+      messageManager.updateStatusMessage(status, "medium", "success");
     });
   },
 
@@ -352,7 +354,7 @@ export var PTChrome = {
      *
      */
   login: function(pocket) {
-    var redirect = chrome.extension.getURL("pocket.html");
+    var redirect = browser.extension.getURL("pocket.html");
     pocket.auth = pocket.auth + encodeURIComponent(redirect);
     window.open(pocket.auth);
   },
@@ -368,7 +370,7 @@ export var PTChrome = {
      */
   loginViaWebAuthFlow: function(pocket) {
     pocket.auth =
-      pocket.auth + encodeURIComponent(chrome.identity.getRedirectURL());
+      pocket.auth + encodeURIComponent(browser.identity.getRedirectURL());
 
     pocket.interactive = true;
 
@@ -383,52 +385,13 @@ export var PTChrome = {
   },
 
   /*
-     * Figure out if Firefox, Chrome or other, if Chrome use sync
-     * otherwise use local
-     */
-  getStorageType: function() {
-    if (!browser.isFirefox) {
-      if (
-        typeof chrome.storage.sync !== "undefined" &&
-        typeof chrome.storage.sync.get !== "undefined"
-      ) {
-        browser.storageType = chrome.storage.sync;
-        return browser.storageType;
-      }
-    } else if (
-      typeof chrome.storage.local !== "undefined" &&
-      typeof chrome.storage.local.get !== "undefined"
-    ) {
-      browser.storageType = chrome.storage.local;
-      return browser.storageType;
-    }
-
-    //@to-do revert to localStorage
-    console.log("chrome.storage is unavailable.");
-    return;
-  },
-
-  /*
      * Only chrome has sync, if sync is available use it
      * otherwise reverts to using local storage
      * @to-do add a localStorage fallback for browsers that
      * don't recognize chrome.storage
      */
-  store: function(key, callback) {
-    browser.getStorageType();
-
-    if (typeof browser.storageType === "undefined") {
-      console.log("No storage available");
-      callback();
-      return;
-    }
-
-    try {
-      browser.storageType.set(key, callback);
-    } catch (e) {
-      console.log(e);
-      return;
-    }
+  store: function(key) {
+    return browser.storage.local.set(key);
   },
 
   /**
@@ -439,12 +402,8 @@ export var PTChrome = {
      * @return {[type]}        [description]
      */
   save: function(key, object) {
-    console.log(key + " save " + object);
-    if (typeof chrome.storage === "undefined") {
-      console.log("ERROR");
-    }
     try {
-      chrome.storage.local.set(object, function() {
+      browser.storage.local.set(object, function() {
         var status = document.getElementById("status");
         status.textContent = key + " saved.";
         setTimeout(function() {
@@ -460,61 +419,19 @@ export var PTChrome = {
      * Get an object from local storage
      *
      * @param  {string}   key      The name of key in local storage
-     * @param  {Function} callback [description]
      * @return {Promise}           Promise represents object retrieved from local storage
      */
-  retrieve: function(key, callback) {
-    var storageType;
-
-    if (browser.isFirefox) {
-      if (
-        typeof chrome.storage.local !== "undefined" &&
-        typeof chrome.storage.local.get !== "undefined"
-      ) {
-        storageType = chrome.storage.local;
-      } else {
-        console.log(
-          "Browser is Firefox but chrome.storage.local is unavailable, returning default key value"
-        );
-        //    callback(key);
-        //   return;
-      }
-    } else if (
-      typeof chrome.storage.sync !== "undefined" &&
-      typeof chrome.storage.sync.get !== "undefined"
-    ) {
-      storageType = chrome.storage.sync;
-    } else {
-      console.log("Storage unavailable, returning default key value");
-      // callback(key);
-      // return;
-    }
-
-    return new Promise(function(resolve, reject) {
-      storageType.get(key, function(value) {
-        if (typeof value !== "undefined") {
-          resolve(value);
-          return value;
-        }
-        reject(Error("Couldn't retrieve key"));
-      });
-    });
-  },
-
-  /**
-     * Create a new tab in the current window
-     * @param  {string} tabKey A URL?
-     * @todo  Properly document the tabKey parameter
-     * @return {[type]}        [description]
-     */
-  createTab: function(tabKey) {
-    if (typeof chrome.tabs !== "undefined") {
-      chrome.tabs.create(tabKey);
-      return;
-    }
-    console.log("Unable to create this tab: ");
-    console.dir(tabKey);
-    return;
+  retrieve: function(key) {
+    return browser.storage.local.get(key);
+    //    return new Promise(function(resolve, reject) {
+    //      browser.storage.local.get(key, function(value) {
+    //        if (typeof value !== "undefined") {
+    //          resolve(value);
+    //          return value;
+    //        }
+    //        reject(Error("Couldn't retrieve key"));
+    //      });
+    //    });
   },
 
   /**
@@ -523,17 +440,8 @@ export var PTChrome = {
      * @return {[type]}     [description]
      */
   extensionGetURL: function(path) {
-    if (typeof chrome.extension.getURL !== "undefined") {
-      return chrome.extension.getURL(path);
-    }
-
-    console.log("Unable to get extension relative URL as absolute URL");
-    return false;
+    return browser.extension.getURL(path);
   }
 };
 
-//browser.init();
-if (typeof (browser.ENV !== "undefined") && browser.ENV === "DEVELOPMENT") {
-  console.log("DEFAULT TABS: " + browser.getTabs());
-}
-browser.init();
+browserUtils.init();

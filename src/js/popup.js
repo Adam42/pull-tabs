@@ -1,5 +1,5 @@
 "use strict";
-import { browser } from "./browser";
+import { browserUtils } from "./browser.js";
 import { options } from "./options.js";
 import { form } from "./form.js";
 import { messageManager } from "./message.js";
@@ -34,7 +34,7 @@ export var popup = popup || {
         "info"
       );
 
-      browser
+      browserUtils
         .getTabs()
         .then(function(tabs) {
           popup.tabs = tabs;
@@ -61,9 +61,7 @@ export var popup = popup || {
   doInitialSetup: function() {
     if (document.getElementById("setup") === null) {
       var optionsLink = document.createElement("a");
-      //Browser is not instantiated at this point
-      //optionsLink.href = Browser.extensionGetURL('options.html');
-      optionsLink.href = chrome.extension.getURL("options.html");
+      optionsLink.href = browserUtils.extensionGetURL("options.html");
       optionsLink.id = "initial-load";
       optionsLink.textContent = " Setup PullTabs with your preferences.";
 
@@ -82,7 +80,7 @@ export var popup = popup || {
       setupMessage.addEventListener("click", function(e) {
         e.preventDefault();
         localStorage.initialSetup = "no";
-        chrome.runtime.openOptionsPage();
+        browser.runtime.openOptionsPage();
       });
     }
   },
@@ -194,7 +192,7 @@ export var popup = popup || {
   },
 
   getFullMimeType: function() {
-    return browser.retrieve(options.fullMimeType);
+    return browserUtils.retrieve(options.fullMimeType);
   },
 
   assembleForm: function(tabs, prefs, mimeTypes) {
@@ -260,7 +258,7 @@ export var popup = popup || {
     this.tabs = form.getSelectedTabs(this.tabs);
 
     if (this.tabs.downloads.length > 0) {
-      browser.downloadUrls(this.tabs.downloads);
+      browserUtils.downloadUrls(this.tabs.downloads);
     }
 
     if (this.tabs.pockets.length > 0) {
@@ -268,11 +266,11 @@ export var popup = popup || {
     }
 
     if (this.tabs.closes.length > 0) {
-      browser.closeTabs(this.tabs.closes);
+      browserUtils.closeTabs(this.tabs.closes);
     }
 
     if (this.tabs.bookmarks.length > 0) {
-      browser.bookmarkTabs(this.tabs.bookmarks);
+      browserUtils.bookmarkTabs(this.tabs.bookmarks);
     }
 
     return;
@@ -340,7 +338,7 @@ export var popup = popup || {
       "info"
     );
 
-    return browser.retrieve(key).then(function(value) {
+    return browserUtils.retrieve(key).then(function(value) {
       messageManager.removeStatusMessage(msgID);
       return value;
     });
@@ -352,7 +350,8 @@ export var popup = popup || {
     return;
   },
 
-  getOptions: function(callback) {
+  //returns a promise
+  getOptions: function() {
     var key = {
       application: "download",
       image: "download",
@@ -364,7 +363,7 @@ export var popup = popup || {
       unknown: "ignore"
     };
 
-    return browser.retrieve(key, callback);
+    return browserUtils.retrieve(key);
   },
 
   setOptions: function(items) {
@@ -499,7 +498,7 @@ export var popup = popup || {
   processButton: function(action) {
     switch (action) {
       case "download":
-        browser.downloadUrls(popup.tabs);
+        browserUtils.downloadUrls(popup.tabs);
         break;
 
       case "pocket":
@@ -507,11 +506,11 @@ export var popup = popup || {
         break;
 
       case "bookmark":
-        browser.bookmarkTabs(popup.tabs);
+        browserUtils.bookmarkTabs(popup.tabs);
         break;
 
       case "close":
-        browser.closeTabs(popup.tabs);
+        browserUtils.closeTabs(popup.tabs);
         break;
 
       default:

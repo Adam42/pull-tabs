@@ -7,23 +7,20 @@
     "parserOptions": {
         "sourceType": "module"
     },
+    "globals": {
+        "browser": true
+    },
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-newline": "error",
-        "array-bracket-spacing": [
-            "error",
-            "never"
-        ],
+        "array-bracket-spacing": ["error", "never"],
         "array-callback-return": "off",
         "array-element-newline": "off",
         "arrow-body-style": "error",
         "arrow-parens": "error",
         "arrow-spacing": "error",
         "block-scoped-var": "off",
-        "block-spacing": [
-            "error",
-            "never"
-        ],
+        "block-spacing": ["error", "never"],
         "brace-style": "off",
         "callback-return": "off",
         "camelcase": "off",
@@ -31,33 +28,21 @@
         "class-methods-use-this": "error",
         "comma-dangle": "off",
         "comma-spacing": "off",
-        "comma-style": [
-            "error",
-            "last"
-        ],
+        "comma-style": ["error", "last"],
         "complexity": "error",
-        "computed-property-spacing": [
-            "error",
-            "never"
-        ],
+        "computed-property-spacing": ["error", "never"],
         "consistent-return": "off",
         "consistent-this": "error",
         "curly": "error",
         "default-case": "error",
-        "dot-location": [
-            "error",
-            "property"
-        ],
+        "dot-location": ["error", "property"],
         "dot-notation": "off",
         "eol-last": "off",
         "eqeqeq": "off",
         "for-direction": "error",
         "func-call-spacing": "off",
         "func-name-matching": "error",
-        "func-names": [
-            "error",
-            "never"
-        ],
+        "func-names": ["error", "never"],
         "func-style": "off",
         "function-paren-newline": "off",
         "generator-star-spacing": "error",
@@ -75,10 +60,7 @@
         "key-spacing": "off",
         "keyword-spacing": "off",
         "line-comment-position": "off",
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
+        "linebreak-style": ["error", "unix"],
         "lines-around-comment": "off",
         "lines-around-directive": "off",
         "max-depth": "off",
@@ -117,10 +99,7 @@
         "no-implicit-globals": "error",
         "no-implied-eval": "error",
         "no-inline-comments": "off",
-        "no-inner-declarations": [
-            "error",
-            "functions"
-        ],
+        "no-inner-declarations": ["error", "functions"],
         "no-invalid-this": "off",
         "no-iterator": "error",
         "no-label-var": "error",
@@ -222,19 +201,13 @@
         "prefer-template": "off",
         "quote-props": "off",
         "quotes": "off",
-        "radix": [
-            "error",
-            "as-needed"
-        ],
+        "radix": ["error", "as-needed"],
         "require-await": "error",
         "require-jsdoc": "off",
         "rest-spread-spacing": "error",
         "semi": "error",
         "semi-spacing": "off",
-        "semi-style": [
-            "error",
-            "last"
-        ],
+        "semi-style": ["error", "last"],
         "sort-imports": "error",
         "sort-keys": "off",
         "sort-vars": "off",
@@ -255,21 +228,12 @@
         "symbol-description": "error",
         "template-curly-spacing": "error",
         "template-tag-spacing": "error",
-        "unicode-bom": [
-            "error",
-            "never"
-        ],
+        "unicode-bom": ["error", "never"],
         "valid-jsdoc": "error",
         "vars-on-top": "off",
-        "wrap-iife": [
-            "error",
-            "any"
-        ],
+        "wrap-iife": ["error", "any"],
         "wrap-regex": "error",
         "yield-star-spacing": "error",
-        "yoda": [
-            "error",
-            "never"
-        ]
+        "yoda": ["error", "never"]
     }
 }
