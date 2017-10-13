@@ -22,19 +22,4 @@ In this workflow, if you have ten open tabs, you could choose to download two of
 
 This advanced layout was the motivation for writing this extension as I'd often end up with a window filled with countless tabs and wanted to quickly act on all of them but also wanted to act differently on some of them.
 
-##### Current features
-- [x] Save all current tabs
-- [x] Choose which tabs to save
-- [x] Set file preferences by file group type [ 'application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown' ]
-- [x] Save tabs by file group type [ 'application', 'image', 'message', 'model', 'multipart', 'text', 'video', 'unknown' ]
-- [x] Save to Pocket
-- [x] Google Chrome extension
-- [x] Simple and advanced views
-- [x] Mozilla Firefox extension
-
-##### Planned features
-- [ ] Save tabs by file type [ e.g. .html, .pdf, .png etc.]
-- [ ] Post to Twitter integration
-- [ ] Save to Dropbox
-- [ ] Save to Google Drive
-- [ ] Save to Instapaper
+*Downloading may or may not go as you expect, the extension will download the entirety of the tab, so if the tab is an imgur/instagram/flickr/etc. page with an image embedded it will download an HTML file. However, if the tab is a direct link to an image it will download just the image.
