@@ -13,9 +13,9 @@ let mix = require("laravel-mix");
 
 mix
   //For popup.html
-  .js(["src/js/pulltabs.js", "src/js/config.js"], "dist/popup-page.js")
+  .js(["src/js/popup-init.js", "src/js/config.js"], "dist/popup-page.js")
   .js(["src/js/options-init.js"], "dist/options-page.js")
-  .js(["src/js/pulltabs.js", "src/js/auth.js"], "dist/pocket-page.js")
+  .js(["src/js/popup-init.js", "src/js/auth.js"], "dist/pocket-page.js")
   .js(["src/js/config.js", "src/js/about.js"], "dist/about-page.js")
   .combine(
     [
@@ -47,7 +47,6 @@ mix
   .copy("src/pocket.html", "dist/pocket.html")
   .copy("src/popup-init.html", "dist/popup-init.html")
   .copy("src/popup.html", "dist/popup.html");
-
 //errors copying this file into the dist directory
 //for now will place the polyfill into dist manually
 //  .copy(
