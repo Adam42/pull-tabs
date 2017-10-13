@@ -182,7 +182,7 @@ export var pocket = pocket || {
               { active: true, lastFocusedWindow: true },
               function(tabs) {
                 if (tab.id !== tabs[0].id) {
-                  //chrome.tabs.remove(tab.id);
+                  browser.tabs.remove(tab.id);
                 }
               }
             );
@@ -313,16 +313,6 @@ export var pocket = pocket || {
     localStorage[this.pocketKey.user_name] = userName;
 
     this.isAuthorized();
-    /*
-        //pullTabs.browserUtils.save('Pocket', pocket );
-         chrome.storage.local.set( pocket , function () {
-            var status = document.getElementById('status');
-            status.textContent = pocket.key + ' saved.';
-            setTimeout( function () {
-               status.textContent = '';
-            }, 750);
-        });
-*/
   },
 
   /**

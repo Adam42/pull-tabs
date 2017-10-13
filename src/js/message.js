@@ -12,7 +12,7 @@ export var messageManager = messageManager || {
      *
      * @param  {string|object} message  Either the text of the message or an element object
      * @param  {string} duration - short,medium,long, dependent or re-stack
-     * @param  {string} type     The type of message, e.g. success, danger or info
+     * @param  {string} type     The type of message, e.g. primary,success,info,warning,danger
      * @return {void|number}      A dependent message returns a numeric ID, others void.
      */
   updateStatusMessage: function(message, duration, type) {
@@ -25,7 +25,6 @@ export var messageManager = messageManager || {
     status.classList.remove("hidden");
     status.style.top = 0;
     statusMessage.textContent = message;
-
     //test if it's a DOM element instead of just a string
     if (typeof message === "object" && message instanceof HTMLElement) {
       statusMessage.textContent = "";

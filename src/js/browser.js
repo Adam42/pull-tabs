@@ -6,11 +6,11 @@ import { form } from "./form.js";
 
 //Make sure the browser namespace is set to something
 //supported msBrowser is Edge, browser is Firefox/W3C, chrome is Google Chrome
-//if("undefined"==typeof browser){
-//  window.browser = (function() {
-//  return window.msBrowser || window.browser || window.chrome;
-//})();
-//}
+if ("undefined" == typeof browser) {
+  window.browser = (function() {
+    return window.msBrowser || window.browser || window.chrome;
+  })();
+}
 /*
  * Browser
  *
@@ -218,7 +218,6 @@ export var browserUtils = {
           return;
         }
         reject(Error("Couldnt get tabs"));
-        //                pullTabs.App.setTabs(e);
       });
     });
   },
@@ -379,7 +378,7 @@ export var browserUtils = {
       interactive: pocket.interactive
     };
 
-    chrome.identity.launchWebAuthFlow(auth, function(responseUrl) {
+    browser.identity.launchWebAuthFlow(auth).then(function(responseUrl) {
       Pocket.getAccessToken(pocket);
     });
   },
@@ -423,15 +422,6 @@ export var browserUtils = {
      */
   retrieve: function(key) {
     return browser.storage.local.get(key);
-    //    return new Promise(function(resolve, reject) {
-    //      browser.storage.local.get(key, function(value) {
-    //        if (typeof value !== "undefined") {
-    //          resolve(value);
-    //          return value;
-    //        }
-    //        reject(Error("Couldn't retrieve key"));
-    //      });
-    //    });
   },
 
   /**

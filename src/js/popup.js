@@ -104,17 +104,11 @@ export var popup = popup || {
 
   addMimeTypeToTabs: function() {
     return popup.tabs.map(function(tab) {
-      //          var tabObj = popup.tabs.filter(function( tabObj ) {
-      //            return tabObj.id == tab.id;
-      //         })['0'];
-
       popup
         .getContentType(tab.url)
         .then(function(mimeType) {
           var id = "tab" + tab.id.toString();
           popup.setMimeTypesMap(id, mimeType);
-          //                popup.mimeTypesMap[id] = mimeType;
-          //                tabObj.mimeType = mimeType;
         })
         .catch(function(e) {
           console.log(e);
@@ -302,7 +296,6 @@ export var popup = popup || {
             );
           } else {
             resolve("unknown");
-            //                            reject("Content-Type unavailable");
           }
         }
         reject(Error(xhr.statusText));
@@ -316,11 +309,6 @@ export var popup = popup || {
       xhr.send();
     });
   },
-
-  /*  getExtension: function(url){
-        return url.split('.').pop();
-    },
-*/
 
   setLayout: function(layout) {
     popup.layout = layout;

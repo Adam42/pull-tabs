@@ -11,15 +11,6 @@ export var form = form || {
     this.options = values;
   },
 
-  createForm: function(tabs) {
-    popup.getOptions.then(function(options) {
-      popup.assembleForm(tabs, options);
-      return;
-    });
-    popup.watchSubmit(tabs);
-    return;
-  },
-
   createCheckbox: function(tab, type, checked) {
     var input = document.createElement("input");
     input.type = "checkbox";
@@ -111,64 +102,6 @@ export var form = form || {
   setLabelStatus: function(tab, status) {
     var label = document.getElementById("label-tab-" + tab.labelTabId);
     label.setAttribute("class", label.className + " " + status);
-  },
-
-  updateStatus: function(tab, text) {
-    var label = document.getElementById("status");
-    var link = document.createElement("a");
-    var status = document.createElement("p");
-    var message = document.createTextNode(text);
-
-    link.title = tab.title.toString();
-    link.href = tab.url.toString();
-    link.textContent = tab.title.toString();
-
-    status.appendChild(message);
-    status.appendChild(link);
-    label.appendChild(status);
-    label.removeAttribute("class", "hidden");
-  },
-
-  assembleForm: function(tabs, options) {
-    var resources = document.getElementById("resources");
-
-    tabs.forEach(function(tab) {
-      popup.getContentType(tab.url, function(response) {
-        this.mType = response;
-      });
-
-      var type = this.mType
-        .split("/")
-        .shift()
-        .toLowerCase();
-
-      var pref = options[type] ? options[type] : "ignore";
-
-      var checked = "";
-      var active = "";
-
-      if (pref === "download" || pref === "pocket") {
-        checked = "checked";
-        active = "active";
-      }
-
-      var input = popup.createCheckbox(tab, type, checked);
-
-      if (pref === "download") {
-      }
-      var radioDown = popup.createRadioInput(tab, "download", pref);
-      var radioPocket = popup.createRadioInput(tab, "pocket", pref);
-      var radioIgnore = popup.createRadioInput(tab, "ignore", pref);
-
-      var label = popup.createLabel(tab, type, active);
-
-      label.appendChild(input);
-      label.appendChild(radioDown);
-      label.appendChild(radioPocket);
-      label.appendChild(radioIgnore);
-
-      resources.appendChild(label);
-    });
   },
 
   getSelectedGroup: function() {
