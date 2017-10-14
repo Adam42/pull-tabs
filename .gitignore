@@ -1,14 +1,10 @@
 config.json
 node_modules
 npm-debug.log
-tests
 src/js/test.js
-test.html
 .jshintrc
 admin.html
 src/js/admin.js
-buildsteps
-gulpfile.js
 .idea
 dist/*
 !dist/browser-polyfill.min.js

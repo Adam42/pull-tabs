@@ -8,7 +8,7 @@ export var config =
         //get an API key from getpocket.com and place it here
         consumer_key: "YOUR CONSUMER KEY HERE"
       },
-      
+
       app: {
         name: "Pull Tabs"
       }
