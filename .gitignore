@@ -1,5 +1,3 @@
-bower_components
-bootswatch
 config.json
 node_modules
 npm-debug.log
@@ -12,3 +10,5 @@ src/js/admin.js
 buildsteps
 gulpfile.js
 .idea
+dist/*
+!dist/browser-polyfill.min.js
