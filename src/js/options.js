@@ -131,7 +131,7 @@ export var options =
       bindUIActions();
       setDefaultMimeTypes();
       createForm();
-      this.restoreMimeSettings().then(opt.setSettings);
+      this.restoreMimeSettings().then(opt.setMimeSettings);
       this.getLayout().then(options.setLayout);
       this.getAutoClose().then(options.setAutoClose);
 
@@ -158,13 +158,12 @@ export var options =
       return browserUtils.retrieve(opt.mimeSettings);
     };
 
-    /*
-     *
-     * Loop through available mimeTypes and apply user's
-     * stored preferences to each tab.
-     *
+    /**
+    * Loop through available mimeTypes and apply user's
+    * stored action preferences for each mime Type.
+    * @param {[type]} items [description]
     */
-    opt.setSettings = function(items) {
+    opt.setMimeSettings = function(items) {
       for (var i = 0; i < opt.numOfmimeTypes; i++) {
         var settings = document.getElementsByName(opt.mimeTypes[i]);
 
@@ -254,6 +253,14 @@ export var options =
     opt.saveLayout = function() {
       var simpleLayout = document.getElementById("simple");
       var advancedLayout = document.getElementById("advanced");
+
+      if (!simpleLayout.checked && !advancedLayout.checked) {
+        return messageManager.updateStatusMessage(
+          "Choose at least one layout",
+          "short",
+          "danger"
+        );
+      }
 
       if (simpleLayout.checked === true) {
         opt.layout.simple = true;
