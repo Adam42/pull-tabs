@@ -18,22 +18,11 @@ mix
   .js(["src/js/popup-init.js", "src/js/auth.js"], "dist/pocket-page.js")
   .js(["src/js/config.js", "src/js/about.js"], "dist/about-page.js")
   .combine(
-    [
-      "bower_components/bootswatch-dist/css/bootstrap.min.css",
-      "src/css/styles.css"
-    ],
+    ["node_modules/bootswatch/yeti/bootstrap.css", "src/css/styles.css"],
     "dist/style.css"
   )
-  .combine(
-    [
-      "bower_components/bootswatch-dist/css/bootstrap.min.css",
-      "bower_components/bootswatch-dist/css/non-responsive-bootstrap.css",
-      "src/css/styles.css"
-    ],
-    "dist/non-responsive-style.css"
-  )
   //Copy Images
-  .copy("src/img/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
+  .copy("node_modules/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
   .copy("src/img/bookmark.svg", "dist/img/bookmark.svg")
   .copy("src/img/close.svg", "dist/img/close.svg")
   .copy("src/img/download.svg", "dist/img/download.svg")
