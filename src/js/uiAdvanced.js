@@ -2,8 +2,12 @@
 import { form } from "./form.js";
 import { browserUtils } from "./browser.js";
 import { pocket } from "./pocket.js";
-import { popup } from "./popup.js";
 
+/**
+ * Displays the advanced bulk view where users can
+ * activate or de-activate each tab and set actions on it
+ * @type {[type]}
+ */
 export var uiAdvanced = uiAdvanced || {
   prefs: "",
 
@@ -67,6 +71,16 @@ export var uiAdvanced = uiAdvanced || {
     });
   },
 
+  /**
+   * Loop through each tab and create an advanced
+   * form input view for it with each action
+   * available as a form input
+   *
+   * @param  {array} tabs      [description]
+   * @param  {object} prefs     [description]
+   * @param  {object} mimeTypes [description]
+   * @return {[type]}           [description]
+   */
   assembleForm: function(tabs, prefs, mimeTypes) {
     tabs.forEach(function(tab) {
       if (mimeTypes.length > 0) {
@@ -97,6 +111,14 @@ export var uiAdvanced = uiAdvanced || {
   */
     });
   },
+
+  /**
+   * Display a default advanced view for a tab
+   *  without checking nor acting on mimeType of the tab
+   *
+   * @param  {object} tab - A browser tab object
+   * @return {[type]}     [description]
+   */
   displayDefaultAdvancedLayout: function(tab) {
     var resources = document.getElementById("resources");
     var fullType = "unknown";
@@ -125,6 +147,13 @@ export var uiAdvanced = uiAdvanced || {
     resources.appendChild(label);
   },
 
+  /**
+   * Display the advanced view for all tabs and check
+   * the mimeType and set actions based on its type
+   *
+   * @param  {array} tabs Collection of browser tab objects
+   * @return {[type]}      [description]
+   */
   displayAdvancedLayout: function(tabs) {
     this.tabs = tabs;
     var advanced = document.getElementById("advanced");
@@ -154,24 +183,37 @@ export var uiAdvanced = uiAdvanced || {
             }
           })
           .then(function() {
-            popup.watchSubmit();
+            uiAdvanced.watchSubmit();
 
             var numFormTabs = document
               .getElementById("resources")
               .getElementsByClassName("list-group-item");
 
             uiAdvanced.watchCheckBoxes(numFormTabs);
-            uiAdvanced.watchMutateCheck();
+            uiAdvanced.observeCheckboxes();
             uiAdvanced.setActions();
           })
       );
   },
 
-  process: function(evt) {
+  /**
+   * Perform actions on the selected tabs
+   * @param  {event} evt Form submit event
+   * @return {[type]}     [description]
+   */
+  doActionToSelectedTabs: function(evt) {
     evt.preventDefault();
     uiAdvanced.getTabStatus();
   },
 
+  /**
+   * Collect the selected form elements and determine
+   * which action was chosen for each tab, then
+   * perform that action on tabs grouped by their
+   * chosen action
+   *
+   * @return {[type]} [description]
+   */
   getTabStatus: function() {
     this.tabs = form.getSelectedTabs(this.tabs);
 
@@ -293,21 +335,13 @@ export var uiAdvanced = uiAdvanced || {
     }
   },
 
-  //Unused? Should it be used in setAllActive/Inactive above?
-  updateBackground: function(node, label) {
-    if (label.classList.contains("active")) {
-      if (!node.checked) {
-        label.classList.remove("active");
-      }
-    }
-    if (!label.classList.contains("active")) {
-      if (node.checked) {
-        label.classList.add("active");
-      }
-    }
-  },
-
-  watchMutateCheck: function() {
+  /**
+     * Watches checkboxes for clicks and highlights or unhighlights
+     * labels when a tab input field is clicked
+     *
+     * @return {[type]} [description]
+     */
+  observeCheckboxes: function() {
     var form = document.querySelector("#resources");
 
     var observer = new MutationObserver(function(mutations) {
@@ -333,5 +367,14 @@ export var uiAdvanced = uiAdvanced || {
 
     var setup = { attributes: true, childList: true, characterData: true };
     observer.observe(form, setup);
+  },
+
+  /**
+   * Perform the chosen action on each selected tab when form is submitted
+   * @return {Listener} [description]
+   */
+  watchSubmit: function() {
+    var checked = document.getElementById("list");
+    checked.addEventListener("submit", uiAdvanced.doActionToSelectedTabs);
   }
 };

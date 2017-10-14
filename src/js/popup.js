@@ -145,18 +145,7 @@ export var popup = popup || {
     });
   },
 
-  doError: function(error) {
-    console.log("Error: ");
-    console.log(error);
-    return;
-  },
-
-  processGroup: function(evt) {
-    evt.preventDefault();
-    var destination = document.getElementById("default");
-  },
-
-  doAction: function(evt) {
+  doActionToAllTabs: function(evt) {
     evt.preventDefault();
     popup.processButton(this.id);
   },
@@ -186,26 +175,18 @@ export var popup = popup || {
 
   watchButtons: function() {
     var download = document.getElementById("download");
-    download.addEventListener("click", this.doAction);
+    download.addEventListener("click", this.doActionToAllTabs);
 
     var pocket = document.getElementById("pocket");
-    pocket.addEventListener("click", this.doAction);
+    pocket.addEventListener("click", this.doActionToAllTabs);
 
     var bookmark = document.getElementById("bookmark");
-    bookmark.addEventListener("click", this.doAction);
+    bookmark.addEventListener("click", this.doActionToAllTabs);
 
     var close = document.getElementById("close");
-    close.addEventListener("click", this.doAction);
+    close.addEventListener("click", this.doActionToAllTabs);
 
     var ignore = document.getElementById("ignore");
-    ignore.addEventListener("click", this.doAction);
-  },
-
-  watchSubmit: function() {
-    var group = document.getElementById("default");
-    group.addEventListener("submit", this.processGroup);
-
-    var checked = document.getElementById("list");
-    checked.addEventListener("submit", uiAdvanced.process);
+    ignore.addEventListener("click", this.doActionToAllTabs);
   }
 };
