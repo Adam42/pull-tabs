@@ -23,12 +23,7 @@ mix
   )
   //Copy Images
   .copy("node_modules/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
-  .copy("src/img/bookmark.svg", "dist/img/bookmark.svg")
-  .copy("src/img/close.svg", "dist/img/close.svg")
-  .copy("src/img/download.svg", "dist/img/download.svg")
-  .copy("src/img/icon-19.png", "dist/img/icon-19.png")
-  .copy("src/img/icon-38.png", "dist/img/icon-38.png")
-  .copy("src/img/ignore.svg", "dist/img/ignore.svg")
+  .copyDirectory("src/img/", "dist/img/")
   //Copy HTML files
   .copy("src/about.html", "dist/about.html")
   .copy("src/manifest.json", "dist/manifest.json")

@@ -1,11 +1,8 @@
-body{
-    width: 800px;
+body {
+    width: 100%;
 }
-li{
-    padding:10px;
-    list-style-type: none;
-}
-input[type="checkbox"]{
+
+input[type="checkbox"] {
     position: absolute;
     top: 25px;
     /*display: none;*/
@@ -17,49 +14,157 @@ input[type="checkbox"]{
     top: 0px;
 }
 
-button { width: 100%; margin: 10px auto;}
+button {
+    width: 100%;
+    margin: 10px auto;
+}
 
-#default button { width: 120px;}
-#default button img { margin-right: 5px;}
-#default label { width: 140px; float: left;}
+#default button {
+    width: 120px;
+}
+#default button img {
+    margin-right: 5px;
+}
+#default label {
+    width: 140px;
+    float: left;
+}
 
-label{display: block;z-index: 10; }
-label.list-group-item { padding-left: 40px;}
-label.list-group-item p { margin-right: 20px; margin-left: 50px; }
-label.preferences {display: inline; padding: 10px;}
-label.preferences input { margin: 0 10px }
-form#default{ margin-left: 40px;}
-.list-group-item.successful { background-color: green;}
-.list-group-item.failed { background-color: red;}
+label {
+    display: block;
+    z-index: 10;
+}
+label.list-group-item {
+    padding-left: 40px;
+}
+label.list-group-item p {
+    margin-right: 20px;
+    margin-left: 50px;
+}
+label.preferences {
+    display: inline;
+    padding: 10px;
+}
+label.preferences input {
+    margin: 0 10px;
+}
+form#default {
+    margin-left: 40px;
+}
+.list-group-item.successful {
+    background-color: green;
+}
+.list-group-item.failed {
+    background-color: red;
+}
 
-.list-group-item{ width: 750px; margin: 10px 0;}
+.list-group-item {
+    width: 750px;
+    margin: 10px 0;
+}
 
-.panel-heading { padding: 0;}
-.panel-body { padding: 0;}
-.panel-body label {float: left;}
+.panel-heading {
+    padding: 0;
+}
+.panel-body {
+    padding: 0;
+}
+.panel-body label {
+    float: left;
+}
 
-#content { margin-top: 40px;}
-.page-header{margin:35px 0 5px 0; }
-.container { width: 800px;}
-#options { margin: 0 auto;}
-#options #content {margin-top: 0px;}
-#options .container { width: 800px; }
-#options .list-group-item { margin: 5px 10px; float: left; padding: 0;}
-#options input { margin: 0 10px 0 0;}
-#file-type-destinations { padding: 10px 20px;}
-#options label { margin: 0; padding: 10px 20px; }
-#options h4 {margin: 0; padding: 10px 0; }
+#content {
+    margin-top: 40px;
+}
+.page-header {
+    margin: 35px 0 5px 0;
+}
+.container {
+    width: 800px;
+}
+#options {
+    margin: 0 auto;
+}
+#options #content {
+    margin-top: 0px;
+}
+#options .container {
+    width: 800px;
+}
+#options .list-group-item {
+    margin: 5px 10px;
+    float: left;
+    padding: 0;
+}
+#options input {
+    margin: 0 10px 0 0;
+}
+#file-type-destinations {
+    padding: 10px 20px;
+}
+#options label {
+    margin: 0;
+    padding: 10px 20px;
+}
+#options h4 {
+    margin: 0;
+    padding: 10px 0;
+}
 
-#main-nav a { margin: 0 20px; padding: 10px 20px;}
-.container[role="main"] form { }
-#setup {margin-top: 20px; }
-.container[role="complementary"] a {padding-top: 20px;}
+#main-nav a {
+    margin: 0 20px;
+    padding: 10px 20px;
+}
+.container[role="main"] form {
+}
+#setup {
+    margin-top: 20px;
+}
+.container[role="complementary"] a {
+    padding-top: 20px;
+}
 
-#options #status {position: fixed; top: 0; left: 45%; width: 100%; z-index: 0;}
-#popup #status { padding: 10px; }
-.alert-success a {color: #000;}
-.alert-danger a { color: #000;}
-.bounce{margin-left: -9999px; height: 0;}
+#options #status {
+    position: fixed;
+    top: 0;
+    left: 45%;
+    width: 100%;
+    z-index: 0;
+}
+#popup #status {
+    padding: 10px;
+}
+.alert-success a {
+    color: #000;
+}
+.alert-danger a {
+    color: #000;
+}
+.bounce {
+    margin-left: -9999px;
+    height: 0;
+}
+
+.navbar-collapse.collapse {
+    display: block !important;
+}
+
+.navbar-nav > li,
+.navbar-nav {
+    float: left !important;
+}
+
+.navbar-nav.navbar-right:last-child {
+    margin-right: -15px !important;
+}
+
+.navbar-right {
+    float: right !important;
+}
+
+#numTabs {
+    color: #fff;
+}
 
 /* CSS - Cascading Style Sheet */
 /* Palette color codes */
@@ -67,38 +172,73 @@ form#default{ margin-left: 40px;}
 
 /* Feel free to copy&paste color codes to your application */
 
-
 /* As hex codes */
 
-.color-primary-0 { color: #143E22 }	/* Main Primary color */
-.color-primary-1 { color: #3E6D4D }
-.color-primary-2 { color: #234E32 }
-.color-primary-3 { color: #082B14 }
-.color-primary-4 { color: #001808 }
+.color-primary-0 {
+    color: #143e22;
+} /* Main Primary color */
+.color-primary-1 {
+    color: #3e6d4d;
+}
+.color-primary-2 {
+    color: #234e32;
+}
+.color-primary-3 {
+    color: #082b14;
+}
+.color-primary-4 {
+    color: #001808;
+}
 
-.color-complement-0 { color: #55241B }	/* Main Complement color */
-.color-complement-1 { color: #945E54 }
-.color-complement-2 { color: #6A3930 }
-.color-complement-3 { color: #3B120B }
-.color-complement-4 { color: #210500 }
-
-
+.color-complement-0 {
+    color: #55241b;
+} /* Main Complement color */
+.color-complement-1 {
+    color: #945e54;
+}
+.color-complement-2 {
+    color: #6a3930;
+}
+.color-complement-3 {
+    color: #3b120b;
+}
+.color-complement-4 {
+    color: #210500;
+}
 
 /* As RGBa codes */
 
-.rgba-primary-0 { color: rgba( 20, 62, 34,1) }	/* Main Primary color */
-.rgba-primary-1 { color: rgba( 62,109, 77,1) }
-.rgba-primary-2 { color: rgba( 35, 78, 50,1) }
-.rgba-primary-3 { color: rgba(  8, 43, 20,1) }
-.rgba-primary-4 { color: rgba(  0, 24,  8,1) }
+.rgba-primary-0 {
+    color: rgba(20, 62, 34, 1);
+} /* Main Primary color */
+.rgba-primary-1 {
+    color: rgba(62, 109, 77, 1);
+}
+.rgba-primary-2 {
+    color: rgba(35, 78, 50, 1);
+}
+.rgba-primary-3 {
+    color: rgba(8, 43, 20, 1);
+}
+.rgba-primary-4 {
+    color: rgba(0, 24, 8, 1);
+}
 
-.rgba-complement-0 { color: rgba( 85, 36, 27,1) }	/* Main Complement color */
-.rgba-complement-1 { color: rgba(148, 94, 84,1) }
-.rgba-complement-2 { color: rgba(106, 57, 48,1) }
-.rgba-complement-3 { color: rgba( 59, 18, 11,1) }
-.rgba-complement-4 { color: rgba( 33,  5,  0,1) }
-
-
+.rgba-complement-0 {
+    color: rgba(85, 36, 27, 1);
+} /* Main Complement color */
+.rgba-complement-1 {
+    color: rgba(148, 94, 84, 1);
+}
+.rgba-complement-2 {
+    color: rgba(106, 57, 48, 1);
+}
+.rgba-complement-3 {
+    color: rgba(59, 18, 11, 1);
+}
+.rgba-complement-4 {
+    color: rgba(33, 5, 0, 1);
+}
 
 /* Generated by Paletton.com Â© 2002-2014 */
 /* http://paletton.com */

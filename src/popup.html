@@ -11,46 +11,54 @@
     </head>
 
     <body id="popup">
-        <div class="navbar navbar-default navbar-fixed-top">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container">
                 <div id="main-nav" class="navbar-header">
                     <a id="home" href="popup.html" class="navbar-brand">Pull Tabs</a>
-                    <a id="options" href="options.html">Options</a>
-                    <a id="about" href="about.html">About</a>
+                </div>
+
+                <div class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav navbar-left">
+                        <li><a id="options" href="options.html">Options</a></li>
+                        <li><a id="about" href="about.html">About</a></li>
+                    </ul>
+
+                    <small id="numTabs" class="pull-right"><img id="loading-tabs-pacman" height="25px" width="25px" src="img/pacman.svg" />Loading tabs</small>
+
                 </div>
             </div>
         </div>
-        <div id="content">
-            <div id="status"></div>
-            <div id="main" class="container" role="main">
-                <div id="simple">
-                    <h3 class="page-header">Act on all tabs</h3>
 
-                    <p id="numTabs"></p>
+        <div id="content" class="container">
+                <div id="status"></div>
+                <div id="main" role="main">
+                    <div id="simple">
+                        <h3 class="page-header">Act on all tabs</h3>
+                        <form id="default" action="" method="post">
+                            <label><button id="download"><img height="20px" width="20px" src="img/download.svg">Download</button></label>
+                            <label><button id="pocket"><img height="20px" width="12px" src="img/pocket.svg">Pocket</button></label>
+                            <label><button id="bookmark"><img height="20px" width="24px" src="img/bookmark.svg">Bookmark</button></label>
+                            <label><button id="ignore"><img height="20px" width="16px" src="img/ignore.svg">Ignore</button></label>
+                            <label><button id="close"><img height="20px" width="16px" src="img/close.svg">Close</button></label>
+                        </form>
+                    </div>
 
-                    <form id="default" action="" method="post">
-                        <label ><button id="download"><img height="20px" width="20px" src="img/download.svg">Download</button></label>
-                        <label ><button id="pocket"><img height="20px" width="12px" src="img/pocket.svg">Pocket</button></label>
-                        <label ><button id="bookmark"><img height="20px" width="24px" src="img/bookmark.svg">Bookmark</button></label>
-                        <label ><button id="ignore"><img height="20px" width="16px" src="img/ignore.svg">Ignore</button></label>
-                        <label ><button id="close"><img height="20px" width="16px" src="img/close.svg">Close</button></label>
-                    </form>
-                </div>
+                    <div id="advanced" class="hidden">
+                        <h3 class="page-header">Choose tabs & actions</h3>
 
-                <div id="advanced" class="hidden">
-                    <h3 class="page-header">Choose tabs & actions</h3>
+                        <a href="#resources" id="check-all-button" class="btn btn-primary" data-toggle="checkboxes" data-action="check">Check all</a>
+                        <a href="#resources" id="uncheck-all-button" class="btn btn-link" data-toggle="checkboxes" data-action="uncheck">Reset</a>
 
-                    <a href="#resources" id="check-all-button" class="btn btn-primary" data-toggle="checkboxes" data-action="check">Check all</a>
-                    <a href="#resources" id="uncheck-all-button" class="btn btn-link" data-toggle="checkboxes" data-action="uncheck">Reset</a>
+                        <form id="list" action="" method="post">
 
-                    <form id="list" action="" method="post">
+                            <div id="resources"></div>
 
-                        <div id="resources">
-                        </div>
+                            <button class="btn btn-large">Submit</button>
 
-                        <button class="btn btn-large">Submit</button>
-
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
