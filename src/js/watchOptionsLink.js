@@ -4,7 +4,7 @@ export var watchOptionsLink = {
     var optionsLink = document.getElementById("options");
     optionsLink.addEventListener("click", function(e) {
       e.preventDefault();
-      chrome.runtime.openOptionsPage();
+      browser.runtime.openOptionsPage();
     });
   }
 };

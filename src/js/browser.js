@@ -212,7 +212,8 @@ export var browserUtils = {
   getTabs: function() {
     return new Promise(function(resolve, reject) {
       var info = { currentWindow: true };
-      chrome.tabs.query(info, function(e) {
+
+      browser.tabs.query(info).then(function(e) {
         if (typeof e === "object") {
           resolve(e);
           return;

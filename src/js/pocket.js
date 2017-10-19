@@ -77,15 +77,14 @@ export var pocket = pocket || {
     localStorage[this.pocketKey.user_name] = "user_name";
     localStorage[this.pocketKey.access_token] = "access_token";
 
-    chrome.storage.local.set(
-      {
+    browser.storage.local
+      .set({
         access_token: "access_token",
         user_name: "user_name"
-      },
-      function(items) {
+      })
+      .then(function(items) {
         return;
-      }
-    );
+      });
 
     this.isNotAuthorized();
   },
@@ -178,14 +177,13 @@ export var pocket = pocket || {
           //so the popup isn't dependent on a tab being open
           var autoClose;
           if (autoClose) {
-            chrome.tabs.query(
-              { active: true, lastFocusedWindow: true },
-              function(tabs) {
+            browser.tabs
+              .query({ active: true, lastFocusedWindow: true })
+              .then(function(tabs) {
                 if (tab.id !== tabs[0].id) {
                   browser.tabs.remove(tab.id);
                 }
-              }
-            );
+              });
           }
 
           return true;
@@ -231,7 +229,7 @@ export var pocket = pocket || {
      * @return {[type]}        [description]
      */
   getRequestToken: function(pocketRequest) {
-    var redirectURL = chrome.extension.getURL("pocket.html");
+    var redirectURL = browser.extension.getURL("pocket.html");
 
     var data = new FormData();
     data.append("consumer_key", pocketRequest.key);
@@ -275,22 +273,19 @@ export var pocket = pocket || {
      * @return {[type]}            [description]
      */
   getStoredCredentials: function(callback) {
-    if (chrome.storage.local) {
-      chrome.storage.local.get(
-        {
-          access_token: "access_token",
-          user_name: "user_name"
-        },
-        function(items) {
-          if (items.user_name !== "user_name") {
-            pocket.isAuthorized(items);
-          } else {
-            pocket.isNotAuthorized();
-          }
-          return;
+    browser.storage.local
+      .get({
+        access_token: "access_token",
+        user_name: "user_name"
+      })
+      .then(function(items) {
+        if (items.user_name !== "user_name") {
+          pocket.isAuthorized(items);
+        } else {
+          pocket.isNotAuthorized();
         }
-      );
-    }
+        return;
+      });
   },
 
   /**
