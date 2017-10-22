@@ -139,7 +139,7 @@ export var pocket = pocket || {
     try {
       var xhr = new XMLHttpRequest();
       xhr.overrideMimeType("application/json");
-      xhr.open("POST", "https://getpocket.com/v3/add", false);
+      xhr.open("POST", "https://getpocket.com/v3/add", true);
       xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
       xhr.setRequestHeader("X-Accept", "application/json");
 
