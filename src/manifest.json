@@ -4,13 +4,12 @@
     "name": "Pull Tabs",
     "description":
         "Save open tabs to disk as files or put them in your Pocket.",
-    "version": "0.9.11",
+    "version": "0.10.0",
     "options_ui": {
         "page": "options.html",
         "chrome_style": true,
         "open_in_tab": false
     },
-
     "permissions": [
         "tabs",
         "downloads",

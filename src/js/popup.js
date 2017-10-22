@@ -117,10 +117,15 @@ export var popup = popup || {
     this.tabs = tabs;
   },
 
+  /**
+   * Set the number of tabs message
+   * @param {array} tabs Collection of browser tab objects
+   */
   setNumTabs: function(tabs) {
+    var spinner = document.getElementById("loading-tabs-pacman");
+    spinner.classList.add("hidden");
     var numTabs = document.getElementById("numTabs");
-    numTabs.textContent =
-      "This window has " + tabs.length + " tabs. Do this action to all tabs:";
+    numTabs.textContent = tabs.length + " tabs";
   },
 
   setLayout: function(layout) {
