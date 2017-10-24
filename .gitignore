@@ -1,10 +1,4 @@
-config.json
 node_modules
-npm-debug.log
-src/js/test.js
 .jshintrc
-admin.html
-src/js/admin.js
-.idea
 dist/*
 !dist/browser-polyfill.min.js
