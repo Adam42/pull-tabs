@@ -46,44 +46,6 @@ export var browserUtils = {
     );
   },
 
-  /**
-   * [updateUI description]
-   * @param  {object} tab     Browser tab object
-   * @param  {string} message - a message describing the action result
-   * @param  {string} status  corresponds to UI context
-   */
-  updateUI: function(tab, message, status) {
-    if (status === "fail") {
-      browserUtils.updateSimpleUI(tab, message, "danger");
-      browserUtils.updateAdvancedUI(tab, "failed");
-      return;
-    } else {
-      browserUtils.updateAdvancedUI(tab, "successful");
-    }
-
-    browserUtils.updateSimpleUI(tab, message, status);
-  },
-
-  updateSimpleUI: function(tab, messageText, status) {
-    var span = document.createElement("span");
-    var link = document.createElement("a");
-    var message = document.createTextNode(messageText);
-
-    link.title = tab.title.toString();
-    link.href = tab.url;
-    link.textContent = tab.title.toString();
-
-    span.appendChild(message);
-    span.appendChild(link);
-
-    var duration = "short";
-    if (status === "danger") {
-      duration = "long";
-    }
-
-    messageManager.updateStatusMessage(span, duration, status);
-  },
-
   //Update the advanced UI after an action
   updateAdvancedUI: function(tab, message) {
     if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
@@ -95,40 +57,8 @@ export var browserUtils = {
    * Setup up a listener to watch for changes to DownloadItem
    * @return {[type]} [description]
    */
-  watchDownloads: function(tab) {
-    browser.downloads.onChanged.addListener(browserUtils.handleChanged);
-  },
-
-  /**
-   * Trigger UI updates when downloads reach a final state
-   * @param  {object} delta Changes to the downloadItem object
-   */
-  handleChanged: function(delta) {
-    //retrieve the map of downloadItem IDs to tab objects
-    browser.storage.local
-      .get({
-        downloadItemToTabMap: ""
-      })
-      .then(function(result) {
-        //get the tab object corresponding to this downloadItem ID
-        let tabPendingDownload = result["downloadItemToTabMap"][delta.id];
-
-        if (delta.state && delta.state.current === "complete") {
-          browserUtils.updateUI(
-            tabPendingDownload,
-            "Completed downloading ",
-            "success"
-          );
-        }
-
-        if (delta.state && delta.state.current === "interrupted") {
-          browserUtils.updateUI(
-            tabPendingDownload,
-            "Error: failed downloading ",
-            "fail"
-          );
-        }
-      });
+  watchDownloads: function(callback) {
+    browser.downloads.onChanged.addListener(callback);
   },
 
   /**
@@ -157,22 +87,21 @@ export var browserUtils = {
       if (tab.url.substring(0, 6) === "about:") {
         return;
       }
-
-      this.downloadUrl(tab)
+      return this.downloadUrl(tab)
         .then(e => {
           //create a mapping of downloadItem ID to tab object
           tab.downloadItemId = e;
           tabMap.downloadItemToTabMap[e] = tab;
-
           browser.storage.local.set(tabMap);
 
           //Display a message that the download has begun
-          this.updateUI(tab, "Started downloading ", "info");
+          simpleUI.updateUI(tab, "Started downloading ", "info");
         })
         .catch(e => {
-          this.updateUI(tab, "fail");
+          simple.updateUI(tab, "Download start failed", "danger");
           console.log(e);
         });
+      //      return this.downloadUrl(tab);
 
       //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
       var autoClose = false;

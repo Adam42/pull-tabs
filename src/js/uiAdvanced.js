@@ -218,7 +218,7 @@ export var uiAdvanced = uiAdvanced || {
     this.tabs = form.getSelectedTabs(this.tabs);
 
     if (this.tabs.downloads.length > 0) {
-      browserUtils.downloadUrls(this.tabs.downloads);
+      this.downloadUrls(this.tabs.downloads);
     }
 
     if (this.tabs.pockets.length > 0) {
@@ -376,5 +376,112 @@ export var uiAdvanced = uiAdvanced || {
   watchSubmit: function() {
     var checked = document.getElementById("list");
     checked.addEventListener("submit", uiAdvanced.doActionToSelectedTabs);
+  },
+
+  /**
+     * Download a resource represented via a tab's URL
+     * to local disk either as an HTML file or with
+     * the URL's extension if it has one
+     *
+     * Note that the promise is resolved when a download is
+     * started, DownloadItem's state will change to either
+     * "complete" when the download is successful or to "interrupted"
+     * if something prevented the download from completing
+     * thus we must watch for changes to DownloadItem
+     * to check status
+     *
+     * @param  {array} tabs Collection of tab objects
+     * @return {[type]}      [description]
+     */
+  downloadUrls: function(tabs, downloadCompleteCallback) {
+    browserUtils.watchDownloads(this.handleChangedDownloads);
+
+    var tabMap = { downloadItemToTabMap: {} };
+
+    tabs.forEach(function(tab) {
+      //Internal Firefox pages will halt all downloading
+      //so we'll skip any URLs that start with "about:"
+      if (tab.url.substring(0, 6) === "about:") {
+        return;
+      }
+
+      return browserUtils
+        .downloadUrl(tab)
+        .then(e => {
+          //create a mapping of downloadItem ID to tab object
+          tab.downloadItemId = e;
+          tabMap.downloadItemToTabMap["di-" + e] = tab;
+          browser.storage.local.set(tabMap);
+          form.setLabelStatus(tab, "bg-info");
+          //Display a message that the download has begun
+          //          this.updateUI(tab, "Started downloading ", "info");
+        })
+        .catch(e => {
+          this.updateUI(tab, "fail");
+          console.log(e);
+        });
+      //      return this.downloadUrl(tab);
+
+      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
+      var autoClose = false;
+      if (tab.active !== true && autoClose === true) {
+        browser.tabs.remove(tab.id);
+      }
+    }, this);
+  },
+
+  /**
+   * Trigger UI updates when downloads reach a final state
+   * @param  {object} delta Changes to the downloadItem object
+   */
+  handleChangedDownloads: function(delta) {
+    //retrieve the map of downloadItem IDs to tab objects
+    browser.storage.local
+      .get({
+        downloadItemToTabMap: ""
+      })
+      .then(function(result) {
+        let key = "di-" + delta.id;
+        let map = result["downloadItemToTabMap"];
+        //get the tab object corresponding to this downloadItem ID
+        var tabPendingDownload = map[key];
+        if (delta.state && delta.state.current === "complete") {
+          uiAdvanced.updateUI(
+            tabPendingDownload,
+            "Completed downloading ",
+            "success"
+          );
+        }
+
+        if (delta.state && delta.state.current === "interrupted") {
+          uiAdvanced.updateUI(
+            tabPendingDownload,
+            "Error: failed downloading ",
+            "fail"
+          );
+        }
+      });
+  },
+
+  /**
+   * [updateUI description]
+   * @param  {object} tab     Browser tab object
+   * @param  {string} message - a message describing the action result
+   * @param  {string} status  corresponds to UI context
+   */
+  updateUI: function(tab, message, status) {
+    if (status === "fail") {
+      uiAdvanced.updateAdvancedUI(tab, "failed");
+      return;
+    } else {
+      uiAdvanced.updateAdvancedUI(tab, "successful");
+    }
+  },
+
+  //Update the advanced UI after an action
+  updateAdvancedUI: function(tab, message) {
+    if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
+      form.setLabelStatus(tab, message);
+    }
   }
 };
