@@ -16,11 +16,10 @@
         "identity",
         "bookmarks",
         "storage",
-        "http://*/*",
-        "https://*/*",
+
         "https://getpocket.com/v3/*"
     ],
-
+    "optional_permissions": ["http://*/*", "https://*/*"],
     "web_accessible_resources": ["pocket.html"],
 
     "browser_action": {
