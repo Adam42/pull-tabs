@@ -1,6 +1,6 @@
 "use strict";
 import { browserUtils } from "./browser.js";
-import { pocket } from "./pocket.js";
+import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
 
 /**
@@ -112,7 +112,7 @@ export var options =
         .addEventListener("submit", opt.saveMimeSettings);
       document
         .getElementById("pocket-status")
-        .addEventListener("click", pocket.checkLink);
+        .addEventListener("click", PocketAPILayer.checkLink);
       document
         .getElementById("full-mime-types")
         .addEventListener("click", opt.saveFullMimeType);
@@ -143,7 +143,7 @@ export var options =
           console.log(e);
         });
 
-      pocket.checkLocalLoginStatus();
+      PocketAPILayer.checkLocalLoginStatus();
     };
 
     opt.getMimeTypes = function() {

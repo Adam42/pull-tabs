@@ -1,7 +1,7 @@
 "use strict";
 import { form } from "./form.js";
 import { browserUtils } from "./browser.js";
-import { pocket } from "./pocket.js";
+import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 

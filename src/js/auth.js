@@ -1,6 +1,6 @@
 /*Callback for Pocket Oauth response*/
 
 "use strict";
-import { pocket } from "./pocket.js";
+import { PocketAPILayer } from "./pocket.js";
 
-pocket.getAccessToken();
+PocketAPILayer.getAccessToken();

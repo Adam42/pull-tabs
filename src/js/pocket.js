@@ -9,7 +9,7 @@ import { form } from "./form.js";
  * users to save tabs to their Pocket account
  * @type {[type]}
  */
-export var pocket = pocket || {
+export var PocketAPILayer = PocketAPILayer || {
   pocketKey: {
     access_token: "access_token",
     user_name: "user_name"
@@ -102,11 +102,11 @@ export var pocket = pocket || {
     var action = event.target.href.substring(hash);
 
     if (action === "pocket-logout") {
-      pocket.logOut();
+      PocketAPILayer.logOut();
       return;
     }
 
-    pocket.initLogin();
+    PocketAPILayer.initLogin();
   },
 
   /**
@@ -119,8 +119,7 @@ export var pocket = pocket || {
     var pocketRequest = {};
     pocketRequest.url = "https://getpocket.com/v3/oauth/request";
     pocketRequest.key = config.credentials.consumer_key;
-    pocket.getRequestToken(pocketRequest);
-  },
+    PocketAPILayer.getRequestToken(pocketRequest);
   },
 
   /**
@@ -146,7 +145,8 @@ export var pocket = pocket || {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           pocketRequest.token = xhr.response.substring(5);
-          localStorage[pocket.pocketKey.request_token] = pocketRequest.token;
+          localStorage[PocketAPILayer.pocketKey.request_token] =
+            pocketRequest.token;
 
           pocketRequest.auth =
             "https://getpocket.com/auth/authorize?request_token=" +
@@ -183,9 +183,9 @@ export var pocket = pocket || {
       })
       .then(function(items) {
         if (items.user_name !== "user_name") {
-          pocket.isAuthorized(items);
+          PocketAPILayer.isAuthorized(items);
         } else {
-          pocket.isNotAuthorized();
+          PocketAPILayer.isNotAuthorized();
         }
         return;
       });
@@ -236,7 +236,7 @@ export var pocket = pocket || {
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          pocket.setStoredCredentials(xhr.response);
+          PocketAPILayer.setStoredCredentials(xhr.response);
         } else {
           console.error(xhr.statusText);
         }
