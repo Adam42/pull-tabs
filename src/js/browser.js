@@ -230,49 +230,6 @@ export var browserUtils = {
   },
 
   /**
-     * Bookmark collection of tabs
-     * @param  {array} tabs Collection of tab objects
-     */
-  bookmarkTabs: function(tabs) {
-    var numTabs = tabs.length;
-    var i;
-    for (i = 0; i < numTabs; i++) {
-      this.bookmarkTab(tabs[i]);
-    }
-  },
-
-  /**
-     * Bookmark a single tab
-     * @param  {object}   tab      A browser tab object
-     * @return {[type]}            [description]
-     */
-  bookmarkTab: function(tab) {
-    var bookmark = {
-      parentId: localStorage["pullTabsFolderId"],
-      title: tab.title.toString(),
-      url: tab.url
-    };
-
-    var createBookmark = browser.bookmarks.create(bookmark);
-
-    createBookmark.then(function(savedMark) {
-      var link = document.createElement("a");
-      var status = document.createElement("span");
-      var message = document.createTextNode("Successfuly bookmarked ");
-
-      link.title = tab.title.toString();
-      link.href = tab.url;
-      link.textContent = tab.title.toString();
-
-      status.appendChild(message);
-      status.appendChild(link);
-
-      browserUtils.updateAdvancedUI(tab, "successful");
-      messageManager.updateStatusMessage(status, "medium", "success");
-    });
-  },
-
-  /**
      * Login to getpocket.com
      *
      * @param  {object} pocket [description]

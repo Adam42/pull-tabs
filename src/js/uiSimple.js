@@ -2,7 +2,8 @@
 import { browserUtils } from "./browser.js";
 import { popup } from "./popup.js";
 import { messageManager } from "./message.js";
-import { pocket } from "./pocket.js";
+import ServiceProvider from "./services/ServiceProvider.js";
+import ServiceFactory from "./services/ServiceFactory.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -24,11 +25,22 @@ export var uiSimple = uiSimple || {
         break;
 
       case "pocket":
-        pocket.saveTabsToPocket(popup.tabs);
-        break;
-
       case "bookmark":
-        browserUtils.bookmarkTabs(popup.tabs);
+        //retrieve the ServiceProvider corresponding to this action
+        let service = ServiceFactory.convertActionToProvider(action);
+        service = new service(popup.tabs);
+
+        //Loop through each tab and perform the ServiceProvider's action on it
+        popup.tabs.forEach(function(tab) {
+          service.doActionToTab(tab).then(
+            () => {
+              uiSimple.updateUIWithSuccess(tab, action);
+            },
+            () => {
+              uiSimple.updateUIWithFail(tab, action);
+            }
+          );
+        });
         break;
 
       case "close":
@@ -78,8 +90,36 @@ export var uiSimple = uiSimple || {
     if (status === "danger") {
       duration = "long";
     }
-    console.log(status);
+
     messageManager.updateStatusMessage(span, duration, status);
+  },
+
+  /**
+   * Update the UI with a successful message
+   * the action passed in will be converted into passive
+   * tense by added "ed" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithSuccess: function(tab, action) {
+    let actioned = action + "ed";
+    uiSimple.updateUI(tab, "Successfuly " + actioned + " ", "success");
+  },
+
+  /**
+   * Update the UI with a failing message
+   * the action passed in will be converted into current
+   * tense by added "ing" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithFail: function(tab, action) {
+    let actioning = action + "ing";
+    uiSimple.updateUI(tab, "Failed " + actioning + " ", "danger");
   },
 
   downloadUrls: function(tabs) {

@@ -2,7 +2,6 @@
 import { browserUtils } from "./browser.js";
 import { options } from "./options.js";
 import { messageManager } from "./message.js";
-import { pocket } from "./pocket.js";
 import UI from "./ui.js";
 import { uiAdvanced } from "./uiAdvanced.js";
 import { uiSimple } from "./uiSimple.js";

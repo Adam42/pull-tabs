@@ -2,6 +2,8 @@
 import { form } from "./form.js";
 import { browserUtils } from "./browser.js";
 import { pocket } from "./pocket.js";
+import ServiceProvider from "./services/ServiceProvider.js";
+import ServiceFactory from "./services/ServiceFactory.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -222,7 +224,22 @@ export var uiAdvanced = uiAdvanced || {
     }
 
     if (this.tabs.pockets.length > 0) {
-      pocket.saveTabsToPocket(this.tabs.pockets);
+      let action = "pocket";
+
+      //retrieve the ServiceProvider corresponding to this action
+      let service = ServiceFactory.convertActionToProvider(action);
+      service = new service(this.tabs.pockets);
+      //Loop through each tab and perform the ServiceProvider's action on it
+      this.tabs.pockets.forEach(function(tab) {
+        service.doActionToTab(tab).then(
+          () => {
+            uiAdvanced.updateUIWithSuccess(tab, action);
+          },
+          () => {
+            uiAdvanced.updateUIWithFail(tab, action);
+          }
+        );
+      });
     }
 
     if (this.tabs.closes.length > 0) {
@@ -230,7 +247,22 @@ export var uiAdvanced = uiAdvanced || {
     }
 
     if (this.tabs.bookmarks.length > 0) {
-      browserUtils.bookmarkTabs(this.tabs.bookmarks);
+      let action = "bookmark";
+
+      //retrieve the ServiceProvider corresponding to this action
+      let service = ServiceFactory.convertActionToProvider(action);
+      service = new service(this.tabs.bookmarks);
+      //Loop through each tab and perform the ServiceProvider's action on it
+      this.tabs.bookmarks.forEach(function(tab) {
+        service.doActionToTab(tab).then(
+          () => {
+            uiAdvanced.updateUIWithSuccess(tab, action);
+          },
+          () => {
+            uiAdvanced.updateUIWithFail(tab, action);
+          }
+        );
+      });
     }
 
     return;
@@ -483,5 +515,33 @@ export var uiAdvanced = uiAdvanced || {
     if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
       form.setLabelStatus(tab, message);
     }
+  },
+
+  /**
+   * Update the UI with a successful message
+   * the action passed in will be converted into passive
+   * tense by added "ed" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithSuccess: function(tab, action) {
+    let actioned = action + "ed";
+    uiAdvanced.updateUI(tab, "Successfuly " + actioned + " ", "success");
+  },
+
+  /**
+   * Update the UI with a failing message
+   * the action passed in will be converted into current
+   * tense by added "ing" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithFail: function(tab, action) {
+    let actioning = action + "ing";
+    uiAdvanced.updateUI(tab, "Failed " + actioning + " ", "fail");
   }
 };
