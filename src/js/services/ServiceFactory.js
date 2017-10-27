@@ -1,5 +1,6 @@
 import PocketProvider from "./Pocket.js";
 import BookmarkProvider from "./Bookmark.js";
+import CloseProvider from "./Close.js";
 
 /**
  * Helps instantiate ServiceProviders
@@ -9,7 +10,8 @@ export default class ServiceFactory {
     //Set up listing of potential providers
     this.providers = {
       PocketProvider,
-      BookmarkProvider
+      BookmarkProvider,
+      CloseProvider
     };
   }
 
@@ -21,7 +23,8 @@ export default class ServiceFactory {
   static getProviders() {
     return {
       PocketProvider,
-      BookmarkProvider
+      BookmarkProvider,
+      CloseProvider
     };
   }
 

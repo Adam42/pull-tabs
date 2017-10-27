@@ -243,7 +243,23 @@ export var uiAdvanced = uiAdvanced || {
     }
 
     if (this.tabs.closes.length > 0) {
-      browserUtils.closeTabs(this.tabs.closes);
+      let action = "close";
+
+      //retrieve the ServiceProvider corresponding to this action
+      let service = ServiceFactory.convertActionToProvider(action);
+      service = new service(this.tabs.closes);
+      //Loop through each tab and perform the ServiceProvider's action on it
+      this.tabs.closes.forEach(function(tab) {
+        service.doActionToTab(tab).then(
+          () => {
+            uiAdvanced.updateUIWithSuccess(tab, action);
+          },
+          () => {
+            uiAdvanced.updateUIWithFail(tab, action);
+          }
+        );
+      });
+      //browserUtils.closeTabs(this.tabs.closes);
     }
 
     if (this.tabs.bookmarks.length > 0) {

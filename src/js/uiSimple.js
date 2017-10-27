@@ -26,6 +26,7 @@ export var uiSimple = uiSimple || {
 
       case "pocket":
       case "bookmark":
+      case "close":
         //retrieve the ServiceProvider corresponding to this action
         let service = ServiceFactory.convertActionToProvider(action);
         service = new service(popup.tabs);
@@ -41,10 +42,6 @@ export var uiSimple = uiSimple || {
             }
           );
         });
-        break;
-
-      case "close":
-        browserUtils.closeTabs(popup.tabs);
         break;
 
       default:

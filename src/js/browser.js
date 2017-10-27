@@ -206,30 +206,6 @@ export var browserUtils = {
   },
 
   /**
-     * For each tab in a collection of tab object's
-     * close that tab
-     *
-     * @param  {array} tabs Collection of tabs
-     * @return {void}
-     */
-  closeTabs: function(tabs) {
-    var numTabs = tabs.length;
-    var i;
-    for (i = 0; i < numTabs; i++) {
-      this.closeTab(tabs[i]);
-    }
-  },
-
-  /**
-     * Close an individual tab
-     * @param  {object} tab A browser tab object
-     * @return {void}
-     */
-  closeTab: function(tab) {
-    browser.tabs.remove(tab.id);
-  },
-
-  /**
      * Login to getpocket.com
      *
      * @param  {object} pocket [description]
