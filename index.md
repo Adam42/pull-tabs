@@ -31,3 +31,32 @@ This advanced layout was the motivation for writing this extension as I'd often 
 * Simple and advanced views
 
 *Downloading may or may not go as you expect, the extension will download the entirety of the tab, so if the tab is an imgur/instagram/flickr/etc. page with an image embedded it will download an HTML file. However, if the tab is a direct link to an image it will download just the image.
+
+### Screenshots
+
+Below are a few screenshots of the Pull Tabs extension.
+
+<img src="images/pull-tabs-1.png"/>
+Popup with simple and advanced views.
+
+<img src="images/pull-tabs-2.png"/>
+Select tabs and actions per tab.
+
+<img src="images/pull-tabs-3.png"/>
+Downloads in progress and completing.
+
+<img src="images/pull-tabs-4.png"/>
+Bookmarks completed.
+
+
+### Support
+
+If you experience any bugs [please file an issue](https://github.com/Adam42/pull-tabs/issues).
+
+#### Adam
+
+[Tweet at or follow me!](https://twitter.com/adampdotcom)
+
+##### License
+
+Pull Tabs is distributed under the [GPL 3 license](https://raw.githubusercontent.com/Adam42/pull-tabs/master/LICENSE.md).
