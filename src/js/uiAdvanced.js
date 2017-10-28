@@ -226,62 +226,45 @@ export var uiAdvanced = uiAdvanced || {
     if (this.tabs.pockets.length > 0) {
       let action = "pocket";
 
-      //retrieve the ServiceProvider corresponding to this action
-      let service = ServiceFactory.convertActionToProvider(action);
-      service = new service(this.tabs.pockets);
-      //Loop through each tab and perform the ServiceProvider's action on it
-      this.tabs.pockets.forEach(function(tab) {
-        service.doActionToTab(tab).then(
-          () => {
-            uiAdvanced.updateUIWithSuccess(tab, action);
-          },
-          () => {
-            uiAdvanced.updateUIWithFail(tab, action);
-          }
-        );
-      });
+      this.doServiceAction(this.tabs.pockets, action);
     }
 
     if (this.tabs.closes.length > 0) {
       let action = "close";
-
-      //retrieve the ServiceProvider corresponding to this action
-      let service = ServiceFactory.convertActionToProvider(action);
-      service = new service(this.tabs.closes);
-      //Loop through each tab and perform the ServiceProvider's action on it
-      this.tabs.closes.forEach(function(tab) {
-        service.doActionToTab(tab).then(
-          () => {
-            uiAdvanced.updateUIWithSuccess(tab, action);
-          },
-          () => {
-            uiAdvanced.updateUIWithFail(tab, action);
-          }
-        );
-      });
-      //browserUtils.closeTabs(this.tabs.closes);
+      this.doServiceAction(this.tabs.closes, action);
     }
 
     if (this.tabs.bookmarks.length > 0) {
       let action = "bookmark";
-
-      //retrieve the ServiceProvider corresponding to this action
-      let service = ServiceFactory.convertActionToProvider(action);
-      service = new service(this.tabs.bookmarks);
-      //Loop through each tab and perform the ServiceProvider's action on it
-      this.tabs.bookmarks.forEach(function(tab) {
-        service.doActionToTab(tab).then(
-          () => {
-            uiAdvanced.updateUIWithSuccess(tab, action);
-          },
-          () => {
-            uiAdvanced.updateUIWithFail(tab, action);
-          }
-        );
-      });
+      this.doServiceAction(this.tabs.bookmarks, action);
     }
 
     return;
+  },
+
+  /**
+   * Creates a ServiceProvider and performs its associated
+   * action on the collection of tabs
+   *
+   * @param  {array} tabs   Collection of browser tab objects
+   * @param  {string} action The action to be performed
+   * @return {void}
+   */
+  doServiceAction: function(tabs, action) {
+    //retrieve the ServiceProvider corresponding to this action
+    let service = ServiceFactory.convertActionToProvider(action);
+    service = new service(tabs);
+    //Loop through each tab and perform the ServiceProvider's action on it
+    tabs.forEach(function(tab) {
+      service.doActionToTab(tab).then(
+        () => {
+          uiAdvanced.updateUIWithSuccess(tab, action);
+        },
+        () => {
+          uiAdvanced.updateUIWithFail(tab, action);
+        }
+      );
+    });
   },
 
   setMimeTypesMap: function(id, mimeType) {
