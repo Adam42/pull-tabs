@@ -2,6 +2,7 @@
 import { browserUtils } from "./browser.js";
 import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
+import UI from "./ui.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -32,10 +33,7 @@ export var options =
     opt.fullMimeType = {
       retrieveFullMimeType: false
     };
-    opt.layout = {
-      simple: true,
-      advanced: false
-    };
+
     opt.autoClose = {
       autoCloseTabs: false
     };
@@ -132,7 +130,9 @@ export var options =
       setDefaultMimeTypes();
       createForm();
       this.restoreMimeSettings().then(opt.setMimeSettings);
-      this.getLayout().then(options.setLayout);
+      UI.getLayout().then(function(layout) {
+        options.setLayout(layout);
+      });
       this.getAutoClose().then(options.setAutoClose);
 
       this.getFullMimeType()
@@ -186,6 +186,7 @@ export var options =
      * @param {object} layout - An object representing current layout setting
      */
     opt.setLayout = function(layout) {
+      console.log(layout);
       var simple = document.getElementById("simple");
       var advanced = document.getElementById("advanced");
       if (layout.simple === true) {
@@ -262,35 +263,37 @@ export var options =
         );
       }
 
-      if (simpleLayout.checked === true) {
-        opt.layout.simple = true;
-      } else {
-        opt.layout.simple = false;
-      }
+      UI.getLayout().then(function(layout) {
+        if (simpleLayout.checked === true) {
+          layout.simple = true;
+        } else {
+          layout.simple = false;
+        }
 
-      if (advancedLayout.checked === true) {
-        opt.layout.advanced = true;
-      } else {
-        opt.layout.advanced = false;
-      }
+        if (advancedLayout.checked === true) {
+          layout.advanced = true;
+        } else {
+          layout.advanced = false;
+        }
 
-      browserUtils
-        .store(opt.layout)
-        .then(function(value) {
-          messageManager.updateStatusMessage(
-            "Layouts saved.",
-            "short",
-            "success"
-          );
-        })
-        .catch(err => {
-          messageManager.updateStatusMessage(
-            "Error:" + err.message,
-            "medium",
-            "danger"
-          );
-          console.log(err.message);
-        });
+        browserUtils
+          .store(layout)
+          .then(function(value) {
+            messageManager.updateStatusMessage(
+              "Layouts saved.",
+              "short",
+              "success"
+            );
+          })
+          .catch(err => {
+            messageManager.updateStatusMessage(
+              "Error:" + err.message,
+              "medium",
+              "danger"
+            );
+            console.log(err.message);
+          });
+      });
     };
 
     /**
@@ -340,10 +343,6 @@ export var options =
 
     opt.getFullMimeType = function() {
       return browserUtils.retrieve(opt.fullMimeType);
-    };
-
-    opt.getLayout = function() {
-      return browserUtils.retrieve(opt.layout);
     };
 
     opt.getAutoClose = function() {

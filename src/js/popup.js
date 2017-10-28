@@ -14,8 +14,6 @@ import { uiSimple } from "./uiSimple.js";
 export var popup = popup || {
   tabs: "",
 
-  layout: "",
-
   /**
    * Get user's UI layout preferences and then
    * get tabs if advanced layout is active
@@ -23,8 +21,6 @@ export var popup = popup || {
    * @return {[type]} [description]
    */
   init: function() {
-    const view = new UI({});
-
     //Force user to go to options page on initial load
     if (localStorage.initialSetup !== "no") {
       localStorage.initialSetup = "yes";
@@ -32,9 +28,15 @@ export var popup = popup || {
       return;
     }
 
-    view
-      .getLayout()
+    var msgID = messageManager.updateStatusMessage(
+      "Loading layout",
+      "dependent",
+      "info"
+    );
+
+    UI.getLayout()
       .then(function(layout) {
+        messageManager.removeStatusMessage(msgID);
         popup.displayLayout(layout);
       })
       .catch(function(e) {
@@ -89,21 +91,6 @@ export var popup = popup || {
       }
       popup.setNumTabs(tabs);
     });
-  },
-
-  /**
-     * Retrieve the URLs represented in tabs collection
-     * @param  {array} tabs Collection of tab objects
-     * @return {array}      Collection of URLs from user's tabs
-     */
-  getUrls: function(tabs) {
-    var urls = [];
-
-    tabs.forEach(function(tab) {
-      urls.push(tab.url);
-    });
-
-    return urls;
   },
 
   setTabs: function(tabs) {

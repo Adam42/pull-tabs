@@ -11,21 +11,13 @@ export default class UI {
   }
 
   //returns a Promise
-  getLayout() {
+  static getLayout() {
     var key = {
       simple: "true",
       advanced: "false"
     };
-    var msgID = messageManager.updateStatusMessage(
-      "Loading layout",
-      "dependent",
-      "info"
-    );
 
-    return browserUtils.retrieve(key).then(function(value) {
-      messageManager.removeStatusMessage(msgID);
-      return value;
-    });
+    return browserUtils.retrieve(key);
   }
 
   displayLayout() {}

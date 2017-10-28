@@ -46,13 +46,6 @@ export var browserUtils = {
     );
   },
 
-  //Update the advanced UI after an action
-  updateAdvancedUI: function(tab, message) {
-    if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-      form.setLabelStatus(tab, message);
-    }
-  },
-
   /**
    * Setup up a listener to watch for changes to DownloadItem
    * @return {[type]} [description]
