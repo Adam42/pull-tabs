@@ -99,6 +99,11 @@ export var form = form || {
     });
   },
 
+  removeLabelStatus: function(tab, status) {
+    var label = document.getElementById("label-tab-" + tab.labelTabId);
+    label.classList.remove(status);
+  },
+
   setLabelStatus: function(tab, status) {
     var label = document.getElementById("label-tab-" + tab.labelTabId);
     label.setAttribute("class", label.className + " " + status);

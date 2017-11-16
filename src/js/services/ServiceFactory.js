@@ -1,6 +1,7 @@
 import PocketProvider from "./Pocket.js";
 import BookmarkProvider from "./Bookmark.js";
 import CloseProvider from "./Close.js";
+import DownloadProvider from "./Download.js";
 
 /**
  * Helps instantiate ServiceProviders
@@ -11,7 +12,8 @@ export default class ServiceFactory {
     this.providers = {
       PocketProvider,
       BookmarkProvider,
-      CloseProvider
+      CloseProvider,
+      DownloadProvider
     };
   }
 
@@ -24,7 +26,8 @@ export default class ServiceFactory {
     return {
       PocketProvider,
       BookmarkProvider,
-      CloseProvider
+      CloseProvider,
+      DownloadProvider
     };
   }
 

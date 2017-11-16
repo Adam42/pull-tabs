@@ -18,19 +18,34 @@ export var uiSimple = uiSimple || {
   },
 
   processButton: function(action) {
+    //retrieve the ServiceProvider corresponding to this action
+    let service = ServiceFactory.convertActionToProvider(action);
+    service = new service(popup.tabs);
+
     switch (action) {
       case "download":
-        return this.downloadUrls(popup.tabs);
-        //return browserUtils.downloadUrls(popup.tabs);
+        let callback = uiSimple.handleChangedDownloads;
+        service.registerCallback(callback);
+
+        //Loop through each tab and perform the ServiceProvider's action on it
+        popup.tabs.forEach(function(tab) {
+          service
+            .doActionToTab(tab)
+            .then(
+              //Display a message that the download has begun
+              uiSimple.updateUI(tab, "Started downloading ", "info")
+            )
+            .catch(e => {
+              uiSimple.updateUI(tab, "danger");
+              console.log(e);
+            });
+        });
+
         break;
 
       case "pocket":
       case "bookmark":
       case "close":
-        //retrieve the ServiceProvider corresponding to this action
-        let service = ServiceFactory.convertActionToProvider(action);
-        service = new service(popup.tabs);
-
         //Loop through each tab and perform the ServiceProvider's action on it
         popup.tabs.forEach(function(tab) {
           service.doActionToTab(tab).then(
@@ -119,73 +134,40 @@ export var uiSimple = uiSimple || {
     uiSimple.updateUI(tab, "Failed " + actioning + " ", "danger");
   },
 
-  downloadUrls: function(tabs) {
-    browserUtils.watchDownloads(uiSimple.handleChangedDownloads);
-
-    var tabMap = { downloadItemToTabMap: {} };
-
-    tabs.forEach(function(tab) {
-      //Internal Firefox pages will halt all downloading
-      //so we'll skip any URLs that start with "about:"
-      if (tab.url.substring(0, 6) === "about:") {
-        return;
-      }
-
-      return browserUtils
-        .downloadUrl(tab)
-        .then(e => {
-          //create a mapping of downloadItem ID to tab object
-          tab.downloadItemId = e;
-          tab.actionReferrer = "simple";
-          tabMap.downloadItemToTabMap["di-" + e] = tab;
-          browser.storage.local.set(tabMap);
-          //Display a message that the download has begun
-          uiSimple.updateUI(tab, "Started downloading ", "info");
-        })
-        .catch(e => {
-          uiSimple.updateUI(tab, "danger");
-          console.log(e);
-        });
-      //      return this.downloadUrl(tab);
-
-      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
-      var autoClose = false;
-      if (tab.active !== true && autoClose === true) {
-        browser.tabs.remove(tab.id);
-      }
-    }, this);
-  },
-
   /**
    * Trigger UI updates when downloads reach a final state
    * @param  {object} delta Changes to the downloadItem object
    */
   handleChangedDownloads: function(delta) {
-    //retrieve the map of downloadItem IDs to tab objects
-    browser.storage.local
-      .get({
-        downloadItemToTabMap: ""
-      })
-      .then(function(result) {
-        let key = "di-" + delta.id;
-        let map = result["downloadItemToTabMap"];
-        //get the tab object corresponding to this downloadItem ID
-        let tabPendingDownload = map[key];
+    var name = "downloadTabItem-" + delta.id;
+
+    browser.storage.local.get(name).then(function(result) {
+      let tab = result[name];
+
         if (delta.state && delta.state.current === "complete") {
           uiSimple.updateUI(
-            tabPendingDownload,
+            tab,
             "Completed downloading ",
             "success"
           );
+
+          browser.storage.local.remove(name);
+          //      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
+          //      var autoClose = false;
+          //      if (tab.active !== true && autoClose === true) {
+          //        browser.tabs.remove(tab.id);
+          //      }
         }
 
         if (delta.state && delta.state.current === "interrupted") {
           uiSimple.updateUI(
-            tabPendingDownload,
+            tab,
             "Error: failed downloading ",
             "danger"
           );
+
+          browser.storage.local.remove(name);
         }
-      });
+    });
   }
 };

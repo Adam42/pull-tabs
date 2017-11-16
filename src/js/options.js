@@ -186,7 +186,6 @@ export var options =
      * @param {object} layout - An object representing current layout setting
      */
     opt.setLayout = function(layout) {
-      console.log(layout);
       var simple = document.getElementById("simple");
       var advanced = document.getElementById("advanced");
       if (layout.simple === true) {

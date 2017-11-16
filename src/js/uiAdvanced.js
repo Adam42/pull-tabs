@@ -219,8 +219,30 @@ export var uiAdvanced = uiAdvanced || {
   getTabStatus: function() {
     this.tabs = form.getSelectedTabs(this.tabs);
 
+    // DownloadProvider goes through two states
+    // the promise received from browser to start
+    // the download and the result of downloading
     if (this.tabs.downloads.length > 0) {
-      this.downloadUrls(this.tabs.downloads);
+      let tabs = this.tabs.downloads;
+      let action = "download";
+      let callback = uiAdvanced.handleChangedDownloads;
+
+      //retrieve the ServiceProvider corresponding to this action
+      let service = ServiceFactory.convertActionToProvider(action);
+      service = new service(tabs);
+      service.registerCallback(callback);
+
+      //Loop through each tab and perform the ServiceProvider's action on it
+      tabs.forEach(function(tab) {
+        service.doActionToTab(tab).then(
+          () => {
+            form.setLabelStatus(tab, "list-group-item-info");
+          },
+          () => {
+            uiAdvanced.updateUI(tab, "fail");
+          }
+        );
+      });
     }
 
     if (this.tabs.pockets.length > 0) {
@@ -410,83 +432,30 @@ export var uiAdvanced = uiAdvanced || {
   },
 
   /**
-     * Download a resource represented via a tab's URL
-     * to local disk either as an HTML file or with
-     * the URL's extension if it has one
-     *
-     * Note that the promise is resolved when a download is
-     * started, DownloadItem's state will change to either
-     * "complete" when the download is successful or to "interrupted"
-     * if something prevented the download from completing
-     * thus we must watch for changes to DownloadItem
-     * to check status
-     *
-     * @param  {array} tabs Collection of tab objects
-     * @return {[type]}      [description]
-     */
-  downloadUrls: function(tabs, downloadCompleteCallback) {
-    browserUtils.watchDownloads(this.handleChangedDownloads);
-
-    var tabMap = { downloadItemToTabMap: {} };
-
-    tabs.forEach(function(tab) {
-      //Internal Firefox pages will halt all downloading
-      //so we'll skip any URLs that start with "about:"
-      if (tab.url.substring(0, 6) === "about:") {
-        return;
-      }
-
-      return browserUtils
-        .downloadUrl(tab)
-        .then(e => {
-          //create a mapping of downloadItem ID to tab object
-          tab.downloadItemId = e;
-          tabMap.downloadItemToTabMap["di-" + e] = tab;
-          browser.storage.local.set(tabMap);
-          form.setLabelStatus(tab, "bg-info");
-          //Display a message that the download has begun
-          //          this.updateUI(tab, "Started downloading ", "info");
-        })
-        .catch(e => {
-          this.updateUI(tab, "fail");
-          console.log(e);
-        });
-      //      return this.downloadUrl(tab);
-
-      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
-      var autoClose = false;
-      if (tab.active !== true && autoClose === true) {
-        browser.tabs.remove(tab.id);
-      }
-    }, this);
-  },
-
-  /**
    * Trigger UI updates when downloads reach a final state
    * @param  {object} delta Changes to the downloadItem object
    */
   handleChangedDownloads: function(delta) {
-    //retrieve the map of downloadItem IDs to tab objects
+    let name = "downloadTabItem-" + delta.id;
+
     browser.storage.local
-      .get({
-        downloadItemToTabMap: ""
-      })
+      .get(name)
       .then(function(result) {
-        let key = "di-" + delta.id;
-        let map = result["downloadItemToTabMap"];
-        //get the tab object corresponding to this downloadItem ID
-        var tabPendingDownload = map[key];
+        let tab = result[name];
         if (delta.state && delta.state.current === "complete") {
+          form.removeLabelStatus(tab, "list-group-item-info");
           uiAdvanced.updateUI(
-            tabPendingDownload,
+            tab,
             "Completed downloading ",
             "success"
           );
         }
 
         if (delta.state && delta.state.current === "interrupted") {
+          form.removeLabelStatus(tab, "list-group-item-info");
+
           uiAdvanced.updateUI(
-            tabPendingDownload,
+            tab,
             "Error: failed downloading ",
             "fail"
           );
