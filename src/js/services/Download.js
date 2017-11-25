@@ -60,7 +60,7 @@ export default class DownloadProvider extends ServiceProvider {
     //so we'll skip any URLs that start with "about:"
     if (tab.url.substring(0, 6) === "about:") {
       //throw new Error("Cannot download internal Firefox pages");
-      return;
+      return Promise.reject(new Error('fail'));
     }
 
     var file = {
