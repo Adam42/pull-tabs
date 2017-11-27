@@ -36,7 +36,7 @@ export var uiSimple = uiSimple || {
               uiSimple.updateUI(tab, "Started downloading ", "info")
             )
             .catch(e => {
-              uiSimple.updateUI(tab, "danger");
+              uiSimple.updateUI(tab, "Failed downloading ", "danger");
               console.log(e);
             });
         });
