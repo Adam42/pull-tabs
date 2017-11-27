@@ -188,13 +188,13 @@ export var options =
     opt.setLayout = function(layout) {
       var simple = document.getElementById("simple");
       var advanced = document.getElementById("advanced");
-      if (layout.simple === true) {
+      if (String(layout.simple) == 'true') {
         simple.checked = true;
       } else {
         simple.checked = false;
       }
 
-      if (layout.advanced === true) {
+      if (String(layout.advanced) == 'true') {
         advanced.checked = true;
       } else {
         advanced.checked = false;

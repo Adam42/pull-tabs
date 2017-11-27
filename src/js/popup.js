@@ -76,7 +76,7 @@ export var popup = popup || {
      * @return {void} [description]
      */
   displayLayout: function(layout) {
-    if (layout.simple) {
+    if (String(layout.simple) == 'true') {
       uiSimple.watchButtons();
     } else {
       var simple = document.getElementById("simple");
@@ -86,7 +86,7 @@ export var popup = popup || {
     browserUtils.getTabs().then(function(tabs) {
       popup.tabs = tabs;
 
-      if (layout.advanced) {
+      if (String(layout.advanced) == 'true') {
         uiAdvanced.displayAdvancedLayout(tabs);
       }
       popup.setNumTabs(tabs);
