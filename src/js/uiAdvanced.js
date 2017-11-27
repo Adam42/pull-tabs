@@ -438,29 +438,19 @@ export var uiAdvanced = uiAdvanced || {
   handleChangedDownloads: function(delta) {
     let name = "downloadTabItem-" + delta.id;
 
-    browser.storage.local
-      .get(name)
-      .then(function(result) {
-        let tab = result[name];
-        if (delta.state && delta.state.current === "complete") {
-          form.removeLabelStatus(tab, "list-group-item-info");
-          uiAdvanced.updateUI(
-            tab,
-            "Completed downloading ",
-            "success"
-          );
-        }
+    browser.storage.local.get(name).then(function(result) {
+      let tab = result[name];
+      if (delta.state && delta.state.current === "complete") {
+        form.removeLabelStatus(tab, "list-group-item-info");
+        uiAdvanced.updateUI(tab, "Completed downloading ", "success");
+      }
 
-        if (delta.state && delta.state.current === "interrupted") {
-          form.removeLabelStatus(tab, "list-group-item-info");
+      if (delta.state && delta.state.current === "interrupted") {
+        form.removeLabelStatus(tab, "list-group-item-info");
 
-          uiAdvanced.updateUI(
-            tab,
-            "Error: failed downloading ",
-            "fail"
-          );
-        }
-      });
+        uiAdvanced.updateUI(tab, "Error: failed downloading ", "fail");
+      }
+    });
   },
 
   /**

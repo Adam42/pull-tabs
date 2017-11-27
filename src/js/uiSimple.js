@@ -144,30 +144,22 @@ export var uiSimple = uiSimple || {
     browser.storage.local.get(name).then(function(result) {
       let tab = result[name];
 
-        if (delta.state && delta.state.current === "complete") {
-          uiSimple.updateUI(
-            tab,
-            "Completed downloading ",
-            "success"
-          );
+      if (delta.state && delta.state.current === "complete") {
+        uiSimple.updateUI(tab, "Completed downloading ", "success");
 
-          browser.storage.local.remove(name);
-          //      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
-          //      var autoClose = false;
-          //      if (tab.active !== true && autoClose === true) {
-          //        browser.tabs.remove(tab.id);
-          //      }
-        }
+        browser.storage.local.remove(name);
+        //      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
+        //      var autoClose = false;
+        //      if (tab.active !== true && autoClose === true) {
+        //        browser.tabs.remove(tab.id);
+        //      }
+      }
 
-        if (delta.state && delta.state.current === "interrupted") {
-          uiSimple.updateUI(
-            tab,
-            "Error: failed downloading ",
-            "danger"
-          );
+      if (delta.state && delta.state.current === "interrupted") {
+        uiSimple.updateUI(tab, "Error: failed downloading ", "danger");
 
-          browser.storage.local.remove(name);
-        }
+        browser.storage.local.remove(name);
+      }
     });
   }
 };
