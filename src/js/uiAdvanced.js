@@ -239,7 +239,7 @@ export var uiAdvanced = uiAdvanced || {
             form.setLabelStatus(tab, "list-group-item-info");
           },
           () => {
-            uiAdvanced.updateUI(tab, "fail");
+            uiAdvanced.updateUI(tab, "", "fail");
           }
         );
       });
