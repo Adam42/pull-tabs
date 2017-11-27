@@ -2,8 +2,9 @@
 import { browserUtils } from "./browser.js";
 import { options } from "./options.js";
 import { messageManager } from "./message.js";
-import { pocket } from "./pocket.js";
+import UI from "./ui.js";
 import { uiAdvanced } from "./uiAdvanced.js";
+import { uiSimple } from "./uiSimple.js";
 
 /**
  * Main functionality of pullTabs extension
@@ -13,8 +14,12 @@ import { uiAdvanced } from "./uiAdvanced.js";
 export var popup = popup || {
   tabs: "",
 
-  layout: "",
-
+  /**
+   * Get user's UI layout preferences and then
+   * get tabs if advanced layout is active
+   *
+   * @return {[type]} [description]
+   */
   init: function() {
     //Force user to go to options page on initial load
     if (localStorage.initialSetup !== "no") {
@@ -22,36 +27,21 @@ export var popup = popup || {
       popup.doInitialSetup();
       return;
     }
-    //If we don't have any tabs yet then retrieve them
-    if (!popup.tabs) {
-      var msgID = messageManager.updateStatusMessage(
-        "Gathering your tabs",
-        "dependent",
-        "info"
-      );
 
-      browserUtils
-        .getTabs()
-        .then(function(tabs) {
-          popup.tabs = tabs;
-          messageManager.removeStatusMessage(msgID);
-          return tabs;
-        })
-        .then(function(tabs) {
-          popup.setNumTabs(tabs);
-        })
-        .then(
-          popup.getLayout().then(function(layout) {
-            popup.setLayout(layout);
-            popup.displayLayout(layout);
-          })
-        )
-        .catch(function(e) {
-          console.log(e);
-        });
+    var msgID = messageManager.updateStatusMessage(
+      "Loading layout",
+      "dependent",
+      "info"
+    );
 
-      return;
-    }
+    UI.getLayout()
+      .then(function(layout) {
+        messageManager.removeStatusMessage(msgID);
+        popup.displayLayout(layout);
+      })
+      .catch(function(e) {
+        console.log(e);
+      });
   },
 
   doInitialSetup: function() {
@@ -87,30 +77,20 @@ export var popup = popup || {
      */
   displayLayout: function(layout) {
     if (layout.simple) {
-      popup.watchButtons();
+      uiSimple.watchButtons();
     } else {
       var simple = document.getElementById("simple");
       simple.classList.add("hidden");
     }
 
-    if (layout.advanced) {
-      uiAdvanced.displayAdvancedLayout(this.tabs);
-    }
-  },
+    browserUtils.getTabs().then(function(tabs) {
+      popup.tabs = tabs;
 
-  /**
-     * Retrieve the URLs represented in tabs collection
-     * @param  {array} tabs Collection of tab objects
-     * @return {array}      Collection of URLs from user's tabs
-     */
-  getUrls: function(tabs) {
-    var urls = [];
-
-    tabs.forEach(function(tab) {
-      urls.push(tab.url);
+      if (layout.advanced) {
+        uiAdvanced.displayAdvancedLayout(tabs);
+      }
+      popup.setNumTabs(tabs);
     });
-
-    return urls;
   },
 
   setTabs: function(tabs) {
@@ -126,72 +106,5 @@ export var popup = popup || {
     spinner.classList.add("hidden");
     var numTabs = document.getElementById("numTabs");
     numTabs.textContent = tabs.length + " tabs";
-  },
-
-  setLayout: function(layout) {
-    popup.layout = layout;
-  },
-
-  //returns a Promise
-  getLayout: function() {
-    var key = {
-      simple: "true",
-      advanced: "false"
-    };
-    var msgID = messageManager.updateStatusMessage(
-      "Loading layout",
-      "dependent",
-      "info"
-    );
-
-    return browserUtils.retrieve(key).then(function(value) {
-      messageManager.removeStatusMessage(msgID);
-      return value;
-    });
-  },
-
-  doActionToAllTabs: function(evt) {
-    evt.preventDefault();
-    popup.processButton(this.id);
-  },
-
-  processButton: function(action) {
-    switch (action) {
-      case "download":
-        browserUtils.downloadUrls(popup.tabs);
-        break;
-
-      case "pocket":
-        pocket.saveTabsToPocket(popup.tabs);
-        break;
-
-      case "bookmark":
-        browserUtils.bookmarkTabs(popup.tabs);
-        break;
-
-      case "close":
-        browserUtils.closeTabs(popup.tabs);
-        break;
-
-      default:
-        break;
-    }
-  },
-
-  watchButtons: function() {
-    var download = document.getElementById("download");
-    download.addEventListener("click", this.doActionToAllTabs);
-
-    var pocket = document.getElementById("pocket");
-    pocket.addEventListener("click", this.doActionToAllTabs);
-
-    var bookmark = document.getElementById("bookmark");
-    bookmark.addEventListener("click", this.doActionToAllTabs);
-
-    var close = document.getElementById("close");
-    close.addEventListener("click", this.doActionToAllTabs);
-
-    var ignore = document.getElementById("ignore");
-    ignore.addEventListener("click", this.doActionToAllTabs);
   }
 };

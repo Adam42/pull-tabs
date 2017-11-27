@@ -9,7 +9,7 @@ import { form } from "./form.js";
  * users to save tabs to their Pocket account
  * @type {[type]}
  */
-export var pocket = pocket || {
+export var PocketAPILayer = PocketAPILayer || {
   pocketKey: {
     access_token: "access_token",
     user_name: "user_name"
@@ -102,11 +102,11 @@ export var pocket = pocket || {
     var action = event.target.href.substring(hash);
 
     if (action === "pocket-logout") {
-      pocket.logOut();
+      PocketAPILayer.logOut();
       return;
     }
 
-    pocket.initLogin();
+    PocketAPILayer.initLogin();
   },
 
   /**
@@ -119,105 +119,7 @@ export var pocket = pocket || {
     var pocketRequest = {};
     pocketRequest.url = "https://getpocket.com/v3/oauth/request";
     pocketRequest.key = config.credentials.consumer_key;
-    pocket.getRequestToken(pocketRequest);
-  },
-
-  /**
-     * Saves a tab's title & URL to getpocket.com
-     * @param  {object} tab - A browser tab object
-     * @return {boolean}     true if successful, false if not
-     */
-  saveTabToPocket: function(tab) {
-    var url = tab.url;
-
-    var pocket_data = {
-      url: url,
-      consumer_key: config.credentials.consumer_key,
-      access_token: localStorage[this.pocketKey.access_token]
-    };
-
-    try {
-      var xhr = new XMLHttpRequest();
-      xhr.overrideMimeType("application/json");
-      xhr.open("POST", "https://getpocket.com/v3/add", true);
-      xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-      xhr.setRequestHeader("X-Accept", "application/json");
-
-      var link = document.createElement("a");
-      var status = document.createElement("span");
-      var message;
-
-      link.title = tab.title.toString();
-      link.href = tab.url;
-      link.textContent = tab.title.toString();
-
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status !== 200) {
-          if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-            form.setLabelStatus(tab, "failed");
-          }
-          message = document.createTextNode("Failed saving to Pocket ");
-          status.appendChild(message);
-          status.appendChild(link);
-          messageManager.updateStatusMessage(status, "long", "danger");
-
-          return false;
-        } else if (xhr.readyState === 4 && xhr.status === 200) {
-          if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
-            form.setLabelStatus(tab, "successful");
-          }
-
-          message = document.createTextNode("Saved this tab to pocket: ");
-          status.appendChild(message);
-          status.appendChild(link);
-          messageManager.updateStatusMessage(status, "medium", "success");
-
-          //if we remove the tab that the popup was invoked on the popup
-          //goes away, ideally we should move to event scripts
-          //so the popup isn't dependent on a tab being open
-          var autoClose;
-          if (autoClose) {
-            browser.tabs
-              .query({ active: true, lastFocusedWindow: true })
-              .then(function(tabs) {
-                if (tab.id !== tabs[0].id) {
-                  browser.tabs.remove(tab.id);
-                }
-              });
-          }
-
-          return true;
-        }
-      };
-
-      xhr.onerror = function(e) {
-        form.setLabelStatus(tab, "failed");
-
-        console.error("saveTabToPocket error: " + xhr.statusText);
-        return;
-      };
-
-      xhr.send(JSON.stringify(pocket_data));
-    } catch (e) {
-      console.log("saveTabToPocket Exception: ");
-      console.log(e);
-      form.setLabelStatus(tab, "failed");
-      return false;
-    }
-  },
-
-  /**
-     * Bulk save tabs to getpocket.com
-     * @param  {array} tabs - Collection of browser tab objects
-     * @return {[type]}      [description]
-     */
-  saveTabsToPocket: function(tabs) {
-    var numURLs = tabs.length;
-    var i;
-
-    for (i = 0; i < numURLs; i++) {
-      this.saveTabToPocket(tabs[i]);
-    }
+    PocketAPILayer.getRequestToken(pocketRequest);
   },
 
   /**
@@ -243,7 +145,8 @@ export var pocket = pocket || {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           pocketRequest.token = xhr.response.substring(5);
-          localStorage[pocket.pocketKey.request_token] = pocketRequest.token;
+          localStorage[PocketAPILayer.pocketKey.request_token] =
+            pocketRequest.token;
 
           pocketRequest.auth =
             "https://getpocket.com/auth/authorize?request_token=" +
@@ -280,9 +183,9 @@ export var pocket = pocket || {
       })
       .then(function(items) {
         if (items.user_name !== "user_name") {
-          pocket.isAuthorized(items);
+          PocketAPILayer.isAuthorized(items);
         } else {
-          pocket.isNotAuthorized();
+          PocketAPILayer.isNotAuthorized();
         }
         return;
       });
@@ -333,7 +236,7 @@ export var pocket = pocket || {
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          pocket.setStoredCredentials(xhr.response);
+          PocketAPILayer.setStoredCredentials(xhr.response);
         } else {
           console.error(xhr.statusText);
         }
