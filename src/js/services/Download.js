@@ -34,7 +34,6 @@ export default class DownloadProvider extends ServiceProvider {
      * @return {[type]}      [description]
      */
   downloadTabs(tabs) {
-
     tabs.forEach(function(tab) {
       return this.downloadTab(tab)
         .then(e => {})
@@ -60,7 +59,7 @@ export default class DownloadProvider extends ServiceProvider {
     //so we'll skip any URLs that start with "about:"
     if (tab.url.substring(0, 6) === "about:") {
       //throw new Error("Cannot download internal Firefox pages");
-      return Promise.reject(new Error('fail'));
+      return Promise.reject(new Error("fail"));
     }
 
     var file = {
@@ -82,7 +81,7 @@ export default class DownloadProvider extends ServiceProvider {
 
       obj[downloadItem] = tab;
 
-     return browser.storage.local.set(obj);
+      return browser.storage.local.set(obj);
     }, this);
   }
 

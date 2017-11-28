@@ -44,7 +44,7 @@ export var messageManager = messageManager || {
     }
 
     status.appendChild(statusMessage);
-
+    duration = "dependent";
     switch (duration) {
       case "short":
         setTimeout(this.removeStatusMessage, 2000, statusMessage.id);
