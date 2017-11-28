@@ -1,7 +1,9 @@
 "use strict";
 import { form } from "./form.js";
 import { browserUtils } from "./browser.js";
-import { pocket } from "./pocket.js";
+import { PocketAPILayer } from "./pocket.js";
+import ServiceProvider from "./services/ServiceProvider.js";
+import ServiceFactory from "./services/ServiceFactory.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -217,23 +219,74 @@ export var uiAdvanced = uiAdvanced || {
   getTabStatus: function() {
     this.tabs = form.getSelectedTabs(this.tabs);
 
+    // DownloadProvider goes through two states
+    // the promise received from browser to start
+    // the download and the result of downloading
     if (this.tabs.downloads.length > 0) {
-      browserUtils.downloadUrls(this.tabs.downloads);
+      let tabs = this.tabs.downloads;
+      let action = "download";
+      let callback = uiAdvanced.handleChangedDownloads;
+
+      //retrieve the ServiceProvider corresponding to this action
+      let service = ServiceFactory.convertActionToProvider(action);
+      service = new service(tabs);
+      service.registerCallback(callback);
+
+      //Loop through each tab and perform the ServiceProvider's action on it
+      tabs.forEach(function(tab) {
+        service.doActionToTab(tab).then(
+          () => {
+            form.setLabelStatus(tab, "list-group-item-info");
+          },
+          () => {
+            uiAdvanced.updateUI(tab, "", "fail");
+          }
+        );
+      });
     }
 
     if (this.tabs.pockets.length > 0) {
-      pocket.saveTabsToPocket(this.tabs.pockets);
+      let action = "pocket";
+
+      this.doServiceAction(this.tabs.pockets, action);
     }
 
     if (this.tabs.closes.length > 0) {
-      browserUtils.closeTabs(this.tabs.closes);
+      let action = "close";
+      this.doServiceAction(this.tabs.closes, action);
     }
 
     if (this.tabs.bookmarks.length > 0) {
-      browserUtils.bookmarkTabs(this.tabs.bookmarks);
+      let action = "bookmark";
+      this.doServiceAction(this.tabs.bookmarks, action);
     }
 
     return;
+  },
+
+  /**
+   * Creates a ServiceProvider and performs its associated
+   * action on the collection of tabs
+   *
+   * @param  {array} tabs   Collection of browser tab objects
+   * @param  {string} action The action to be performed
+   * @return {void}
+   */
+  doServiceAction: function(tabs, action) {
+    //retrieve the ServiceProvider corresponding to this action
+    let service = ServiceFactory.convertActionToProvider(action);
+    service = new service(tabs);
+    //Loop through each tab and perform the ServiceProvider's action on it
+    tabs.forEach(function(tab) {
+      service.doActionToTab(tab).then(
+        () => {
+          uiAdvanced.updateUIWithSuccess(tab, action);
+        },
+        () => {
+          uiAdvanced.updateUIWithFail(tab, action);
+        }
+      );
+    });
   },
 
   setMimeTypesMap: function(id, mimeType) {
@@ -376,5 +429,81 @@ export var uiAdvanced = uiAdvanced || {
   watchSubmit: function() {
     var checked = document.getElementById("list");
     checked.addEventListener("submit", uiAdvanced.doActionToSelectedTabs);
+  },
+
+  /**
+   * Trigger UI updates when downloads reach a final state
+   * @param  {object} delta Changes to the downloadItem object
+   */
+  handleChangedDownloads: function(delta) {
+    let name = "downloadTabItem-" + delta.id;
+
+    browser.storage.local.get(name).then(function(result) {
+      let tab = result[name];
+      if (delta.state && delta.state.current === "complete") {
+        form.removeLabelStatus(tab, "list-group-item-info");
+        uiAdvanced.updateUI(tab, "Completed downloading ", "success");
+
+        browser.storage.local.remove(name);
+      }
+
+      if (delta.state && delta.state.current === "interrupted") {
+        form.removeLabelStatus(tab, "list-group-item-info");
+
+        uiAdvanced.updateUI(tab, "Error: failed downloading ", "fail");
+
+        browser.storage.local.remove(name);
+      }
+    });
+  },
+
+  /**
+   * [updateUI description]
+   * @param  {object} tab     Browser tab object
+   * @param  {string} message - a message describing the action result
+   * @param  {string} status  corresponds to UI context
+   */
+  updateUI: function(tab, message, status) {
+    if (status === "fail") {
+      uiAdvanced.updateAdvancedUI(tab, "failed");
+      return;
+    } else {
+      uiAdvanced.updateAdvancedUI(tab, "successful");
+    }
+  },
+
+  //Update the advanced UI after an action
+  updateAdvancedUI: function(tab, message) {
+    if (tab.labelTabId !== undefined && tab.labelTabId !== null) {
+      form.setLabelStatus(tab, message);
+    }
+  },
+
+  /**
+   * Update the UI with a successful message
+   * the action passed in will be converted into passive
+   * tense by added "ed" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithSuccess: function(tab, action) {
+    let actioned = action + "ed";
+    uiAdvanced.updateUI(tab, "Successfuly " + actioned + " ", "success");
+  },
+
+  /**
+   * Update the UI with a failing message
+   * the action passed in will be converted into current
+   * tense by added "ing" to the end of the string
+   *
+   * @param  {object} tab    A browser tab object
+   * @param  {string} action Represents the ServiceProvider and its action
+   * @return {[type]}        [description]
+   */
+  updateUIWithFail: function(tab, action) {
+    let actioning = action + "ing";
+    uiAdvanced.updateUI(tab, "Failed " + actioning + " ", "fail");
   }
 };
