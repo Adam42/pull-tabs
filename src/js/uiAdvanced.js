@@ -443,12 +443,16 @@ export var uiAdvanced = uiAdvanced || {
       if (delta.state && delta.state.current === "complete") {
         form.removeLabelStatus(tab, "list-group-item-info");
         uiAdvanced.updateUI(tab, "Completed downloading ", "success");
+
+        browser.storage.local.remove(name);
       }
 
       if (delta.state && delta.state.current === "interrupted") {
         form.removeLabelStatus(tab, "list-group-item-info");
 
         uiAdvanced.updateUI(tab, "Error: failed downloading ", "fail");
+
+        browser.storage.local.remove(name);
       }
     });
   },
