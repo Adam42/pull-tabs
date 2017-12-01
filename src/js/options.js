@@ -3,6 +3,7 @@ import { browserUtils } from "./browser.js";
 import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
+import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
 
 /**
@@ -40,7 +41,9 @@ export var options =
     };
 
     //list of available actions to apply to a tab
-    opt.tabActions = ["ignore", "download", "pocket", "bookmark", "close"];
+    let actions = ServiceFactory.getActions();
+    actions.unshift("ignore");
+    opt.tabActions = actions;
 
     opt.tabOptions = ["enabled", "disabled"];
 
