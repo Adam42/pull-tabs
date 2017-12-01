@@ -73,38 +73,33 @@ export var uiSimple = uiSimple || {
 
     let actions = ServiceFactory.getActions();
 
-    actions.forEach(function(action){
+    actions.forEach(function(action) {
+      let label = document.createElement("label");
+      let button = document.createElement("button");
+      let img = document.createElement("img");
 
-        let label = document.createElement('label');
-        let button = document.createElement('button');
-        let img = document.createElement('img');
+      button.id = action.toLowerCase();
+      img.setAttribute("height", "16px");
+      img.setAttribute("width", "16px");
+      img.setAttribute("src", "img/" + action.toLowerCase() + ".svg");
 
-        button.id = action.toLowerCase();
-        img.setAttribute("height", "16px");
-        img.setAttribute("width", "20px");
-        img.setAttribute('src', 'img/' + action.toLowerCase() + '.svg');
-
-        button.appendChild(img);
-        button.insertAdjacentHTML('beforeEnd', action);
-        label.appendChild(button);
-        simpleForm.appendChild(label);
-  });
-
+      button.appendChild(img);
+      button.insertAdjacentHTML("beforeEnd", action);
+      label.appendChild(button);
+      simpleForm.appendChild(label);
+    });
   },
-
 
   /**
    * Watch for clicks on buttons in the default form
    * and pass the event for further processing
    */
   watchButtons: function() {
-
     let buttons = document.getElementById("default");
 
-     buttons.addEventListener('click',function(event){
-          uiSimple.doActionToAllTabs(event);
-     });
-
+    buttons.addEventListener("click", function(event) {
+      uiSimple.doActionToAllTabs(event);
+    });
   },
 
   /**

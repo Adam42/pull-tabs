@@ -165,3 +165,9 @@ form#default {
 #numTabs {
     color: #fff;
 }
+
+#default:after {
+    content: '';
+    display: block;
+    clear: both;
+}
