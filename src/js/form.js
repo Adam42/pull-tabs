@@ -1,5 +1,7 @@
 "use strict";
 import { popup } from "./popup.js";
+import ServiceFactory from "./services/ServiceFactory.js";
+
 /**
  * Common form functionality
  * @constructor
@@ -123,53 +125,45 @@ export var form = form || {
      */
   getSelectedTabs: function(tabs) {
     var inputs = tabs.length;
-    var downloadURLs = [];
-    var pocketURLs = [];
-    var bookmarkURLs = [];
-    var closeURLs = [];
-    var ignoreURLs = [];
-    var results = [];
+
+    let actions = ServiceFactory.getActions();
+
+    let selected = [];
+
+    actions.forEach(function(action) {
+      selected[action] = [];
+    });
+
+    selected.ignore = [];
 
     var i;
 
+    /**
+     * For every tab we get that tab's advanced UI input
+     * element and loop through each radio button
+     * to get the checked action to perform on this tab
+     */
     for (i = 0; i < inputs; i++) {
       var input = document.getElementById("tab-" + i);
+
       if (input.checked) {
         var radios = document.getElementsByName("tab-pref-" + i);
         var x;
         tabs[i].labelTabId = i;
+
         for (x = 0; x < radios.length; x++) {
           if (radios[x].checked) {
-            var action = radios[x].value;
-            switch (action) {
-              case "download":
-                downloadURLs.push(tabs[i]);
-                break;
-              case "pocket":
-                pocketURLs.push(tabs[i]);
-                break;
-              case "bookmark":
-                bookmarkURLs.push(tabs[i]);
-                break;
-              case "close":
-                closeURLs.push(tabs[i]);
-                break;
-              default:
-                ignoreURLs.push(tabs[i]);
-                break;
-            }
+            let action = radios[x].value;
+            selected[action].push(tabs[i]);
+            break;
           }
         }
       } else {
-        ignoreURLs.push(tabs[i]);
+        selected.ignore.push(tabs[i]);
       }
     }
 
-    tabs.downloads = downloadURLs;
-    tabs.pockets = pocketURLs;
-    tabs.closes = closeURLs;
-    tabs.bookmarks = bookmarkURLs;
-    tabs.ignores = ignoreURLs;
+    tabs.selected = selected;
 
     return tabs;
   }

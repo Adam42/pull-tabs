@@ -133,18 +133,16 @@ export var uiAdvanced = uiAdvanced || {
       active = "active";
     }
 
-    var input = form.createCheckbox(tab, fullType, checked);
-    var radioDown = form.createRadioInput(tab, "download", pref);
-    var radioPocket = form.createRadioInput(tab, "pocket", pref);
-    var radioBookmark = form.createRadioInput(tab, "bookmark", pref);
-    var radioClose = form.createRadioInput(tab, "close", pref);
+    var checkbox = form.createCheckbox(tab, fullType, checked);
     var label = form.createLabel(tab, fullType, active);
+    label.appendChild(checkbox);
 
-    label.appendChild(input);
-    label.appendChild(radioDown);
-    label.appendChild(radioPocket);
-    label.appendChild(radioBookmark);
-    label.appendChild(radioClose);
+    let actions = ServiceFactory.getActions();
+
+    actions.forEach(function(action) {
+      let radioButton = form.createRadioInput(tab, action, pref);
+      label.appendChild(radioButton);
+    });
 
     resources.appendChild(label);
   },
@@ -217,49 +215,15 @@ export var uiAdvanced = uiAdvanced || {
    * @return {[type]} [description]
    */
   getTabStatus: function() {
-    this.tabs = form.getSelectedTabs(this.tabs);
+    this.selectedTabs = form.getSelectedTabs(this.tabs);
 
-    // DownloadProvider goes through two states
-    // the promise received from browser to start
-    // the download and the result of downloading
-    if (this.tabs.downloads.length > 0) {
-      let tabs = this.tabs.downloads;
-      let action = "download";
-      let callback = uiAdvanced.handleChangedDownloads;
+    let actions = ServiceFactory.getActions();
 
-      //retrieve the ServiceProvider corresponding to this action
-      let service = ServiceFactory.convertActionToProvider(action);
-      service = new service(tabs);
-      service.registerCallback(callback);
-
-      //Loop through each tab and perform the ServiceProvider's action on it
-      tabs.forEach(function(tab) {
-        service.doActionToTab(tab).then(
-          () => {
-            form.setLabelStatus(tab, "list-group-item-info");
-          },
-          () => {
-            uiAdvanced.updateUI(tab, "", "fail");
-          }
-        );
-      });
-    }
-
-    if (this.tabs.pockets.length > 0) {
-      let action = "pocket";
-
-      this.doServiceAction(this.tabs.pockets, action);
-    }
-
-    if (this.tabs.closes.length > 0) {
-      let action = "close";
-      this.doServiceAction(this.tabs.closes, action);
-    }
-
-    if (this.tabs.bookmarks.length > 0) {
-      let action = "bookmark";
-      this.doServiceAction(this.tabs.bookmarks, action);
-    }
+    actions.forEach(function(action) {
+      if (this.selectedTabs.selected[action].length > 0) {
+        this.doServiceAction(this.selectedTabs.selected[action], action);
+      }
+    }, this);
 
     return;
   },
@@ -276,6 +240,18 @@ export var uiAdvanced = uiAdvanced || {
     //retrieve the ServiceProvider corresponding to this action
     let service = ServiceFactory.convertActionToProvider(action);
     service = new service(tabs);
+
+    // DownloadProvider goes through two states
+    // the promise received from browser to start
+    // the download and the result of downloading
+    if (String(action) === "download") {
+      this.initDownload(service, tabs);
+
+      //early return so we don't trigger the normal process
+      return;
+    }
+
+    //For everything else we should receive a promise as the final result in one step
     //Loop through each tab and perform the ServiceProvider's action on it
     tabs.forEach(function(tab) {
       service.doActionToTab(tab).then(
@@ -284,6 +260,23 @@ export var uiAdvanced = uiAdvanced || {
         },
         () => {
           uiAdvanced.updateUIWithFail(tab, action);
+        }
+      );
+    });
+  },
+
+  initDownload: function(service, tabs) {
+    let callback = uiAdvanced.handleChangedDownloads;
+    service.registerCallback(callback);
+
+    //Loop through each tab and start the download or mark it failed
+    tabs.forEach(function(tab) {
+      service.doActionToTab(tab).then(
+        () => {
+          form.setLabelStatus(tab, "list-group-item-info");
+        },
+        () => {
+          uiAdvanced.updateUI(tab, "", "fail");
         }
       );
     });

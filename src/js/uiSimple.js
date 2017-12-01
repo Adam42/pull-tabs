@@ -78,13 +78,16 @@ export var uiSimple = uiSimple || {
       let button = document.createElement("button");
       let img = document.createElement("img");
 
-      button.id = action.toLowerCase();
+      button.id = action;
       img.setAttribute("height", "16px");
       img.setAttribute("width", "16px");
-      img.setAttribute("src", "img/" + action.toLowerCase() + ".svg");
+      img.setAttribute("src", "img/" + action + ".svg");
 
       button.appendChild(img);
-      button.insertAdjacentHTML("beforeEnd", action);
+      button.insertAdjacentHTML(
+        "beforeEnd",
+        action.charAt(0).toUpperCase() + action.slice(1).toLowerCase()
+      );
       label.appendChild(button);
       simpleForm.appendChild(label);
     });
