@@ -4,6 +4,7 @@ import { popup } from "./popup.js";
 import { messageManager } from "./message.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
+import capitalize from "./helpers.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -84,10 +85,7 @@ export var uiSimple = uiSimple || {
       img.setAttribute("src", "img/" + action + ".svg");
 
       button.appendChild(img);
-      button.insertAdjacentHTML(
-        "beforeEnd",
-        action.charAt(0).toUpperCase() + action.slice(1).toLowerCase()
-      );
+      button.insertAdjacentHTML("beforeEnd", capitalize(action));
       label.appendChild(button);
       simpleForm.appendChild(label);
     });

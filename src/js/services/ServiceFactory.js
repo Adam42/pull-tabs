@@ -1,4 +1,6 @@
 import { Providers } from "./providers.js";
+import capitalize from "../helpers.js";
+
 /**
  * Helps instantiate ServiceProviders
  */
@@ -40,10 +42,7 @@ export default class ServiceFactory {
    * @return {Class}        Returns a class of that service provider
    */
   static convertActionToProvider(action) {
-    let name =
-      action.charAt(0).toUpperCase() +
-      action.slice(1).toLowerCase() +
-      "Provider";
+    let name = capitalize(action) + "Provider";
 
     let providers = ServiceFactory.getProviders();
 

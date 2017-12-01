@@ -3,6 +3,7 @@ import { browserUtils } from "./browser.js";
 import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
+import capitalize from "./helpers.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -58,10 +59,6 @@ export var options =
       opt.tabActions.forEach(function(element) {
         tabSettings[element] = this.tabOptions[0];
       }, opt);
-    }
-
-    function capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     function createForm() {
