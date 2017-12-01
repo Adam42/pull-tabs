@@ -101,7 +101,7 @@ export var uiSimple = uiSimple || {
 
     let buttons = document.getElementById("default");
 
-     buttons.addEventListener('click',function(e){
+     buttons.addEventListener('click',function(event){
           uiSimple.doActionToAllTabs(event);
      });
 
