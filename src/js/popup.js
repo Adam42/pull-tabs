@@ -77,6 +77,7 @@ export var popup = popup || {
      */
   displayLayout: function(layout) {
     if (String(layout.simple) == "true") {
+      uiSimple.displayButtons();
       uiSimple.watchButtons();
     } else {
       var simple = document.getElementById("simple");

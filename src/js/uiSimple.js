@@ -64,21 +64,47 @@ export var uiSimple = uiSimple || {
     }
   },
 
+  /**
+   * Get the provider actions and create a button for each of them
+   * @return {[type]} [description]
+   */
+  displayButtons: function() {
+    let simpleForm = document.getElementById("default");
+
+    let actions = ServiceFactory.getActions();
+
+    actions.forEach(function(action){
+
+        let label = document.createElement('label');
+        let button = document.createElement('button');
+        let img = document.createElement('img');
+
+        button.id = action.toLowerCase();
+        img.setAttribute("height", "16px");
+        img.setAttribute("width", "20px");
+        img.setAttribute('src', 'img/' + action.toLowerCase() + '.svg');
+
+        button.appendChild(img);
+        button.insertAdjacentHTML('beforeEnd', action);
+        label.appendChild(button);
+        simpleForm.appendChild(label);
+  });
+
+  },
+
+
+  /**
+   * Watch for clicks on buttons in the default form
+   * and pass the event for further processing
+   */
   watchButtons: function() {
-    var download = document.getElementById("download");
-    download.addEventListener("click", uiSimple.doActionToAllTabs);
 
-    var pocket = document.getElementById("pocket");
-    pocket.addEventListener("click", uiSimple.doActionToAllTabs);
+    let buttons = document.getElementById("default");
 
-    var bookmark = document.getElementById("bookmark");
-    bookmark.addEventListener("click", uiSimple.doActionToAllTabs);
+     buttons.addEventListener('click',function(e){
+          uiSimple.doActionToAllTabs(event);
+     });
 
-    var close = document.getElementById("close");
-    close.addEventListener("click", uiSimple.doActionToAllTabs);
-
-    var ignore = document.getElementById("ignore");
-    ignore.addEventListener("click", uiSimple.doActionToAllTabs);
   },
 
   /**

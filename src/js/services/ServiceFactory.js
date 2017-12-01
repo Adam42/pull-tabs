@@ -18,6 +18,23 @@ export default class ServiceFactory {
   }
 
   /**
+   * Converts Providers into their actions words
+   * @return {array} Collection of provider actions
+   */
+  static getActions() {
+    let providers = ServiceFactory.getProviders();
+    let actions = [];
+
+    for (var key in providers) {
+      if (providers.hasOwnProperty(key)) {
+        let action = key.replace("Provider", "").toLowerCase();
+        actions.push(action);
+      }
+    }
+    return actions;
+  }
+
+  /**
    * Takes a text action and returns its provider
    * @param  {string} action An action taken on a tab or tabs
    * @return {Class}        Returns a class of that service provider
