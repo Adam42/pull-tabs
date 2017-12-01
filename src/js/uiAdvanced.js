@@ -349,7 +349,7 @@ export var uiAdvanced = uiAdvanced || {
     var i;
 
     var checkBoxes = document
-      .getElementById("list")
+      .getElementById("advanced-ui")
       .querySelectorAll("input[type=checkbox]");
 
     checkBoxes.forEach(function(checkBox) {
@@ -374,7 +374,7 @@ export var uiAdvanced = uiAdvanced || {
     var i;
 
     var checkBoxes = document
-      .getElementById("list")
+      .getElementById("advanced-ui")
       .querySelectorAll("input[type=checkbox]");
 
     checkBoxes.forEach(function(checkBox) {
@@ -427,7 +427,7 @@ export var uiAdvanced = uiAdvanced || {
    * @return {Listener} [description]
    */
   watchSubmit: function() {
-    var checked = document.getElementById("list");
+    var checked = document.getElementById("advanced-ui");
     checked.addEventListener("submit", uiAdvanced.doActionToSelectedTabs);
   },
 

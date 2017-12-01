@@ -19,13 +19,13 @@ button {
     margin: 10px auto;
 }
 
-#default button {
+#simple-ui button {
     width: 120px;
 }
-#default button img {
+#simple-ui button img {
     margin-right: 5px;
 }
-#default label {
+#simple-ui label {
     width: 140px;
     float: left;
 }
@@ -48,7 +48,7 @@ label.preferences {
 label.preferences input {
     margin: 0 10px;
 }
-form#default {
+form#simple-ui {
     margin-left: 40px;
 }
 .list-group-item.successful {
@@ -166,7 +166,7 @@ form#default {
     color: #fff;
 }
 
-#default:after {
+#simple-ui:after {
     content: '';
     display: block;
     clear: both;

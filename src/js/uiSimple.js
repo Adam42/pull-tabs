@@ -69,7 +69,7 @@ export var uiSimple = uiSimple || {
    * @return {[type]} [description]
    */
   displayButtons: function() {
-    let simpleForm = document.getElementById("default");
+    let simpleForm = document.getElementById("simple-ui");
 
     let actions = ServiceFactory.getActions();
 
@@ -95,7 +95,7 @@ export var uiSimple = uiSimple || {
    * and pass the event for further processing
    */
   watchButtons: function() {
-    let buttons = document.getElementById("default");
+    let buttons = document.getElementById("simple-ui");
 
     buttons.addEventListener("click", function(event) {
       uiSimple.doActionToAllTabs(event);
