@@ -1,20 +1,11 @@
-import PocketProvider from "./Pocket.js";
-import BookmarkProvider from "./Bookmark.js";
-import CloseProvider from "./Close.js";
-import DownloadProvider from "./Download.js";
-
+import { Providers } from "./providers.js";
 /**
  * Helps instantiate ServiceProviders
  */
 export default class ServiceFactory {
   constructor() {
     //Set up listing of potential providers
-    this.providers = {
-      PocketProvider,
-      BookmarkProvider,
-      CloseProvider,
-      DownloadProvider
-    };
+    this.providers = Providers;
   }
 
   /**
@@ -23,12 +14,7 @@ export default class ServiceFactory {
    * @return {object} Object where keys are the classes for Service Providers we might need
    */
   static getProviders() {
-    return {
-      PocketProvider,
-      BookmarkProvider,
-      CloseProvider,
-      DownloadProvider
-    };
+    return Providers;
   }
 
   /**
