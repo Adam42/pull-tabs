@@ -1,7 +1,5 @@
-import PocketProvider from "./Pocket.js";
-import BookmarkProvider from "./Bookmark.js";
-import CloseProvider from "./Close.js";
-import DownloadProvider from "./Download.js";
+import { Providers } from "./providers.js";
+import capitalize from "../helpers.js";
 
 /**
  * Helps instantiate ServiceProviders
@@ -9,12 +7,7 @@ import DownloadProvider from "./Download.js";
 export default class ServiceFactory {
   constructor() {
     //Set up listing of potential providers
-    this.providers = {
-      PocketProvider,
-      BookmarkProvider,
-      CloseProvider,
-      DownloadProvider
-    };
+    this.providers = Providers;
   }
 
   /**
@@ -23,12 +16,24 @@ export default class ServiceFactory {
    * @return {object} Object where keys are the classes for Service Providers we might need
    */
   static getProviders() {
-    return {
-      PocketProvider,
-      BookmarkProvider,
-      CloseProvider,
-      DownloadProvider
-    };
+    return Providers;
+  }
+
+  /**
+   * Converts Providers into their actions words
+   * @return {array} Collection of provider actions
+   */
+  static getActions() {
+    let providers = ServiceFactory.getProviders();
+    let actions = [];
+
+    for (var key in providers) {
+      if (providers.hasOwnProperty(key)) {
+        let action = key.replace("Provider", "").toLowerCase();
+        actions.push(action);
+      }
+    }
+    return actions;
   }
 
   /**
@@ -37,10 +42,7 @@ export default class ServiceFactory {
    * @return {Class}        Returns a class of that service provider
    */
   static convertActionToProvider(action) {
-    let name =
-      action.charAt(0).toUpperCase() +
-      action.slice(1).toLowerCase() +
-      "Provider";
+    let name = capitalize(action) + "Provider";
 
     let providers = ServiceFactory.getProviders();
 

@@ -4,6 +4,7 @@ import { popup } from "./popup.js";
 import { messageManager } from "./message.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
+import capitalize from "./helpers.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -64,21 +65,54 @@ export var uiSimple = uiSimple || {
     }
   },
 
+  /**
+   * Get the provider actions and create a button for each of them
+   * @return {[type]} [description]
+   */
+  displayButtons: function() {
+    let simpleForm = document.getElementById("simple-ui");
+
+    let actions = ServiceFactory.getActions();
+
+    actions.forEach(function(action) {
+      let label = document.createElement("label");
+      let button = this.renderActionButton(action);
+
+      label.appendChild(button);
+      simpleForm.appendChild(label);
+    }, this);
+  },
+
+  /**
+   * Create a button for a service action
+   * @param  {string} action An action a ServiceProvider makes available
+   * @return {HTMLButtonElement}        An action Button
+   */
+  renderActionButton: function(action) {
+    let button = document.createElement("button");
+    let img = document.createElement("img");
+
+    button.id = action;
+    img.setAttribute("height", "16px");
+    img.setAttribute("width", "16px");
+    img.setAttribute("src", "img/" + action + ".svg");
+
+    button.appendChild(img);
+    button.insertAdjacentHTML("beforeEnd", capitalize(action));
+
+    return button;
+  },
+
+  /**
+   * Watch for clicks on buttons in the default form
+   * and pass the event for further processing
+   */
   watchButtons: function() {
-    var download = document.getElementById("download");
-    download.addEventListener("click", uiSimple.doActionToAllTabs);
+    let buttons = document.getElementById("simple-ui");
 
-    var pocket = document.getElementById("pocket");
-    pocket.addEventListener("click", uiSimple.doActionToAllTabs);
-
-    var bookmark = document.getElementById("bookmark");
-    bookmark.addEventListener("click", uiSimple.doActionToAllTabs);
-
-    var close = document.getElementById("close");
-    close.addEventListener("click", uiSimple.doActionToAllTabs);
-
-    var ignore = document.getElementById("ignore");
-    ignore.addEventListener("click", uiSimple.doActionToAllTabs);
+    buttons.addEventListener("click", function(event) {
+      uiSimple.doActionToAllTabs(event);
+    });
   },
 
   /**

@@ -2,7 +2,7 @@ body {
     width: 100%;
 }
 
-input[type="checkbox"] {
+#resources input[type="checkbox"] {
     position: absolute;
     top: 25px;
     /*display: none;*/
@@ -19,36 +19,36 @@ button {
     margin: 10px auto;
 }
 
-#default button {
+#simple-ui button {
     width: 120px;
 }
-#default button img {
+#simple-ui button img {
     margin-right: 5px;
 }
-#default label {
+#simple-ui label {
     width: 140px;
     float: left;
 }
 
-label {
+#resources label {
     display: block;
     z-index: 10;
 }
-label.list-group-item {
+#resources label.list-group-item {
     padding-left: 40px;
 }
-label.list-group-item p {
+#resources label.list-group-item p {
     margin-right: 20px;
     margin-left: 50px;
 }
-label.preferences {
+#resources label.preferences {
     display: inline;
     padding: 10px;
 }
-label.preferences input {
+#resources label.preferences input {
     margin: 0 10px;
 }
-form#default {
+form#simple-ui {
     margin-left: 40px;
 }
 .list-group-item.successful {
@@ -96,7 +96,7 @@ form#default {
     float: left;
     padding: 0;
 }
-#options input {
+#options #file-type-destinations input {
     margin: 0 10px 0 0;
 }
 #file-type-destinations {
@@ -164,4 +164,10 @@ form#default {
 
 #numTabs {
     color: #fff;
+}
+
+#simple-ui:after {
+    content: '';
+    display: block;
+    clear: both;
 }

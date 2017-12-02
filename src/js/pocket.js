@@ -16,16 +16,7 @@ export var PocketAPILayer = PocketAPILayer || {
   },
 
   init: function() {
-    if (
-      typeof localStorage[this.pocketKey.user_name] !== "undefined" &&
-      localStorage[this.pocketKey.user_name] !== "user_name"
-    ) {
-      this.isAuthorized();
-      return;
-    }
-
-    this.isNotAuthorized();
-    return;
+    this.checkLocalLoginStatus();
   },
 
   /**
