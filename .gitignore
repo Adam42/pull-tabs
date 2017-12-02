@@ -2,3 +2,5 @@ node_modules
 .jshintrc
 dist/*
 !dist/browser-polyfill.min.js
+!dist/chrome/browser-polyfill.min.js
+build/*
