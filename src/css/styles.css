@@ -2,7 +2,7 @@ body {
     width: 100%;
 }
 
-input[type="checkbox"] {
+#resources input[type="checkbox"] {
     position: absolute;
     top: 25px;
     /*display: none;*/
@@ -30,22 +30,22 @@ button {
     float: left;
 }
 
-label {
+#resources label {
     display: block;
     z-index: 10;
 }
-label.list-group-item {
+#resources label.list-group-item {
     padding-left: 40px;
 }
-label.list-group-item p {
+#resources label.list-group-item p {
     margin-right: 20px;
     margin-left: 50px;
 }
-label.preferences {
+#resources label.preferences {
     display: inline;
     padding: 10px;
 }
-label.preferences input {
+#resources label.preferences input {
     margin: 0 10px;
 }
 form#simple-ui {
@@ -96,7 +96,7 @@ form#simple-ui {
     float: left;
     padding: 0;
 }
-#options input {
+#options #file-type-destinations input {
     margin: 0 10px 0 0;
 }
 #file-type-destinations {
