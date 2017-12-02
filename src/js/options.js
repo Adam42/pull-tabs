@@ -15,8 +15,7 @@ import capitalize from "./helpers.js";
 export var options =
   options ||
   (function() {
-    var tabSettings = {},
-      opt = {};
+    var opt = {};
 
     //list of mimetypes we'll act on
     opt.mimeTypes = [
@@ -35,6 +34,8 @@ export var options =
     opt.fullMimeType = {
       retrieveFullMimeType: false
     };
+
+    opt.services = {};
 
     opt.autoClose = {
       autoCloseTabs: false
@@ -58,16 +59,18 @@ export var options =
       }, opt);
     }
 
-    function setDefaultTabActions() {
-      opt.tabActions.forEach(function(element) {
-        tabSettings[element] = this.tabOptions[0];
+    function setDefaultServices() {
+      opt.tabActions.forEach(function(action) {
+        opt.services[action] = this.tabOptions[0];
       }, opt);
     }
 
-    function createForm() {
+    function createOptionsForm() {
       var optionsForm = document.getElementById("file-type-destinations");
 
       for (var i = 0; i < opt.numOfmimeTypes; i++) {
+        let mimeType = opt.mimeTypes[i];
+
         var panel = document.createElement("div");
         panel.setAttribute("class", "panel panel-default row");
 
@@ -75,32 +78,76 @@ export var options =
         headerDiv.setAttribute("class", "panel-heading col-md-2");
 
         var header = document.createElement("h4");
-        header.textContent = capitalize(opt.mimeTypes[i]);
+        header.textContent = capitalize(mimeType);
 
         headerDiv.appendChild(header);
         panel.appendChild(headerDiv);
 
-        var formDiv = document.createElement("div");
-        formDiv.setAttribute("class", "panel-body col-md-10");
-
-        for (var x = 0; x < opt.numOftabActions; x++) {
-          var label = document.createElement("label");
-
-          var input = document.createElement("input");
-          input.type = "radio";
-          input.id = opt.tabActions[x];
-          input.name = opt.mimeTypes[i];
-          input.value = opt.tabActions[x];
-
-          var span = document.createElement("span");
-          span.textContent = capitalize(opt.tabActions[x]);
-          label.appendChild(input);
-          label.appendChild(span);
-          formDiv.appendChild(label);
-        }
-        panel.appendChild(formDiv);
+        let radioInputs = createRadioInputs(mimeType);
+        panel.appendChild(radioInputs);
 
         optionsForm.appendChild(panel);
+      }
+    }
+
+    function createRadioInputs(name) {
+      let group = document.createElement("div");
+      group.setAttribute("class", "panel-body col-md-10");
+
+      for (var x = 0; x < opt.numOftabActions; x++) {
+        let label = document.createElement("label");
+        let input = document.createElement("input");
+        let action = opt.tabActions[x];
+
+        input.type = "radio";
+        input.id = action;
+        input.name = name;
+        input.value = action;
+
+        let span = document.createElement("span");
+        span.textContent = capitalize(action);
+
+        label.appendChild(input);
+        label.appendChild(span);
+        group.appendChild(label);
+      }
+
+      return group;
+    }
+
+    /**
+     * Create a checkbox element for services
+     * @param  {[type]} name [description]
+     * @return {HTMLButtonElement} [description]
+     */
+    function createCheckBoxInput(name) {
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.id = name;
+      input.title = name;
+      input.value = opt.services[name];
+      input.checked = String(opt.services[name]) === "enabled" ? true : false;
+
+      let label = document.createElement("label");
+      label.classList.add("checkbox");
+      label.setAttribute("for", name);
+
+      label.appendChild(input);
+      label.insertAdjacentHTML("beforeEnd", capitalize(name));
+
+      return label;
+    }
+
+    /**
+     * Create the form for services and their enabled/disabled status.
+     */
+    function createServicesForm() {
+      var servicesForm = document.getElementById("list-of-services");
+      for (var service in opt.services) {
+        if (opt.services.hasOwnProperty(service)) {
+          let checkbox = createCheckBoxInput(service);
+          servicesForm.appendChild(checkbox);
+        }
       }
     }
 
@@ -108,6 +155,9 @@ export var options =
       document
         .getElementById("settings")
         .addEventListener("submit", opt.saveMimeSettings);
+      document
+        .getElementById("services")
+        .addEventListener("click", opt.saveServices);
       document
         .getElementById("pocket-status")
         .addEventListener("click", PocketAPILayer.checkLink);
@@ -127,12 +177,20 @@ export var options =
 
     opt.init = function() {
       bindUIActions();
+
       setDefaultMimeTypes();
-      createForm();
+      setDefaultServices();
+
+      createOptionsForm();
+      createServicesForm();
+
       this.restoreMimeSettings().then(opt.setMimeSettings);
+      this.restoreServices().then(opt.setServices);
+
       UI.getLayout().then(function(layout) {
         options.setLayout(layout);
       });
+
       this.getAutoClose().then(options.setAutoClose);
 
       this.getFullMimeType()
@@ -158,6 +216,11 @@ export var options =
       return browserUtils.retrieve(opt.mimeSettings);
     };
 
+    opt.restoreServices = function() {
+      console.log("running");
+      return browserUtils.retrieve(opt.services);
+    };
+
     /**
     * Loop through available mimeTypes and apply user's
     * stored action preferences for each mime Type.
@@ -176,6 +239,25 @@ export var options =
           } else {
             settings[x].checked = false;
           }
+        }
+      }
+    };
+
+    opt.setServices = function(services) {
+      services = Object.entries(services);
+      let num = services.length;
+
+      for (var i = 0; i < num; i++) {
+        let service = services[i];
+        let name = service[0];
+        let value = service[1];
+        let serviceInput = document.getElementById(name);
+        if (String(value) === "enabled") {
+          serviceInput.checked = true;
+          serviceInput.value = "enabled";
+        } else {
+          serviceInput.checked = false;
+          serviceInput.value = "disabled";
         }
       }
     };
@@ -228,7 +310,6 @@ export var options =
       }
 
       opt.storeOption(opt.autoClose, "Autoclose");
-
     };
 
     /**
@@ -240,6 +321,8 @@ export var options =
       var advancedLayout = document.getElementById("advanced");
 
       if (!simpleLayout.checked && !advancedLayout.checked) {
+        //We don't want to save the layout if both
+        //are disabled so we early return
         return messageManager.updateStatusMessage(
           "Choose at least one layout",
           "short",
@@ -261,7 +344,6 @@ export var options =
         }
 
         opt.storeOption(layout, "Layouts");
-
       });
     };
 
@@ -293,8 +375,6 @@ export var options =
       }
 
       opt.storeOption(opt.fullMimeType, "Full mime type");
-
-
     };
 
     opt.getFullMimeType = function() {
@@ -325,16 +405,15 @@ export var options =
       }
 
       opt.storeOption(opt.mimeSettings, "Mime settings");
-
     };
 
-   /**
+    /**
      * Try to store an option and update the UI with
      * the result of the attempt
      * @param  {object} option      The object to be saved
      * @param  {string} displayText Human formatted name for the option
      */
-    opt.storeOption = function(option, displayText){
+    opt.storeOption = function(option, displayText) {
       browserUtils
         .store(option)
         .then(
@@ -351,6 +430,27 @@ export var options =
             "danger"
           );
         });
+    };
+
+    /**
+     * Save service providers status ( enabled/disabled )
+     * @param  {[type]} evt [description]
+     * @return {[type]}     [description]
+     */
+    opt.saveServices = function(evt) {
+      evt.preventDefault();
+      let target = evt.target;
+      let name = target.htmlFor ? target.htmlFor : target.id;
+      let service = document.getElementById(name);
+      service.checked = !service.checked;
+      service.value = service.checked ? "enabled" : "disabled";
+
+      if (opt.services.hasOwnProperty(name)) {
+        let serviceObj = {};
+        serviceObj[name] = service.checked ? "enabled" : "disabled";
+
+        opt.storeOption(serviceObj, "Services");
+      }
     };
 
     return opt;
