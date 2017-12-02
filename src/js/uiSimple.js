@@ -76,19 +76,31 @@ export var uiSimple = uiSimple || {
 
     actions.forEach(function(action) {
       let label = document.createElement("label");
-      let button = document.createElement("button");
-      let img = document.createElement("img");
+      let button = this.renderActionButton(action);
 
-      button.id = action;
-      img.setAttribute("height", "16px");
-      img.setAttribute("width", "16px");
-      img.setAttribute("src", "img/" + action + ".svg");
-
-      button.appendChild(img);
-      button.insertAdjacentHTML("beforeEnd", capitalize(action));
       label.appendChild(button);
       simpleForm.appendChild(label);
-    });
+    }, this);
+  },
+
+  /**
+   * Create a button for a service action
+   * @param  {string} action An action a ServiceProvider makes available
+   * @return {HTMLButtonElement}        An action Button
+   */
+  renderActionButton: function(action) {
+    let button = document.createElement("button");
+    let img = document.createElement("img");
+
+    button.id = action;
+    img.setAttribute("height", "16px");
+    img.setAttribute("width", "16px");
+    img.setAttribute("src", "img/" + action + ".svg");
+
+    button.appendChild(img);
+    button.insertAdjacentHTML("beforeEnd", capitalize(action));
+
+    return button;
   },
 
   /**
