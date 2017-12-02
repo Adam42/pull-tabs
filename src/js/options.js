@@ -227,23 +227,8 @@ export var options =
         opt.autoClose.autoCloseTabs = false;
       }
 
-      browserUtils
-        .store(opt.autoClose)
-        .then(function(value) {
-          messageManager.updateStatusMessage(
-            "Autoclose saved.",
-            "short",
-            "success"
-          );
-        })
-        .catch(err => {
-          messageManager.updateStatusMessage(
-            "Error:" + err.message,
-            "medium",
-            "danger"
-          );
-          console.log(err.message);
-        });
+      opt.storeOption(opt.autoClose, "Autoclose");
+
     };
 
     /**
@@ -275,23 +260,8 @@ export var options =
           layout.advanced = false;
         }
 
-        browserUtils
-          .store(layout)
-          .then(function(value) {
-            messageManager.updateStatusMessage(
-              "Layouts saved.",
-              "short",
-              "success"
-            );
-          })
-          .catch(err => {
-            messageManager.updateStatusMessage(
-              "Error:" + err.message,
-              "medium",
-              "danger"
-            );
-            console.log(err.message);
-          });
+        opt.storeOption(layout, "Layouts");
+
       });
     };
 
@@ -322,22 +292,9 @@ export var options =
         opt.fullMimeType.retrieveFullMimeType = false;
       }
 
-      browserUtils
-        .store(opt.fullMimeType)
-        .then(
-          messageManager.updateStatusMessage(
-            "Full mime type saved.",
-            "short",
-            "success"
-          )
-        )
-        .catch(err => {
-          messageManager.updateStatusMessage(
-            "Error:" + err.message,
-            "medium",
-            "danger"
-          );
-        });
+      opt.storeOption(opt.fullMimeType, "Full mime type");
+
+
     };
 
     opt.getFullMimeType = function() {
@@ -367,11 +324,22 @@ export var options =
         }
       }
 
+      opt.storeOption(opt.mimeSettings, "Mime settings");
+
+    };
+
+   /**
+     * Try to store an option and update the UI with
+     * the result of the attempt
+     * @param  {object} option      The object to be saved
+     * @param  {string} displayText Human formatted name for the option
+     */
+    opt.storeOption = function(option, displayText){
       browserUtils
-        .store(opt.mimeSettings)
+        .store(option)
         .then(
           messageManager.updateStatusMessage(
-            "Mime settings saved",
+            displayText + " saved.",
             "short",
             "success"
           )
