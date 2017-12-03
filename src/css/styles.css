@@ -8,12 +8,6 @@ body {
     /*display: none;*/
 }
 
-#layout-options input[type="checkbox"] {
-    position: relative;
-    right: 10px;
-    top: 0px;
-}
-
 button {
     width: 100%;
     margin: 10px auto;
@@ -82,33 +76,9 @@ form#simple-ui {
 .container {
     width: 800px;
 }
-#options {
-    margin: 0 auto;
-}
-#options #content {
-    margin-top: 0px;
-}
-#options .container {
-    width: 800px;
-}
-#options .list-group-item {
-    margin: 5px 10px;
-    float: left;
-    padding: 0;
-}
-#options #file-type-destinations input {
-    margin: 0 10px 0 0;
-}
+
 #file-type-destinations {
     padding: 10px 20px;
-}
-#options label {
-    margin: 0;
-    padding: 10px 20px;
-}
-#options h4 {
-    margin: 0;
-    padding: 10px 0;
 }
 
 #main-nav a {
@@ -124,13 +94,6 @@ form#simple-ui {
     padding-top: 20px;
 }
 
-#options #status {
-    position: fixed;
-    top: 0;
-    left: 45%;
-    width: 100%;
-    z-index: 0;
-}
 #popup #status {
     padding: 10px;
 }
@@ -167,7 +130,48 @@ form#simple-ui {
 }
 
 #simple-ui:after {
-    content: '';
+    content: "";
     display: block;
     clear: both;
+}
+
+/**
+ * Options page
+ */
+#options-page input[type="checkbox"] {
+    position: relative;
+    right: 10px;
+    top: 0px;
+}
+#options-page {
+    margin: 0 auto;
+}
+#options-page #content {
+    margin-top: 0px;
+}
+#options-page .container {
+    width: 800px;
+}
+#options-page .list-group-item {
+    margin: 5px 10px;
+    float: left;
+    padding: 0;
+}
+#options-page #file-type-destinations input {
+    margin: 0 10px 0 0;
+}
+#options-page label {
+    margin: 0;
+    padding: 10px 20px;
+}
+#options-page h4 {
+    margin: 0;
+    padding: 10px 0;
+}
+#options-page #status {
+    position: fixed;
+    top: 0;
+    left: 45%;
+    width: 100%;
+    z-index: 0;
 }

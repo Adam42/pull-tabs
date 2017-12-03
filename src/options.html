@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="style.css" />
     </head>
 
-    <body id="options">
+    <body id="options-page">
         <div id="content">
             <div class="container" role="button">
                 <h3 class="page-header">Services</h3>
@@ -27,22 +27,28 @@
             <div class="container" role="button">
                 <h3 class="page-header">Layout</h3>
 
-                 <div id="layout-options">
+                 <div id="preference-layout">
                      <div class="panel-heading col-md-10">
                         <h4>Choose to display simple, advanced or both layouts</h4>
                     </div>
                     <div class="panel-body col-md-4">
-                        <label><input type="checkbox" id="simple" value="simple"><span>Simple</span></label>
-                        <label><input type="checkbox" id="advanced" value="advanced">Advanced</label>
+                        <label for="preference-input-simple">
+                            <input type="checkbox" id="preference-input-simple" value="simple"><span>Simple</span>
+                        </label>
+                        <label for="preference-input-advanced">
+                            <input type="checkbox" id="preference-input-advanced" value="advanced"><span>Advanced</span>
+                        </label>
                     </div>
                 </div>
 
-                <div id="autoclose-options">
+                <div id="preference-autoclose">
                      <div class="panel-heading col-md-10">
                         <h4>Autoclose tabs after successful action?</h4>
                     </div>
                     <div class="panel-body col-md-4">
-                        <label><input disabled type="checkbox" id="autoclose" value="yes"><span>Close tabs after action</span></label>
+                        <label disabled for="preference-input-autoclose">
+                            <input disabled type="checkbox" id="preference-input-autoclose" value="yes"><span>Close tabs after action</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -50,7 +56,7 @@
             <div class="container">
                 <h3 class="page-header">mimeType</h3>
 
-                <div id="mime-type-options">
+                <div id="preference-mime-type">
                     <div class="panel-heading col-md-10">
                         <h4>Choose whether to retrieve mime type via an additional call</h4>
                         <p>Choosing to retrieve the full mime type will allow you to set the advanced options to
@@ -60,14 +66,16 @@
                         <p><strong>tl;dr:</strong>Enabling this option will allow automatic handling of tabs but will take longer to load</p>
                     </div>
                     <div class="panel-body col-md-8">
-                        <label><input disabled type="checkbox" id="full-mime-types" value="yes">Get full mime types?</label>
+                        <label for="preference-input-full-mime-types">
+                            <input disabled type="checkbox" id="preference-input-full-mime-types" value="yes"><span>Get full mime types?</span>
+                        </label>
                     </div>
                 </div>
             </div>
 
             <div class="container">
                 <h3 class="page-header">Services</h3>
-                 <form id="services" action="" method="post">
+                 <form id="preference-services" action="" method="post">
 
                     <div id="list-of-services">
                     </div>
@@ -77,7 +85,7 @@
 
             <div class="container" role="main">
                 <h3 class="page-header">Options</h3>
-                 <form id="settings" action="" method="post">
+                 <form id="preference-settings" action="" method="post">
 
                     <div id="file-type-destinations">
                     </div>

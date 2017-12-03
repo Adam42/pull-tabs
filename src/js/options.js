@@ -153,25 +153,25 @@ export var options =
 
     function bindUIActions() {
       document
-        .getElementById("settings")
+        .getElementById("preference-settings")
         .addEventListener("submit", opt.saveMimeSettings);
       document
-        .getElementById("services")
+        .getElementById("preference-services")
         .addEventListener("click", opt.saveServices);
       document
         .getElementById("pocket-status")
         .addEventListener("click", PocketAPILayer.checkLink);
       document
-        .getElementById("full-mime-types")
+        .getElementById("preference-input-full-mime-types")
         .addEventListener("click", opt.saveFullMimeType);
       document
-        .getElementById("simple")
+        .getElementById("preference-input-simple")
         .addEventListener("click", opt.saveLayout);
       document
-        .getElementById("advanced")
+        .getElementById("preference-input-advanced")
         .addEventListener("click", opt.saveLayout);
       document
-        .getElementById("autoclose")
+        .getElementById("preference-input-autoclose")
         .addEventListener("click", opt.saveAutoClose);
     }
 
@@ -268,8 +268,8 @@ export var options =
      * @param {object} layout - An object representing current layout setting
      */
     opt.setLayout = function(layout) {
-      var simple = document.getElementById("simple");
-      var advanced = document.getElementById("advanced");
+      var simple = document.getElementById("preference-input-simple");
+      var advanced = document.getElementById("preference-input-advanced");
       if (String(layout.simple) == "true") {
         simple.checked = true;
       } else {
@@ -288,7 +288,9 @@ export var options =
      * @param {object} autoclose - Object storing user's autoclose preference
      */
     opt.setAutoClose = function(autoclose) {
-      var autoCloseButton = document.getElementById("autoclose");
+      var autoCloseButton = document.getElementById(
+        "preference-input-autoclose"
+      );
 
       if (autoclose.autoCloseTabs === true) {
         autoCloseButton.checked = true;
@@ -301,7 +303,9 @@ export var options =
      * @return {Promise} Promise represents storage update result
      */
     opt.saveAutoClose = function() {
-      var autoCloseButton = document.getElementById("autoclose");
+      var autoCloseButton = document.getElementById(
+        "preference-input-autoclose"
+      );
 
       if (autoCloseButton.checked === true) {
         opt.autoClose.autoCloseTabs = true;
@@ -317,8 +321,8 @@ export var options =
      * @return {Promise} Promise represents result of storage action
      */
     opt.saveLayout = function() {
-      var simpleLayout = document.getElementById("simple");
-      var advancedLayout = document.getElementById("advanced");
+      var simpleLayout = document.getElementById("preference-input-simple");
+      var advancedLayout = document.getElementById("preference-input-advanced");
 
       if (!simpleLayout.checked && !advancedLayout.checked) {
         //We don't want to save the layout if both
@@ -352,7 +356,9 @@ export var options =
      * @param {object} fullMimeType Object representing user's mimeType preference
      */
     opt.setFullMimeType = function(fullMimeType) {
-      var fullMimeTypeElement = document.getElementById("full-mime-types");
+      var fullMimeTypeElement = document.getElementById(
+        "preference-input-full-mime-types"
+      );
       if (fullMimeType.retrieveFullMimeType === true) {
         fullMimeTypeElement.checked = true;
       } else {
@@ -366,7 +372,9 @@ export var options =
      * @return {Promise} Promise represents result of storage action
      */
     opt.saveFullMimeType = function() {
-      var isChecked = document.getElementById("full-mime-types").checked;
+      var isChecked = document.getElementById(
+        "preference-input-full-mime-types"
+      ).checked;
 
       if (isChecked === true) {
         opt.fullMimeType.retrieveFullMimeType = true;
