@@ -8,8 +8,11 @@
     "/build/about.html": "/build/about.html",
     "/build/options.html": "/build/options.html",
     "/build/pocket.html": "/build/pocket.html",
-    "/build/popup-init.html": "/build/popup-init.html",
     "/build/popup.html": "/build/popup.html",
     "/dist/browser/manifest.json": "/dist/browser/manifest.json",
-    "/dist/chrome/manifest.json": "/dist/chrome/manifest.json"
+    "/dist/chrome/manifest.json": "/dist/chrome/manifest.json",
+    "/dist/chrome/about-page.js": "/dist/chrome/about-page.js",
+    "/dist/chrome/options-page.js": "/dist/chrome/options-page.js",
+    "/dist/chrome/pocket-page.js": "/dist/chrome/pocket-page.js",
+    "/dist/chrome/popup-page.js": "/dist/chrome/popup-page.js"
 }
