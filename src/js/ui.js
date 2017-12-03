@@ -1,5 +1,5 @@
 import { messageManager } from "./message.js";
-import { browserUtils } from "./browser.js";
+import storage from "./storage.js";
 
 export default class UI {
   constructor(state) {
@@ -17,7 +17,7 @@ export default class UI {
       advanced: "false"
     };
 
-    return browserUtils.retrieve(key);
+    return storage.retrieve(key);
   }
 
   displayLayout() {}

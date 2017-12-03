@@ -1,6 +1,6 @@
 "use strict";
 import { form } from "./form.js";
-import { browserUtils } from "./browser.js";
+import storage from "./storage.js";
 import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
@@ -16,7 +16,7 @@ export var uiAdvanced = uiAdvanced || {
   mimeTypesMap: {},
 
   getFullMimeType: function() {
-    return browserUtils.retrieve(options.fullMimeType);
+    return storage.retrieve(options.fullMimeType);
   },
 
   addMimeTypeToTabs: function() {
@@ -299,7 +299,7 @@ export var uiAdvanced = uiAdvanced || {
       unknown: "ignore"
     };
 
-    return browserUtils.retrieve(key);
+    return storage.retrieve(key);
   },
 
   setOptions: function(items) {

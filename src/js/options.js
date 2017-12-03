@@ -1,10 +1,10 @@
 "use strict";
-import { browserUtils } from "./browser.js";
 import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
+import storage from "./storage.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -213,12 +213,11 @@ export var options =
     };
 
     opt.restoreMimeSettings = function() {
-      return browserUtils.retrieve(opt.mimeSettings);
+      return storage.retrieve(opt.mimeSettings);
     };
 
     opt.restoreServices = function() {
-      console.log("running");
-      return browserUtils.retrieve(opt.services);
+      return storage.retrieve(opt.services);
     };
 
     /**
@@ -386,11 +385,11 @@ export var options =
     };
 
     opt.getFullMimeType = function() {
-      return browserUtils.retrieve(opt.fullMimeType);
+      return storage.retrieve(opt.fullMimeType);
     };
 
     opt.getAutoClose = function() {
-      return browserUtils.retrieve(opt.autoClose);
+      return storage.retrieve(opt.autoClose);
     };
 
     /*
@@ -422,7 +421,7 @@ export var options =
      * @param  {string} displayText Human formatted name for the option
      */
     opt.storeOption = function(option, displayText) {
-      browserUtils
+      storage
         .store(option)
         .then(
           messageManager.updateStatusMessage(
