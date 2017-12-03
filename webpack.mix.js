@@ -38,7 +38,7 @@ mix
   //aka Mozilla Firefox
   .copyDirectory("build", "dist/browser/")
   .combine(
-    ["src/manifest.json", "src/manifest-browser.json"],
+    ["src/manifest-base.json", "src/manifest-browser.json"],
     "dist/browser/manifest.json"
   )
   //Create a build for browsers that need a browser
@@ -46,7 +46,7 @@ mix
   //to chrome callbacks
   .copyDirectory("build", "dist/chrome/")
   .combine(
-    ["src/manifest.json", "src/manifest-chrome.json"],
+    ["src/manifest-base.json", "src/manifest-chrome.json"],
     "dist/chrome/manifest.json"
   );
 
