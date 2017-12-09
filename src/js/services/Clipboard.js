@@ -23,7 +23,7 @@ export default class ClipboardProvider extends ServiceProvider {
   copyAllTabsToClipboard() {
     let clipboardText = this.tabs.reduce(
       (text, currentTab) =>
-        text + String(currentTab.title) + ": " + String(currentTab.url)
+        text + String(currentTab.title) + ": " + String(currentTab.url) + "\n"
     );
 
     let tempElem = document.createElement("textarea");
@@ -57,11 +57,10 @@ export default class ClipboardProvider extends ServiceProvider {
     var copyText = document.getElementById("temp-clipboard-text");
     copyText.select();
 
-    try{
+    try {
       document.execCommand("Copy");
-    }
-    catch(err){
-      return Promise.reject(new Error('fail'));
+    } catch (err) {
+      return Promise.reject(new Error("fail"));
     }
 
     document.body.removeChild(tempElem);
