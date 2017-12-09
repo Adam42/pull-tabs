@@ -1,5 +1,6 @@
 import { messageManager } from "./message.js";
-import { browserUtils } from "./browser.js";
+import storage from "./storage.js";
+import { keys } from "./keys.js";
 
 export default class UI {
   constructor(state) {
@@ -12,12 +13,7 @@ export default class UI {
 
   //returns a Promise
   static getLayout() {
-    var key = {
-      simple: "true",
-      advanced: "false"
-    };
-
-    return browserUtils.retrieve(key);
+    return storage.retrieve(keys.preferences.layout);
   }
 
   displayLayout() {}

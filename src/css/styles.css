@@ -8,12 +8,6 @@ body {
     /*display: none;*/
 }
 
-#layout-options input[type="checkbox"] {
-    position: relative;
-    right: 10px;
-    top: 0px;
-}
-
 button {
     width: 100%;
     margin: 10px auto;
@@ -69,9 +63,6 @@ form#simple-ui {
 .panel-body {
     padding: 0;
 }
-.panel-body label {
-    float: left;
-}
 
 #content {
     margin-top: 40px;
@@ -82,33 +73,9 @@ form#simple-ui {
 .container {
     width: 800px;
 }
-#options {
-    margin: 0 auto;
-}
-#options #content {
-    margin-top: 0px;
-}
-#options .container {
-    width: 800px;
-}
-#options .list-group-item {
-    margin: 5px 10px;
-    float: left;
-    padding: 0;
-}
-#options #file-type-destinations input {
-    margin: 0 10px 0 0;
-}
+
 #file-type-destinations {
     padding: 10px 20px;
-}
-#options label {
-    margin: 0;
-    padding: 10px 20px;
-}
-#options h4 {
-    margin: 0;
-    padding: 10px 0;
 }
 
 #main-nav a {
@@ -124,13 +91,6 @@ form#simple-ui {
     padding-top: 20px;
 }
 
-#options #status {
-    position: fixed;
-    top: 0;
-    left: 45%;
-    width: 100%;
-    z-index: 0;
-}
 #popup #status {
     padding: 10px;
 }
@@ -167,7 +127,60 @@ form#simple-ui {
 }
 
 #simple-ui:after {
-    content: '';
+    content: "";
     display: block;
     clear: both;
 }
+
+/**
+ * Options page
+ */
+
+#options-page {
+    margin: 0 auto;
+}
+#options-page #content {
+    margin-top: 0px;
+}
+#options-page .container {
+    width: 800px;
+}
+#options-page .list-group-item {
+    margin: 5px 10px;
+    float: left;
+    padding: 0;
+}
+#options-page #file-type-destinations input {
+    margin: 0 10px 0 0;
+}
+
+#options-page #file-type-destinations .panel-body label {
+    float: left;
+    padding: 10px 20px;
+}
+
+#options-page input[type="checkbox"] {
+ margin: 0 10px 0 10px;
+}
+#options-page h4 {
+    margin: 0;
+    padding: 10px 0;
+}
+#options-page #status {
+    position: fixed;
+    top: 0;
+    left: 45%;
+    width: 100%;
+    z-index: 0;
+}
+
+#overlay {
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 999;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}​

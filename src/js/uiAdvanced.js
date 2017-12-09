@@ -1,6 +1,7 @@
 "use strict";
 import { form } from "./form.js";
-import { browserUtils } from "./browser.js";
+import { keys } from "./keys.js";
+import storage from "./storage.js";
 import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
@@ -16,7 +17,7 @@ export var uiAdvanced = uiAdvanced || {
   mimeTypesMap: {},
 
   getFullMimeType: function() {
-    return browserUtils.retrieve(options.fullMimeType);
+    return storage.retrieve(keys.preferences.fullMimeType);
   },
 
   addMimeTypeToTabs: function() {
@@ -137,14 +138,20 @@ export var uiAdvanced = uiAdvanced || {
     var label = form.createLabel(tab, fullType, active);
     label.appendChild(checkbox);
 
+    let getServices = browser.storage.local.get(keys.preferences.services);
+
     let actions = ServiceFactory.getActions();
 
-    actions.forEach(function(action) {
-      let radioButton = form.createRadioInput(tab, action, pref);
-      label.appendChild(radioButton);
+    getServices.then(services => {
+      actions.forEach(function(action) {
+        let status = services["service_" + action];
+        if (String(status) === "enabled") {
+          let radioButton = form.createRadioInput(tab, action, pref);
+          label.appendChild(radioButton);
+          resources.appendChild(label);
+        }
+      });
     });
-
-    resources.appendChild(label);
   },
 
   /**
@@ -299,7 +306,7 @@ export var uiAdvanced = uiAdvanced || {
       unknown: "ignore"
     };
 
-    return browserUtils.retrieve(key);
+    return storage.retrieve(key);
   },
 
   setOptions: function(items) {

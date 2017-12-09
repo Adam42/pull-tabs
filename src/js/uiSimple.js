@@ -5,6 +5,7 @@ import { messageManager } from "./message.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
+import { keys } from "./keys.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -74,13 +75,21 @@ export var uiSimple = uiSimple || {
 
     let actions = ServiceFactory.getActions();
 
-    actions.forEach(function(action) {
-      let label = document.createElement("label");
-      let button = this.renderActionButton(action);
+    let getServices = browser.storage.local.get(keys.preferences.services);
 
-      label.appendChild(button);
-      simpleForm.appendChild(label);
-    }, this);
+    getServices.then(services => {
+      actions.forEach(function(action) {
+        let status = services["service_" + action];
+
+        if (String(status) === "enabled") {
+          let label = document.createElement("label");
+          let button = this.renderActionButton(action);
+
+          label.appendChild(button);
+          simpleForm.appendChild(label);
+        }
+      }, this);
+    });
   },
 
   /**

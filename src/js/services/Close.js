@@ -37,6 +37,14 @@ export default class CloseProvider extends ServiceProvider {
      * @return {Promise} - A Promise resolving to result of closing tabs
      */
   closeTab(tab) {
+    //Don't close the tab that the popup was invoked on
+    //as it'll halt the extension
+    //ideally we should move to event scripts
+    //so the popup isn't dependent on a tab being open
+    if (tab.active === true) {
+      return Promise.reject(new Error("Refusing to autoclose the active tab!"));
+    }
+
     return browser.tabs.remove(tab.id);
   }
 }

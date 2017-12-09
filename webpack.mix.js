@@ -12,32 +12,73 @@ let mix = require("laravel-mix");
  */
 
 mix
-  //For popup.html
-  .js(["src/js/popup-init.js", "src/js/config.js"], "dist/popup-page.js")
-  .js(["src/js/options-init.js"], "dist/options-page.js")
-  .js(["src/js/popup-init.js", "src/js/auth.js"], "dist/pocket-page.js")
-  .js(["src/js/config.js", "src/js/about.js"], "dist/about-page.js")
+  //Only show notification if the build fails
+  .disableSuccessNotifications()
+  //Create stylesheet
   .combine(
     ["node_modules/bootswatch/yeti/bootstrap.css", "src/css/styles.css"],
-    "dist/style.css"
+    "build/style.css"
   )
-  //Copy Images
-  .copy("node_modules/simple-icons/icons/pocket.svg", "dist/img/pocket.svg")
-  .copyDirectory("src/img/", "dist/img/")
+  //Copy Pocket Image to build
+  .copy("node_modules/simple-icons/icons/pocket.svg", "build/img/pocket.svg")
+  //Copy img dir to browser and chrome dist
+  .copyDirectory("src/img/", "dist/browser/img/")
+  .copyDirectory("src/img/", "dist/chrome/img/")
   //Copy HTML files
-  .copy("src/about.html", "dist/about.html")
-  .copy("src/manifest.json", "dist/manifest.json")
-  .copy("src/options.html", "dist/options.html")
-  .copy("src/pocket.html", "dist/pocket.html")
-  .copy("src/popup-init.html", "dist/popup-init.html")
-  .copy("src/popup.html", "dist/popup.html");
-//errors copying this file into the dist directory
-//for now will place the polyfill into dist manually
-//  .copy(
-//    "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
-//    "dist/browser-polyfill.min.js"
-//  );
-
+  .copy("src/about.html", "build/about.html")
+  .copy("src/options.html", "build/options.html")
+  .copy("src/pocket.html", "build/pocket.html")
+  .copy("src/popup.html", "build/popup.html")
+  //Create JS file for each page
+  .js(["src/js/config.js", "src/js/about.js"], "build/about-page.js")
+  .js(["src/js/options-init.js"], "build/options-page.js")
+  .js(["src/js/popup-init.js", "src/js/auth.js"], "build/pocket-page.js")
+  .js(["src/js/popup-init.js", "src/js/config.js"], "build/popup-page.js")
+  //Create a dist for browser compatible web-extensions
+  //aka Mozilla Firefox
+  .copyDirectory("build", "dist/browser/")
+  .combine(
+    ["src/manifest-base.json", "src/manifest-browser.json"],
+    "dist/browser/manifest.json"
+  )
+  //Create a build for browsers that need a browser
+  //polyfill to
+  .copyDirectory("build", "dist/chrome/")
+  .combine(
+    ["src/manifest-base.json", "src/manifest-chrome.json"],
+    "dist/chrome/manifest.json"
+  )
+  //For the page JS files in the chrome dist
+  //append the browser polyfill to translate
+  //browser promises to chrome callbacks
+  .combine(
+    [
+      "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+      "build/about-page.js"
+    ],
+    "dist/chrome/about-page.js"
+  )
+  .combine(
+    [
+      "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+      "build/options-page.js"
+    ],
+    "dist/chrome/options-page.js"
+  )
+  .combine(
+    [
+      "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+      "build/pocket-page.js"
+    ],
+    "dist/chrome/pocket-page.js"
+  )
+  .combine(
+    [
+      "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+      "build/popup-page.js"
+    ],
+    "dist/chrome/popup-page.js"
+  );
 // Full API
 // mix.js(src, output);
 // mix.react(src, output); <-- Identical to mix.js(), but registers React Babel compilation.
