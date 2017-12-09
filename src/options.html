@@ -8,6 +8,7 @@
     </head>
 
     <body id="options-page">
+        <div id="overlay"></div>
         <div id="content">
             <div class="container" role="button">
                 <h3 class="page-header">Services</h3>
@@ -32,11 +33,10 @@
                         <h4>Choose to display simple, advanced or both layouts</h4>
                     </div>
                     <div class="panel-body col-md-4">
-                        <label for="preference-input-simple">
-                            <input type="checkbox" id="preference-input-simple" value="simple"><span>Simple</span>
-                        </label>
-                        <label for="preference-input-advanced">
-                            <input type="checkbox" id="preference-input-advanced" value="advanced"><span>Advanced</span>
+                            <input type="checkbox" id="preference-input-simple" value="simple">
+                            <label for="preference-input-simple"><span>Simple</span></label>
+                            <input type="checkbox" id="preference-input-advanced" value="advanced">                        <label for="preference-input-advanced">
+<span>Advanced</span>
                         </label>
                     </div>
                 </div>
@@ -46,8 +46,10 @@
                         <h4>Autoclose tabs after successful action?</h4>
                     </div>
                     <div class="panel-body col-md-4">
-                        <label disabled for="preference-input-autoclose">
-                            <input disabled type="checkbox" id="preference-input-autoclose" value="yes"><span>Close tabs after action</span>
+                            <input type="checkbox" id="preference-input-autoclose" value="yes">
+                        <label for="preference-input-autoclose">
+
+                            <span>Close tabs after action</span>
                         </label>
                     </div>
                 </div>

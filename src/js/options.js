@@ -2,9 +2,9 @@
 import { PocketAPILayer } from "./pocket.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
-import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
 import storage from "./storage.js";
+import { keys } from "./keys.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -35,33 +35,14 @@ export var options =
       retrieveFullMimeType: false
     };
 
-    opt.services = {};
-
-    opt.autoClose = {
-      autoCloseTabs: false
-    };
-
-    //list of available actions to apply to a tab
-    let actions = ServiceFactory.getActions();
-    actions.unshift("ignore");
-    opt.tabActions = actions;
-
-    opt.tabOptions = ["enabled", "disabled"];
-
-    opt.numOftabActions = opt.tabActions.length;
+    opt.numOftabActions = keys.preferences.tabActions.length;
 
     //create a default preferences object to pass to restoreOptions
     //in case there is no existing preferences stored or
     //if stored preferences can't be retrieved will use this default
     function setDefaultMimeTypes() {
       opt.mimeTypes.forEach(function(element) {
-        opt.mimeSettings[element] = this.tabActions[0];
-      }, opt);
-    }
-
-    function setDefaultServices() {
-      opt.tabActions.forEach(function(action) {
-        opt.services[action] = this.tabOptions[0];
+        opt.mimeSettings[element] = keys.preferences.tabActions[0];
       }, opt);
     }
 
@@ -97,7 +78,7 @@ export var options =
       for (var x = 0; x < opt.numOftabActions; x++) {
         let label = document.createElement("label");
         let input = document.createElement("input");
-        let action = opt.tabActions[x];
+        let action = keys.preferences.tabActions[x];
 
         input.type = "radio";
         input.id = action;
@@ -120,22 +101,32 @@ export var options =
      * @param  {[type]} name [description]
      * @return {HTMLButtonElement} [description]
      */
-    function createCheckBoxInput(name) {
-      var input = document.createElement("input");
+    function addCheckBoxInput(name, form) {
+      let heading = document.createElement("div");
+      heading.setAttribute("class", "panel-heading col-md-10");
+      heading.textContent = capitalize(name);
+
+      let body = document.createElement("div");
+      body.setAttribute("class", "panel-body col-md-8");
+
+      let input = document.createElement("input");
       input.type = "checkbox";
       input.id = name;
       input.title = name;
-      input.value = opt.services[name];
-      input.checked = String(opt.services[name]) === "enabled" ? true : false;
+      input.value = keys.preferences.services[name];
+      input.checked =
+        String(keys.preferences.services[name]) === "enabled" ? true : false;
 
       let label = document.createElement("label");
-      label.classList.add("checkbox");
       label.setAttribute("for", name);
-
-      label.appendChild(input);
       label.insertAdjacentHTML("beforeEnd", capitalize(name));
 
-      return label;
+      body.appendChild(input);
+      body.appendChild(label);
+
+      form.appendChild(heading);
+
+      form.appendChild(body);
     }
 
     /**
@@ -143,10 +134,9 @@ export var options =
      */
     function createServicesForm() {
       var servicesForm = document.getElementById("list-of-services");
-      for (var service in opt.services) {
-        if (opt.services.hasOwnProperty(service)) {
-          let checkbox = createCheckBoxInput(service);
-          servicesForm.appendChild(checkbox);
+      for (var service in keys.preferences.services) {
+        if (keys.preferences.services.hasOwnProperty(service)) {
+          addCheckBoxInput(service, servicesForm);
         }
       }
     }
@@ -179,7 +169,6 @@ export var options =
       bindUIActions();
 
       setDefaultMimeTypes();
-      setDefaultServices();
 
       createOptionsForm();
       createServicesForm();
@@ -217,7 +206,7 @@ export var options =
     };
 
     opt.restoreServices = function() {
-      return storage.retrieve(opt.services);
+      return storage.retrieve(keys.preferences.services);
     };
 
     /**
@@ -267,18 +256,21 @@ export var options =
      * @param {object} layout - An object representing current layout setting
      */
     opt.setLayout = function(layout) {
-      var simple = document.getElementById("preference-input-simple");
-      var advanced = document.getElementById("preference-input-advanced");
+      var simpleCheckbox = document.getElementById("preference-input-simple");
+      var advancedCheckbox = document.getElementById(
+        "preference-input-advanced"
+      );
+
       if (String(layout.simple) == "true") {
-        simple.checked = true;
+        simpleCheckbox.checked = true;
       } else {
-        simple.checked = false;
+        simpleCheckbox.checked = false;
       }
 
       if (String(layout.advanced) == "true") {
-        advanced.checked = true;
+        advancedCheckbox.checked = true;
       } else {
-        advanced.checked = false;
+        advancedCheckbox.checked = false;
       }
     };
 
@@ -307,12 +299,12 @@ export var options =
       );
 
       if (autoCloseButton.checked === true) {
-        opt.autoClose.autoCloseTabs = true;
+        keys.preferences.autoClose.autoCloseTabs = true;
       } else {
-        opt.autoClose.autoCloseTabs = false;
+        keys.preferences.autoClose.autoCloseTabs = false;
       }
 
-      opt.storeOption(opt.autoClose, "Autoclose");
+      opt.storeOption(keys.preferences.autoClose, "Autoclose");
     };
 
     /**
@@ -320,10 +312,12 @@ export var options =
      * @return {Promise} Promise represents result of storage action
      */
     opt.saveLayout = function() {
-      var simpleLayout = document.getElementById("preference-input-simple");
-      var advancedLayout = document.getElementById("preference-input-advanced");
+      let simpleCheckbox = document.getElementById("preference-input-simple");
+      let advancedCheckbox = document.getElementById(
+        "preference-input-advanced"
+      );
 
-      if (!simpleLayout.checked && !advancedLayout.checked) {
+      if (!simpleCheckbox.checked && !advancedCheckbox.checked) {
         //We don't want to save the layout if both
         //are disabled so we early return
         return messageManager.updateStatusMessage(
@@ -334,18 +328,17 @@ export var options =
       }
 
       UI.getLayout().then(function(layout) {
-        if (simpleLayout.checked === true) {
+        if (simpleCheckbox.checked === true) {
           layout.simple = true;
         } else {
           layout.simple = false;
         }
 
-        if (advancedLayout.checked === true) {
+        if (advancedCheckbox.checked === true) {
           layout.advanced = true;
         } else {
           layout.advanced = false;
         }
-
         opt.storeOption(layout, "Layouts");
       });
     };
@@ -389,7 +382,7 @@ export var options =
     };
 
     opt.getAutoClose = function() {
-      return storage.retrieve(opt.autoClose);
+      return storage.retrieve(keys.preferences.autoClose);
     };
 
     /*
@@ -406,12 +399,29 @@ export var options =
 
         for (var x = 0; x < opt.numOftabActions; x++) {
           if (settings[x].checked) {
-            opt.mimeSettings[opt.mimeTypes[i]] = opt.tabActions[x];
+            opt.mimeSettings[opt.mimeTypes[i]] = keys.preferences.tabActions[x];
           }
         }
       }
 
       opt.storeOption(opt.mimeSettings, "Mime settings");
+    };
+
+    /**
+     * Display an overlay on the whole screen to prevent user input
+     *
+     */
+    opt.enableOverlay = function() {
+      let overlay = document.getElementById("overlay");
+      overlay.style.display = "block";
+    };
+
+    /**
+     * Remove the overlay thus allowing user input again
+     */
+    opt.disableOverlay = function() {
+      let overlay = document.getElementById("overlay");
+      overlay.style.display = "none";
     };
 
     /**
@@ -421,21 +431,25 @@ export var options =
      * @param  {string} displayText Human formatted name for the option
      */
     opt.storeOption = function(option, displayText) {
+      opt.enableOverlay();
+
       storage
         .store(option)
-        .then(
+        .then(() => {
           messageManager.updateStatusMessage(
             displayText + " saved.",
             "short",
             "success"
-          )
-        )
+          );
+          opt.disableOverlay();
+        })
         .catch(err => {
           messageManager.updateStatusMessage(
             "Error:" + err.message,
             "medium",
             "danger"
           );
+          opt.disableOverlay();
         });
     };
 
@@ -445,17 +459,14 @@ export var options =
      * @return {[type]}     [description]
      */
     opt.saveServices = function(evt) {
-      evt.preventDefault();
       let target = evt.target;
       let name = target.htmlFor ? target.htmlFor : target.id;
       let service = document.getElementById(name);
-      service.checked = !service.checked;
       service.value = service.checked ? "enabled" : "disabled";
 
-      if (opt.services.hasOwnProperty(name)) {
+      if (keys.preferences.services.hasOwnProperty(name)) {
         let serviceObj = {};
         serviceObj[name] = service.checked ? "enabled" : "disabled";
-
         opt.storeOption(serviceObj, "Services");
       }
     };
