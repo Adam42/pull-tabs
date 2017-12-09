@@ -107,7 +107,7 @@ export var uiSimple = uiSimple || {
     img.setAttribute("src", "img/" + action + ".svg");
 
     button.appendChild(img);
-    button.insertAdjacentHTML("beforeEnd", capitalize(action));
+    button.insertAdjacentText("beforeEnd", capitalize(action).toString());
 
     return button;
   },

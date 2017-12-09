@@ -115,9 +115,9 @@ export var options =
 
       let label = document.createElement("label");
       label.setAttribute("for", name);
-      label.insertAdjacentHTML(
+      label.insertAdjacentText(
         "beforeEnd",
-        capitalize(name.substring("service_".length))
+        capitalize(name.substring("service_".length)).toString()
       );
 
       body.appendChild(input);

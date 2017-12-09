@@ -1,5 +1,4 @@
 "use strict";
-var sanitize = require("sanitize-filename");
 import { messageManager } from "./message.js";
 import { config } from "./config.js";
 import { form } from "./form.js";
