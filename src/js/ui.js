@@ -1,5 +1,6 @@
 import { messageManager } from "./message.js";
-import Preferences from "./preferences.js";
+import storage from "./storage.js";
+import { keys } from "./keys.js";
 
 export default class UI {
   constructor(state) {
@@ -12,7 +13,7 @@ export default class UI {
 
   //returns a Promise
   static getLayout() {
-    return Preferences.get("layout");
+    return storage.retrieve(keys.preferences.layout);
   }
 
   displayLayout() {}

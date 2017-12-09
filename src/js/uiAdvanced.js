@@ -1,5 +1,6 @@
 "use strict";
 import { form } from "./form.js";
+import { keys } from "./keys.js";
 import storage from "./storage.js";
 import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
@@ -16,7 +17,7 @@ export var uiAdvanced = uiAdvanced || {
   mimeTypesMap: {},
 
   getFullMimeType: function() {
-    return storage.retrieve(options.fullMimeType);
+    return storage.retrieve(keys.preferences.fullMimeType);
   },
 
   addMimeTypeToTabs: function() {
