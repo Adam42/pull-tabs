@@ -46,28 +46,11 @@ export default class PocketProvider extends ServiceProvider {
           reject(Error("Could not save to Pocket"));
         } else if (xhr.readyState === 4 && xhr.status === 200) {
           resolve(xhr.response);
-
-          //if we remove the tab that the popup was invoked on the popup
-          //goes away, ideally we should move to event scripts
-          //so the popup isn't dependent on a tab being open
-          //          var autoClose;
-          //          if (autoClose) {
-          //            browser.tabs
-          //              .query({ active: true, lastFocusedWindow: true })
-          //              .then(function(tabs) {
-          //                if (tab.id !== tabs[0].id) {
-          //                  browser.tabs.remove(tab.id);
-          //                }
-          //              });
-          //          }//
-
-          //          return true;
         }
       };
 
       xhr.onerror = function(e) {
         reject(Error("Could not save to Pocket" + xhr.statusText));
-        //        form.setLabelStatus(tab, "failed");
       };
 
       xhr.send(JSON.stringify(pocket_data));

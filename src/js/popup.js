@@ -1,6 +1,5 @@
 "use strict";
 import { browserUtils } from "./browser.js";
-import { options } from "./options.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
 import { uiAdvanced } from "./uiAdvanced.js";
@@ -22,10 +21,9 @@ export var popup = popup || {
    */
   init: function() {
     //Force user to go to options page on initial load
-    if (localStorage.initialSetup !== "no") {
-      localStorage.initialSetup = "yes";
+    if (localStorage.getItem("initialSetup") === null) {
       popup.doInitialSetup();
-      return;
+      localStorage.initialSetup = "done";
     }
 
     var msgID = messageManager.updateStatusMessage(
@@ -65,7 +63,6 @@ export var popup = popup || {
 
       setupMessage.addEventListener("click", function(e) {
         e.preventDefault();
-        localStorage.initialSetup = "no";
         browser.runtime.openOptionsPage();
       });
     }

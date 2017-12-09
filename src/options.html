@@ -35,11 +35,14 @@
                     <div class="panel-body col-md-4">
                             <input type="checkbox" id="preference-input-simple" value="simple">
                             <label for="preference-input-simple"><span>Simple</span></label>
-                            <input type="checkbox" id="preference-input-advanced" value="advanced">                        <label for="preference-input-advanced">
-<span>Advanced</span>
-                        </label>
+                            <input type="checkbox" id="preference-input-advanced" value="advanced">
+                            <label for="preference-input-advanced"><span>Advanced</span></label>
                     </div>
                 </div>
+
+            </div>
+            <div class="container" role="button">
+                <h3 class="page-header">Autoclose</h3>
 
                 <div id="preference-autoclose">
                      <div class="panel-heading col-md-10">
@@ -56,7 +59,19 @@
             </div>
 
             <div class="container">
-                <h3 class="page-header">mimeType</h3>
+                <h3 class="page-header">Services</h3>
+                 <form id="preference-services" action="" method="post">
+
+                    <div id="list-of-services">
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="container">
+
+           <h2 class="page-header">Advanced view options</h2>
 
                 <div id="preference-mime-type">
                     <div class="panel-heading col-md-10">
@@ -75,18 +90,8 @@
                 </div>
             </div>
 
-            <div class="container">
-                <h3 class="page-header">Services</h3>
-                 <form id="preference-services" action="" method="post">
-
-                    <div id="list-of-services">
-                    </div>
-
-                </form>
-            </div>
-
             <div class="container" role="main">
-                <h3 class="page-header">Options</h3>
+                <h3 class="page-header">Default actions per mime-type</h3>
                  <form id="preference-settings" action="" method="post">
 
                     <div id="file-type-destinations">
