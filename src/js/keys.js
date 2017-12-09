@@ -26,7 +26,8 @@ keys.preferences.tabOptions = ["enabled", "disabled"];
 function setDefaultServices() {
   for (let action in actions) {
     let name = actions[action];
-    keys.preferences.services[name] = keys.preferences.tabOptions[0];
+    keys.preferences.services["service_" + name] =
+      keys.preferences.tabOptions[0];
   }
 }
 setDefaultServices();

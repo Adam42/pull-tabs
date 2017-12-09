@@ -72,8 +72,8 @@ export var options =
     }
 
     function createRadioInputs(name) {
-      let group = document.createElement("div");
-      group.setAttribute("class", "panel-body col-md-10");
+      let div = document.createElement("div");
+      div.setAttribute("class", "panel-body col-md-10");
 
       for (var x = 0; x < opt.numOftabActions; x++) {
         let label = document.createElement("label");
@@ -90,10 +90,10 @@ export var options =
 
         label.appendChild(input);
         label.appendChild(span);
-        group.appendChild(label);
+        div.appendChild(label);
       }
 
-      return group;
+      return div;
     }
 
     /**
@@ -101,16 +101,12 @@ export var options =
      * @param  {[type]} name [description]
      * @return {HTMLButtonElement} [description]
      */
-    function addCheckBoxInput(name, form) {
-      let heading = document.createElement("div");
-      heading.setAttribute("class", "panel-heading col-md-10");
-      heading.textContent = capitalize(name);
-
+    function addServiceCheckBox(name, form) {
       let body = document.createElement("div");
       body.setAttribute("class", "panel-body col-md-8");
-
       let input = document.createElement("input");
       input.type = "checkbox";
+      input.name = "service-checkbox";
       input.id = name;
       input.title = name;
       input.value = keys.preferences.services[name];
@@ -119,13 +115,13 @@ export var options =
 
       let label = document.createElement("label");
       label.setAttribute("for", name);
-      label.insertAdjacentHTML("beforeEnd", capitalize(name));
+      label.insertAdjacentHTML(
+        "beforeEnd",
+        capitalize(name.substring("service_".length))
+      );
 
       body.appendChild(input);
       body.appendChild(label);
-
-      form.appendChild(heading);
-
       form.appendChild(body);
     }
 
@@ -136,18 +132,12 @@ export var options =
       var servicesForm = document.getElementById("list-of-services");
       for (var service in keys.preferences.services) {
         if (keys.preferences.services.hasOwnProperty(service)) {
-          addCheckBoxInput(service, servicesForm);
+          addServiceCheckBox(service, servicesForm);
         }
       }
     }
 
     function bindUIActions() {
-      document
-        .getElementById("preference-settings")
-        .addEventListener("submit", opt.saveMimeSettings);
-      document
-        .getElementById("preference-services")
-        .addEventListener("click", opt.saveServices);
       document
         .getElementById("pocket-status")
         .addEventListener("click", PocketAPILayer.checkLink);
@@ -165,6 +155,15 @@ export var options =
         .addEventListener("click", opt.saveAutoClose);
     }
 
+    function bindGeneratedUI() {
+      document
+        .getElementById("preference-settings")
+        .addEventListener("submit", opt.saveMimeSettings);
+      document.getElementsByName("service-checkbox").forEach(function(elem) {
+        elem.addEventListener("click", opt.saveServices);
+      });
+    }
+
     opt.init = function() {
       bindUIActions();
 
@@ -172,6 +171,8 @@ export var options =
 
       createOptionsForm();
       createServicesForm();
+
+      bindGeneratedUI();
 
       this.restoreMimeSettings().then(opt.setMimeSettings);
       this.restoreServices().then(opt.setServices);
@@ -240,6 +241,7 @@ export var options =
         let name = service[0];
         let value = service[1];
         let serviceInput = document.getElementById(name);
+
         if (String(value) === "enabled") {
           serviceInput.checked = true;
           serviceInput.value = "enabled";
@@ -461,14 +463,15 @@ export var options =
     opt.saveServices = function(evt) {
       let target = evt.target;
       let name = target.htmlFor ? target.htmlFor : target.id;
-      let service = document.getElementById(name);
-      service.value = service.checked ? "enabled" : "disabled";
+      target.value = target.checked ? "enabled" : "disabled";
 
       if (keys.preferences.services.hasOwnProperty(name)) {
         let serviceObj = {};
-        serviceObj[name] = service.checked ? "enabled" : "disabled";
+        serviceObj[name] = target.value;
         opt.storeOption(serviceObj, "Services");
       }
+
+      target.checked = target.value == "enabled" ? true : false;
     };
 
     return opt;
