@@ -138,14 +138,20 @@ export var uiAdvanced = uiAdvanced || {
     var label = form.createLabel(tab, fullType, active);
     label.appendChild(checkbox);
 
+    let getServices = browser.storage.local.get(keys.preferences.services);
+
     let actions = ServiceFactory.getActions();
 
-    actions.forEach(function(action) {
-      let radioButton = form.createRadioInput(tab, action, pref);
-      label.appendChild(radioButton);
+    getServices.then(services => {
+      actions.forEach(function(action) {
+        let status = services["service_" + action];
+        if (String(status) === "enabled") {
+          let radioButton = form.createRadioInput(tab, action, pref);
+          label.appendChild(radioButton);
+          resources.appendChild(label);
+        }
+      });
     });
-
-    resources.appendChild(label);
   },
 
   /**

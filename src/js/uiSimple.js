@@ -78,13 +78,10 @@ export var uiSimple = uiSimple || {
     let getServices = browser.storage.local.get(keys.preferences.services);
 
     getServices.then(services => {
-      console.log(services);
       actions.forEach(function(action) {
         let status = services["service_" + action];
 
         if (String(status) === "enabled") {
-          console.log(action);
-
           let label = document.createElement("label");
           let button = this.renderActionButton(action);
 
