@@ -6,6 +6,7 @@ import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import { messageManager } from "./message.js";
+import UI from "./ui.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -288,6 +289,7 @@ export var uiAdvanced = uiAdvanced || {
       service.doActionToTab(tab).then(
         () => {
           uiAdvanced.updateUIWithSuccess(tab, action);
+          UI.autoCloseIfEnabled(tab);
         },
         () => {
           uiAdvanced.updateUIWithFail(tab, action);
@@ -469,6 +471,7 @@ export var uiAdvanced = uiAdvanced || {
         uiAdvanced.updateUI(tab, "Completed downloading ", "success");
 
         browser.storage.local.remove(name);
+        UI.autoCloseIfEnabled(tab);
       }
 
       if (delta.state && delta.state.current === "interrupted") {

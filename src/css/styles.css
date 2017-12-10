@@ -126,6 +126,10 @@ form#simple-ui {
     color: #fff;
 }
 
+#autoclose-status {
+    color: #fff;
+}
+
 #simple-ui:after {
     content: "";
     display: block;

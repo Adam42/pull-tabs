@@ -113,6 +113,11 @@ export var uiSimple = uiSimple || {
     });
   },
 
+  displaySimpleLayout: function() {
+    uiSimple.displayButtons();
+    uiSimple.watchButtons();
+  },
+
   /**
    * Create a button for a service action
    * @param  {string} action An action a ServiceProvider makes available
@@ -219,21 +224,6 @@ export var uiSimple = uiSimple || {
         uiSimple.updateUI(tab, "Error: failed downloading ", "danger");
 
         browser.storage.local.remove(name);
-      }
-    });
-  },
-
-  /**
-   * Check the user's preferences and autoclose
-   * the tab after a successful result
-   * @param  {object} tab Browser tab object
-   */
-  autoCloseIfEnabled: function(tab) {
-    browser.storage.local.get(keys.preferences.autoClose).then(preference => {
-      if (String(preference.autoCloseTabs) === "true") {
-        let close = ServiceFactory.convertActionToProvider("close");
-        close = new close();
-        close.doActionToTab(tab);
       }
     });
   }
