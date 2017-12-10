@@ -5,6 +5,7 @@ import storage from "./storage.js";
 import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
+import { messageManager } from "./message.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -255,6 +256,29 @@ export var uiAdvanced = uiAdvanced || {
       this.initDownload(service, tabs);
 
       //early return so we don't trigger the normal process
+      return;
+    }
+
+    //Performing copy on each tab would result in just one tab
+    //in the clipboard at the end of a set of actions
+    if (String(action) === "clipboard") {
+      service.doActionToTabs(tabs).then(
+        () => {
+          messageManager.updateStatusMessage(
+            "Copied tabs to clipboard",
+            "short",
+            "success"
+          );
+        },
+        () => {
+          messageManager.updateStatusMessage(
+            "Failed to copy tabs to clipboard",
+            "medium",
+            "danger"
+          );
+        }
+      );
+
       return;
     }
 

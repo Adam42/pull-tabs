@@ -20,14 +20,15 @@ export default class ClipboardProvider extends ServiceProvider {
    * [copyAllTabsToClipboard description]
    * @return {[type]} [description]
    */
-  copyAllTabsToClipboard() {
-    let clipboardText = this.tabs.reduce(
-      (text, currentTab) =>
-        text + String(currentTab.title) + ": " + String(currentTab.url) + "\n"
-    );
+  copyAllTabsToClipboard(tabs) {
+    let text = "";
+
+    const reducer = (text, currentTab) =>
+      text + String(currentTab.title) + ": " + String(currentTab.url) + "\n";
+
+    let clipboardText = tabs.reduce(reducer, text);
 
     let tempElem = document.createElement("textarea");
-
     //Just setting display or visibility to none interferes with selecting the text to copy
     //https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
     // Place in top-left corner of screen regardless of scroll position.
