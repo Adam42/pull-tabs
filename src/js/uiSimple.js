@@ -113,6 +113,10 @@ export var uiSimple = uiSimple || {
     });
   },
 
+  /**
+   * Generates and displays buttons for service actions
+   * and attaches event handlers to them
+   */
   displaySimpleLayout: function() {
     uiSimple.displayButtons();
     uiSimple.watchButtons();

@@ -112,11 +112,14 @@ export var popup = popup || {
     numTabs.textContent = tabs.length + " tabs";
   },
 
+  /**
+   * Shows statement if user has autoclose enabled
+   *
+   * @param  {object} autoCloseStatus The stored autoclose preference object
+   */
   displayAutoCloseStatus: function(autoCloseStatus) {
     let autoCloseElem = document.getElementById("autoclose-status");
     if (String(autoCloseStatus.autoCloseTabs) === "true") {
-      console.log(String(autoCloseStatus.autoCloseTabs));
-
       autoCloseElem.classList.remove("hidden");
     } else {
       autoCloseElem.classList.add("hidden");
