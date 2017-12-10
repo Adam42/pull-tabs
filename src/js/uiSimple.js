@@ -45,6 +45,26 @@ export var uiSimple = uiSimple || {
 
         break;
 
+      case "clipboard":
+        service.doActionToTabs().then(
+          () => {
+            messageManager.updateStatusMessage(
+              "Copied tabs to clipboard",
+              "short",
+              "success"
+            );
+          },
+          () => {
+            messageManager.updateStatusMessage(
+              "Failed to copy tabs to clipboard",
+              "medium",
+              "danger"
+            );
+          }
+        );
+
+        break;
+
       case "pocket":
       case "bookmark":
       case "close":
