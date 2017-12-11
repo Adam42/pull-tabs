@@ -6,6 +6,7 @@ import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import { messageManager } from "./message.js";
+import UI from "./ui.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -282,18 +283,8 @@ export var uiAdvanced = uiAdvanced || {
       return;
     }
 
-    //For everything else we should receive a promise as the final result in one step
-    //Loop through each tab and perform the ServiceProvider's action on it
-    tabs.forEach(function(tab) {
-      service.doActionToTab(tab).then(
-        () => {
-          uiAdvanced.updateUIWithSuccess(tab, action);
-        },
-        () => {
-          uiAdvanced.updateUIWithFail(tab, action);
-        }
-      );
-    });
+    //For everything else we perform the action on each tab and perform default UI updates
+    UI.doActionToTabForTabs(tabs, service, uiAdvanced);
   },
 
   initDownload: function(service, tabs) {
@@ -469,6 +460,7 @@ export var uiAdvanced = uiAdvanced || {
         uiAdvanced.updateUI(tab, "Completed downloading ", "success");
 
         browser.storage.local.remove(name);
+        UI.autoCloseIfEnabled(tab);
       }
 
       if (delta.state && delta.state.current === "interrupted") {

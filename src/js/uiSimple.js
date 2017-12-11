@@ -6,6 +6,7 @@ import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
 import { keys } from "./keys.js";
+import UI from "./ui.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -68,17 +69,7 @@ export var uiSimple = uiSimple || {
       case "pocket":
       case "bookmark":
       case "close":
-        //Loop through each tab and perform the ServiceProvider's action on it
-        popup.tabs.forEach(function(tab) {
-          service.doActionToTab(tab).then(
-            () => {
-              uiSimple.updateUIWithSuccess(tab, action);
-            },
-            () => {
-              uiSimple.updateUIWithFail(tab, action);
-            }
-          );
-        });
+        UI.doActionToTabForTabs(popup.tabs, service, uiSimple);
         break;
 
       default:
@@ -110,6 +101,15 @@ export var uiSimple = uiSimple || {
         }
       }, this);
     });
+  },
+
+  /**
+   * Generates and displays buttons for service actions
+   * and attaches event handlers to them
+   */
+  displaySimpleLayout: function() {
+    uiSimple.displayButtons();
+    uiSimple.watchButtons();
   },
 
   /**
@@ -211,11 +211,7 @@ export var uiSimple = uiSimple || {
         uiSimple.updateUI(tab, "Completed downloading ", "success");
 
         browser.storage.local.remove(name);
-        //      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
-        //      var autoClose = false;
-        //      if (tab.active !== true && autoClose === true) {
-        //        browser.tabs.remove(tab.id);
-        //      }
+        UI.autoCloseIfEnabled(tab);
       }
 
       if (delta.state && delta.state.current === "interrupted") {

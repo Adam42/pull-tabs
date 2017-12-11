@@ -106,23 +106,27 @@ form#simple-ui {
 }
 
 .navbar-collapse.collapse {
-    display: block !important;
+    display: block;
 }
 
 .navbar-nav > li,
 .navbar-nav {
-    float: left !important;
+    float: left;
 }
 
 .navbar-nav.navbar-right:last-child {
-    margin-right: -15px !important;
+    margin-right: -15px;
 }
 
 .navbar-right {
-    float: right !important;
+    float: right;
 }
 
 #numTabs {
+    color: #fff;
+}
+
+#autoclose-status {
     color: #fff;
 }
 

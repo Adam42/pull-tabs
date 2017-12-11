@@ -40,6 +40,10 @@ export var popup = popup || {
       .catch(function(e) {
         console.log(e);
       });
+
+    UI.getAutoCloseStatus().then(function(autoCloseStatus) {
+      popup.displayAutoCloseStatus(autoCloseStatus);
+    });
   },
 
   doInitialSetup: function() {
@@ -74,19 +78,21 @@ export var popup = popup || {
      */
   displayLayout: function(layout) {
     if (String(layout.simple) == "true") {
-      uiSimple.displayButtons();
-      uiSimple.watchButtons();
+      uiSimple.displaySimpleLayout();
     } else {
       var simple = document.getElementById("simple");
       simple.classList.add("hidden");
     }
 
+    //We need to getTabs to setNumTabs
+    //otherwise we could wait to getTabs until later
     browserUtils.getTabs().then(function(tabs) {
       popup.tabs = tabs;
 
       if (String(layout.advanced) == "true") {
         uiAdvanced.displayAdvancedLayout(tabs);
       }
+
       popup.setNumTabs(tabs);
     });
   },
@@ -104,5 +110,19 @@ export var popup = popup || {
     spinner.classList.add("hidden");
     var numTabs = document.getElementById("numTabs");
     numTabs.textContent = tabs.length + " tabs";
+  },
+
+  /**
+   * Shows statement if user has autoclose enabled
+   *
+   * @param  {object} autoCloseStatus The stored autoclose preference object
+   */
+  displayAutoCloseStatus: function(autoCloseStatus) {
+    let autoCloseElem = document.getElementById("autoclose-status");
+    if (String(autoCloseStatus.autoCloseTabs) === "true") {
+      autoCloseElem.classList.remove("hidden");
+    } else {
+      autoCloseElem.classList.add("hidden");
+    }
   }
 };
