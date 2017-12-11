@@ -6,6 +6,7 @@ import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
 import { keys } from "./keys.js";
+import UI from "./ui.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -73,7 +74,7 @@ export var uiSimple = uiSimple || {
           service.doActionToTab(tab).then(
             () => {
               uiSimple.updateUIWithSuccess(tab, action);
-              uiSimple.autoCloseIfEnabled(tab);
+              UI.autoCloseIfEnabled(tab);
             },
             () => {
               uiSimple.updateUIWithFail(tab, action);
@@ -221,7 +222,7 @@ export var uiSimple = uiSimple || {
         uiSimple.updateUI(tab, "Completed downloading ", "success");
 
         browser.storage.local.remove(name);
-        uiSimple.autoCloseIfEnabled(tab);
+        UI.autoCloseIfEnabled(tab);
       }
 
       if (delta.state && delta.state.current === "interrupted") {
