@@ -24,6 +24,27 @@ export default class UI {
   displayLayout() {}
 
   /**
+   * Loop through each tab and perform the ServiceProvider's action on it
+   * and have the UI react to the promise resolution for that tab
+   * @param  {array} tabs    Collection of browser tab objects
+   * @param  {class} service A Service Provider
+   * @param  {class} view    A UI type, simple or advanced
+   */
+  static doActionToTabForTabs(tabs, service, view) {
+    tabs.forEach(function(tab) {
+      service.doActionToTab(tab).then(
+        () => {
+          view.updateUIWithSuccess(tab, action);
+          UI.autoCloseIfEnabled(tab);
+        },
+        () => {
+          view.updateUIWithFail(tab, action);
+        }
+      );
+    });
+  }
+
+  /**
    * Check the user's preferences and autoclose
    * the tab after a successful result
    * @param  {object} tab Browser tab object

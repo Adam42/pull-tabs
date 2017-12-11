@@ -69,18 +69,7 @@ export var uiSimple = uiSimple || {
       case "pocket":
       case "bookmark":
       case "close":
-        //Loop through each tab and perform the ServiceProvider's action on it
-        popup.tabs.forEach(function(tab) {
-          service.doActionToTab(tab).then(
-            () => {
-              uiSimple.updateUIWithSuccess(tab, action);
-              UI.autoCloseIfEnabled(tab);
-            },
-            () => {
-              uiSimple.updateUIWithFail(tab, action);
-            }
-          );
-        });
+        UI.doActionToTabForTabs(popup.tabs, service, uiSimple);
         break;
 
       default:

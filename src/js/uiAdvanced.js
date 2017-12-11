@@ -283,19 +283,8 @@ export var uiAdvanced = uiAdvanced || {
       return;
     }
 
-    //For everything else we should receive a promise as the final result in one step
-    //Loop through each tab and perform the ServiceProvider's action on it
-    tabs.forEach(function(tab) {
-      service.doActionToTab(tab).then(
-        () => {
-          uiAdvanced.updateUIWithSuccess(tab, action);
-          UI.autoCloseIfEnabled(tab);
-        },
-        () => {
-          uiAdvanced.updateUIWithFail(tab, action);
-        }
-      );
-    });
+    //For everything else we perform the action on each tab and perform default UI updates
+    UI.doActionToTabForTabs(tabs, service, uiAdvanced);
   },
 
   initDownload: function(service, tabs) {
