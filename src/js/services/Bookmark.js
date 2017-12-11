@@ -22,11 +22,7 @@ export default class BookmarkProvider extends ServiceProvider {
      * @param  {array} tabs Collection of tab objects
      */
   bookmarkTabs(tabs) {
-    var numTabs = tabs.length;
-    var i;
-    for (i = 0; i < numTabs; i++) {
-      return this.bookmarkTab(tabs[i]);
-    }
+    this.forEachTabDo(tabs, this.BookmarkTab.call(this));
   }
 
   /**

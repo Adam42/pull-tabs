@@ -284,7 +284,7 @@ export var uiAdvanced = uiAdvanced || {
     }
 
     //For everything else we perform the action on each tab and perform default UI updates
-    UI.doActionToTabForTabs(tabs, service, uiAdvanced);
+    UI.doActionToTabForTabs(tabs, action, uiAdvanced);
   },
 
   initDownload: function(service, tabs) {

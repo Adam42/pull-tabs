@@ -24,11 +24,7 @@ export default class CloseProvider extends ServiceProvider {
      * @return {Promise} - A Promise resolving to result of closing tabs
      */
   closeTabs(tabs) {
-    var numTabs = tabs.length;
-    var i;
-    for (i = 0; i < numTabs; i++) {
-      return this.closeTab(tabs[i]);
-    }
+    this.forEachTabDo(tabs, this.closeTab.call(this));
   }
 
   /**

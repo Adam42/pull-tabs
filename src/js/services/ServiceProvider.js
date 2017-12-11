@@ -22,4 +22,18 @@ export default class ServiceProvider {
   doActionToTabs(tabs) {
     console.log(tabs);
   }
+
+  /**
+   * Do an action for each tab in a collection of tabs
+   * @param  {array} tabs   Collection of browser tab objects
+   * @param  {function} action Function to call on each tab
+   * @return Promise        Returns promise returned by action function
+   */
+  forEachTabDo(tabs, action) {
+    var numTabs = tabs.length;
+    var i;
+    for (i = 0; i < numTabs; i++) {
+      return action(tabs[i]);
+    }
+  }
 }

@@ -69,7 +69,7 @@ export var uiSimple = uiSimple || {
       case "pocket":
       case "bookmark":
       case "close":
-        UI.doActionToTabForTabs(popup.tabs, service, uiSimple);
+        UI.doActionToTabForTabs(popup.tabs, action, uiSimple);
         break;
 
       default:

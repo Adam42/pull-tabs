@@ -27,10 +27,13 @@ export default class UI {
    * Loop through each tab and perform the ServiceProvider's action on it
    * and have the UI react to the promise resolution for that tab
    * @param  {array} tabs    Collection of browser tab objects
-   * @param  {class} service A Service Provider
+   * @param  {string} action The action to apply to the tab via its Service Provider
    * @param  {class} view    A UI type, simple or advanced
    */
-  static doActionToTabForTabs(tabs, service, view) {
+  static doActionToTabForTabs(tabs, action, view) {
+    let service = ServiceFactory.convertActionToProvider(action);
+    service = new service(tabs);
+
     tabs.forEach(function(tab) {
       service.doActionToTab(tab).then(
         () => {

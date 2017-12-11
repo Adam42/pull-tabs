@@ -63,11 +63,6 @@ export default class PocketProvider extends ServiceProvider {
      * @return {[type]}      [description]
      */
   saveTabsToPocket(tabs) {
-    var numURLs = tabs.length;
-    var i;
-
-    for (i = 0; i < numURLs; i++) {
-      this.saveTabToPocket(tabs[i]);
-    }
+    this.forEachTabDo(tabs, this.saveTabToPocket.call(this));
   }
 }
