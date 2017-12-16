@@ -1,8 +1,5 @@
 "use strict";
-import { messageManager } from "./message.js";
 import { config } from "./config.js";
-import { browserUtils } from "./browser.js";
-import { form } from "./form.js";
 
 /**
  * Integration with getpocket.com allowing
@@ -107,10 +104,11 @@ export var PocketAPILayer = PocketAPILayer || {
      * @return {[type]} [description]
      */
   initLogin: function() {
-    var pocketRequest = {};
+    let pocketRequest = {};
     pocketRequest.url = "https://getpocket.com/v3/oauth/request";
-    pocketRequest.key = config.credentials.consumer_key;
-    PocketAPILayer.getRequestToken(pocketRequest);
+    pocketRequest.consumer_key = config.credentials.consumer_key;
+
+    PocketAPILayer.getRequestCode(pocketRequest);
   },
 
   /**
@@ -121,12 +119,10 @@ export var PocketAPILayer = PocketAPILayer || {
      * @param  {object} pocketRequest An object with key and token
      * @return {[type]}        [description]
      */
-  getRequestToken: function(pocketRequest) {
-    var redirectURL = browser.extension.getURL("pocket.html");
-
+  getRequestCode: function(pocketRequest) {
     var data = new FormData();
-    data.append("consumer_key", pocketRequest.key);
-    data.append("redirect_uri", encodeURIComponent(redirectURL));
+    data.append("consumer_key", pocketRequest.consumer_key);
+    data.append("redirect_uri", browser.identity.getRedirectURL());
 
     var xhr = new XMLHttpRequest();
 
@@ -135,16 +131,29 @@ export var PocketAPILayer = PocketAPILayer || {
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          pocketRequest.token = xhr.response.substring(5);
-          localStorage[PocketAPILayer.pocketKey.request_token] =
-            pocketRequest.token;
+          //Response is in the form:
+          //code=this-is-the-request-token
+          let request_token = xhr.response.substring(5);
 
           pocketRequest.auth =
             "https://getpocket.com/auth/authorize?request_token=" +
-            pocketRequest.token +
+            request_token +
             "&redirect_uri=";
 
-          browserUtils.login(pocketRequest);
+          let redirect = browser.identity.getRedirectURL();
+          let url = pocketRequest.auth + redirect;
+
+          let details = {
+            url: url,
+            interactive: true
+          };
+
+          //Next we launchWebAuthFlow which will handle authentication
+          //and authorization after which we can exchange our request
+          //token for an access token
+          browser.identity.launchWebAuthFlow(details).then(function(redirect) {
+            PocketAPILayer.getAccessToken(request_token);
+          });
         } else {
           console.error(xhr.statusText);
         }
@@ -189,7 +198,8 @@ export var PocketAPILayer = PocketAPILayer || {
      * @param {object} credentials Object with user's access token and username
      */
   setStoredCredentials: function(credentials) {
-    //response = access_token=ACCESS_TOKEN&username=USERNAME
+    //The response from getpocket.com will take the form:
+    //access_token=ACCESS_TOKEN&username=USERNAME
     var accessTokenStart = credentials.search("=") + 1;
     var accessTokenEnd = credentials.search("&");
     var userNameStart = accessTokenEnd + 10;
@@ -205,24 +215,22 @@ export var PocketAPILayer = PocketAPILayer || {
   },
 
   /**
-     * Authorize a user to getpocket.com and if successful
-     * call function to persist credentials to local storage
+     * Exchange a request token for an access token and Pocket username
+     * and if successful call function to persist credentials to local storage
      *
-     * @param  {object} pocket Object with consumer key and request token
+     * @param  {object} request_token The request token to exchange for an access token
      * @return {Promise|void}        If successful a promise via local storage action
      */
-  getAccessToken: function(pocketAuthAttempt) {
-    var pocketAuthAttempt = {};
-    pocketAuthAttempt.url = "https://getpocket.com/v3/oauth/authorize";
-    pocketAuthAttempt.key = config.credentials.consumer_key;
-    pocketAuthAttempt.token = localStorage[this.pocketKey.request_token];
+  getAccessToken: function(request_token) {
+    let url = "https://getpocket.com/v3/oauth/authorize";
+
     var data = new FormData();
-    data.append("consumer_key", pocketAuthAttempt.key);
-    data.append("code", pocketAuthAttempt.token);
+    data.append("consumer_key", config.credentials.consumer_key);
+    data.append("code", request_token);
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open("POST", pocketAuthAttempt.url, true);
+    xhr.open("POST", url, true);
 
     xhr.onload = function(e) {
       if (xhr.readyState === 4) {
