@@ -40,12 +40,6 @@ export default class DownloadProvider extends ServiceProvider {
         .catch(e => {
           this.updateUI(tab, "fail");
         });
-
-      //@to-do check preferences to see if user chose to auto-close tabs upon successful action},
-      var autoClose = false;
-      if (tab.active !== true && autoClose === true) {
-        browser.tabs.remove(tab.id);
-      }
     }, this);
   }
 
