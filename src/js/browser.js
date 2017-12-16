@@ -128,34 +128,9 @@ export var browserUtils = {
      *
      */
   login: function(pocket) {
-    var redirect = browser.extension.getURL("pocket.html");
+    let redirect = browser.extension.getURL("pocket.html");
     pocket.auth = pocket.auth + encodeURIComponent(redirect);
     window.open(pocket.auth);
-  },
-
-  /**
-     * Use launchWebAuthFlow to perform getpocket.com login
-     * Supported in Chrome and Firefox ( as of version 53 )
-     *
-     * @link https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/identity/launchWebAuthFlow
-     * @param  {object} pocket [description]
-     * @return {[type]}        [description]
-     * @todo  Re-implement using this method instead of window.open
-     */
-  loginViaWebAuthFlow: function(pocket) {
-    pocket.auth =
-      pocket.auth + encodeURIComponent(browser.identity.getRedirectURL());
-
-    pocket.interactive = true;
-
-    var auth = {
-      url: pocket.auth,
-      interactive: pocket.interactive
-    };
-
-    browser.identity.launchWebAuthFlow(auth).then(function(responseUrl) {
-      Pocket.getAccessToken(pocket);
-    });
   },
 
   /**
