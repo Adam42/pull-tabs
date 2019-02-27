@@ -1,6 +1,6 @@
 {
     "name": "pulltabs",
-    "version": "0.14.2",
+    "version": "0.15.0",
     "description": "A browser extension to gather the current window's tabs and offer options to save them to disk.",
     "main": "src/js/popup.js",
     "directories": {
