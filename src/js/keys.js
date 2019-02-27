@@ -20,16 +20,34 @@ keys.preferences.layout = {
 keys.preferences.autoClose = {
   autoCloseTabs: false
 };
-keys.preferences.retrieveFullMimeType = false;
 
-keys.preferences.services = {};
+/**
+ * Preference key for whether to use additional HTTP requests
+ * to get tabs again in order to determine their content-type
+ * @type {Boolean}
+ */
+keys.preferences.retrieveFullMimeType = false;
 
 //list of available actions to apply to a tab
 let actions = ServiceFactory.getActions();
 actions.unshift("ignore");
 keys.preferences.tabActions = actions;
 
-keys.preferences.tabOptions = ["enabled", "disabled"];
+keys.preferences.tabOptions = ["disabled", "enabled"];
+
+/**
+ * The list of possible services
+ * under a "service_$ServiceActionName" key
+ * for instance:
+ * {
+ *   service_download: "enabled",
+ *   service_bookmark: "enabled",
+ *   service_pocket: "disabled"
+ *   etc...
+ *  }
+ * @type {Object}
+ */
+keys.preferences.services = {};
 
 /**
  * Creates a collection of services based on the action
@@ -39,7 +57,15 @@ function setDefaultServices() {
   for (let action in actions) {
     let name = actions[action];
     keys.preferences.services["service_" + name] =
-      keys.preferences.tabOptions[0];
+      keys.preferences.tabOptions[1];
   }
 }
+
+//Make this more dynamic but for now just disable the pocket service
+function disableDefaultServices(service_name) {
+  keys.preferences.services["service_" + service_name] =
+    keys.preferences.tabOptions[0];
+}
+
 setDefaultServices();
+disableDefaultServices("pocket");
