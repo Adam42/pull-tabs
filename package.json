@@ -1,8 +1,7 @@
 {
     "name": "pulltabs",
-    "version": "0.14.0",
-    "description":
-        "A browser extension to gather the current window's tabs and offer options to save them to disk.",
+    "version": "0.15.0",
+    "description": "A browser extension to gather the current window's tabs and offer options to save them to disk.",
     "main": "src/js/popup.js",
     "directories": {
         "test": "tests"
@@ -16,7 +15,7 @@
         "es6-map": "^0.1.5",
         "sanitize-filename": "^1.6.1",
         "simple-icons": "^1.2.7",
-        "webextension-polyfill": "^0.2.1",
+        "webextension-polyfill": "^0.4.0",
         "xmlhttprequest": "^1.6.0"
     },
     "devDependencies": {
@@ -24,14 +23,10 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev":
-            "NODE_ENV=development webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "watch":
-            "NODE_ENV=development webpack --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "hot":
-            "NODE_ENV=development webpack-dev-server --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "production":
-            "NODE_ENV=production webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        "dev": "NODE_ENV=development webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "watch": "NODE_ENV=development webpack --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "hot": "NODE_ENV=development webpack-dev-server --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+        "production": "NODE_ENV=production webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "repository": {
         "type": "git",
