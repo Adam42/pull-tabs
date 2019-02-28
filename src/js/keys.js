@@ -30,9 +30,12 @@ keys.preferences.retrieveFullMimeType = false;
 
 //list of available actions to apply to a tab
 let actions = ServiceFactory.getActions();
-actions.unshift("ignore");
-keys.preferences.tabActions = actions;
 
+//ignore is always needed as a non-action
+//and thus not able to be disabled by the user
+actions.unshift("ignore");
+
+keys.preferences.tabActions = actions;
 keys.preferences.tabOptions = ["disabled", "enabled"];
 
 /**
@@ -62,6 +65,8 @@ function setDefaultServices() {
 }
 
 //Make this more dynamic but for now just disable the pocket service
+//this just disables the service from the initial keys used to make
+//the persistent service object so it only disables a service initially one time
 function disableDefaultServices(service_name) {
   keys.preferences.services["service_" + service_name] =
     keys.preferences.tabOptions[0];
