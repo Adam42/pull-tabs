@@ -32,3 +32,7 @@ web-ext run
 Make all changes in the src directory use npm to build the extension. Load the extension from the dist directory in your browser.
 
 Please use [prettier](https://prettier.io/) to format any Javascript files in the src directory before committing!
+
+### Deployment
+
+Mostly a note for myself, when releasing a new version simply run `npm run dev`. As browsers prefer un-minified files and minifying local files doesn't provide much performance gain it's best to not use `npm run production` when creating releases.
