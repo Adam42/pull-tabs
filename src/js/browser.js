@@ -36,6 +36,10 @@ export var browserUtils = {
     }
   },
 
+  isChrome: function(){
+    return (typeof window.chrome !== 'undefined');
+  },
+
   isFile: function(pathname) {
     return (
       pathname
@@ -128,7 +132,7 @@ export var browserUtils = {
      *
      */
   login: function(pocket) {
-    let redirect = browser.extension.getURL("pocket.html");
+    let redirect = this.extensionGetURL("pocket.html");
     pocket.auth = pocket.auth + encodeURIComponent(redirect);
     window.open(pocket.auth);
   },
@@ -139,6 +143,10 @@ export var browserUtils = {
      * @return {[type]}     [description]
      */
   extensionGetURL: function(path) {
+    //For chrome use chrome.runtime.getURL()
+    if(this.isChrome()){
+      return browser.runtime.getURL(path);
+    }
     return browser.extension.getURL(path);
   }
 };
