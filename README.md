@@ -23,10 +23,15 @@ Once npm finishes installing, build an install that npm watches and re-compiles 
 npm run watch
 ```
 
-in Mozilla Firefox you can also use [web-ext](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext) to have Firefox watch the extension files and reload Firefox when it changes. After creating a build run web-ext in the "dist" directory:
+in Mozilla Firefox you can also use [web-ext](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext) to have Firefox watch the extension files and reload Firefox when it changes. After creating a build run web-ext in the "dist/browser" directory:
 
 ```
 web-ext run
+```
+
+Mac users, temporarily use the below to workaround a bug in web-ext:
+```
+web-ext run -f=/Applications/Firefox.app/Contents/MacOS/firefox
 ```
 
 Make all changes in the src directory use npm to build the extension. Load the extension from the dist directory in your browser.
