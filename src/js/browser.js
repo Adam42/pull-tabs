@@ -143,11 +143,7 @@ export var browserUtils = {
      * @return {[type]}     [description]
      */
   extensionGetURL: function(path) {
-    //For chrome use chrome.runtime.getURL()
-    if(this.isChrome()){
       return browser.runtime.getURL(path);
-    }
-    return browser.extension.getURL(path);
   }
 };
 
