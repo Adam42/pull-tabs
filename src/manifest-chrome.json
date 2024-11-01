@@ -8,12 +8,5 @@
         "identity",
         "bookmarks",
         "storage"
-    ],
-    "host_permissions":[
-            "https://getpocket.com/v3/*"
-    ],
-    "optional_host_permissions": [
-        "http://*/*",
-        "https://*/*"
     ]
 }

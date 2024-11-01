@@ -8,8 +8,6 @@
         "downloads",
         "identity",
         "bookmarks",
-        "storage",
-        "https://getpocket.com/v3/*"
-    ],
-    "optional_permissions": ["http://*/*", "https://*/*"],
+        "storage"
+    ]
 }

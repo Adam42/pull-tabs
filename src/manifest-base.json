@@ -4,7 +4,7 @@
     "name": "Pull Tabs",
     "description":
         "Save open tabs to disk as files or put them in your Pocket.",
-    "version": "0.16.1",
+    "version": "0.16.2",
     "web_accessible_resources": [{
         "resources": ["pocket.html", "https://getpocket.com/v3/*"],
         "matches": [],
@@ -18,3 +18,10 @@
         "default_popup": "popup.html",
         "default_title": "Pull Tabs"
     },
+     "host_permissions": [
+            "https://getpocket.com/v3/*"
+    ],
+    "optional_permissions": [
+        "http://*/*",
+         "https://*/*"
+     ],
