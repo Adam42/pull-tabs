@@ -11,40 +11,42 @@ export default class ServiceFactory {
   }
 
   /**
-   * Duplicates the prop setting in the constructor statically
-   * so we can reference providers statically
-   * @return {object} Object where keys are the classes for Service Providers we might need
+   * Get all available service providers
+   * @return {Object<string, ServiceProvider>} Map of provider names to provider classes
    */
   static getProviders() {
     return Providers;
   }
 
   /**
-   * Converts Providers into their actions words
-   * @return {array} Collection of provider actions
+   * Convert Providers into their action names
+   * @return {string[]} Collection of provider actions
    */
   static getActions() {
-    let providers = ServiceFactory.getProviders();
-    let actions = [];
+    const providers = ServiceFactory.getProviders();
 
-    for (var key in providers) {
-      if (providers.hasOwnProperty(key)) {
-        let action = key.replace("Provider", "").toLowerCase();
-        actions.push(action);
-      }
-    }
-    return actions;
+    return Object.keys(providers).map(key =>
+      key.replace("Provider", "").toLowerCase()
+    );
   }
 
   /**
-   * Takes a text action and returns its provider
-   * @param  {string} action An action taken on a tab or tabs
-   * @return {Class}        Returns a class of that service provider
+   * Convert an action name to its corresponding provider
+   * @param {string} action - An action taken on a tab or tabs
+   * @throws {Error} If no provider is found for the given action
+   * @return {ServiceProvider} The corresponding service provider class
    */
   static convertActionToProvider(action) {
-    let name = capitalize(action) + "Provider";
+    if (!action || typeof action !== 'string') {
+      throw new TypeError('Action must be a non-empty string');
+    }
 
-    let providers = ServiceFactory.getProviders();
+    const name = `${capitalize(action)}Provider`;
+    const providers = ServiceFactory.getProviders();
+
+    if (!providers[name]) {
+      throw new Error(`Provider for action "${action}" not found.`);
+    }
 
     return providers[name];
   }
