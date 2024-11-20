@@ -410,26 +410,33 @@ export var uiAdvanced = uiAdvanced || {
      * @return {[type]} [description]
      */
   observeCheckboxes: function() {
-    var form = document.querySelector("#resources");
+    const form = document.querySelector("#resources");
 
-    var observer = new MutationObserver(function(mutations) {
+    const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        var node = document.querySelector(
-          "#" + mutation.addedNodes[0].id + " > input"
-        );
-        var label = document.querySelector("#label-" + node.id);
-        label.addEventListener("click", function() {
-          if (label.classList.contains("active")) {
-            if (!node.checked) {
-              label.classList.remove("active");
+        if (mutation.addedNodes.length > 0) {
+          let node = document.querySelector("#" + mutation.addedNodes[0].id + " > input");
+
+          if (node) {
+            let label = document.querySelector("#label-" + node.id);
+
+            if(label) {
+              label.addEventListener("click", function() {
+
+                if (label.classList.contains("active")) {
+                  if (!node.checked) {
+                    label.classList.remove("active");
+                  }
+                }
+                else{
+                  if (node.checked) {
+                    label.classList.add("active");
+                  }
+                }
+              });
             }
           }
-          if (!label.classList.contains("active")) {
-            if (node.checked) {
-              label.classList.add("active");
-            }
-          }
-        });
+        }
       });
     });
 
