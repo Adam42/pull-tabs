@@ -11,10 +11,10 @@
         "extension_ids": []
     }],
     "icons": {
-        "16": "img/icon-19.png",
-        "32": "img/icon-38.png",
-        "48": "img/icon-38.png",
-        "128": "img/icon-38.png"
+        "16": "img/icon-16.png",
+        "32": "img/icon-32.png",
+        "48": "img/icon-48.png",
+        "128": "img/icon-128.png"
     },
      "host_permissions": [
             "https://getpocket.com/v3/*"
