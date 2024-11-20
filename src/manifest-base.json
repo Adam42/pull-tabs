@@ -7,7 +7,7 @@
     "version": "0.17.0",
     "web_accessible_resources": [{
         "resources": ["pocket.html", "https://getpocket.com/v3/*"],
-        "matches": ["<all_urls>"],
+        "matches": [],
         "extension_ids": []
     }],
     "icons": {
@@ -17,7 +17,5 @@
         "128": "img/icon-128.png"
     },
      "host_permissions": [
-            "https://getpocket.com/v3/*",
-            "http://*/*",
-            "https://*/*"
+            "https://getpocket.com/v3/*"
     ],
