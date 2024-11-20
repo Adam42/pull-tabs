@@ -1,4 +1,4 @@
-var sanitize = require("sanitize-filename");
+import { sanitize } from "sanitize-filename-ts";
 import ServiceProvider from "./ServiceProvider.js";
 import { browserUtils } from "../browser.js";
 
