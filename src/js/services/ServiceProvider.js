@@ -1,9 +1,13 @@
 /**
- * Base class for ServiceProviders to extend
- * When adding a new provider, extend this class and ensure it has a doActionToTab and doActionToTabs
+ * Base class for ServiceProviders
+ * All providers must implement doActionToTab and doActionToTabs methods
+ * @abstract
  */
 export default class ServiceProvider {
   constructor(tabs) {
+    if (!Array.isArray(tabs)) {
+      throw new TypeError('tabs must be an array');
+    }
     this.tabs = tabs;
   }
 
