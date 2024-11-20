@@ -404,36 +404,44 @@ export var uiAdvanced = uiAdvanced || {
   },
 
   /**
-     * Watches checkboxes for clicks and highlights or unhighlights
-     * labels when a tab input field is clicked
-     *
-     * @return {[type]} [description]
-     */
+   * Watches checkboxes for clicks and highlights or unhighlights
+   * labels when a tab input field is clicked.
+   *
+   * Observes changes to the DOM within the specified form element,
+   * and adds event listeners to dynamically added checkboxes.
+   * When a checkbox's label is clicked, it toggles the active class
+   * based on the checkbox's checked state.
+   */
   observeCheckboxes: function() {
-    var form = document.querySelector("#resources");
+    const form = document.querySelector("#resources");
 
-    var observer = new MutationObserver(function(mutations) {
+    const observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        var node = document.querySelector(
-          "#" + mutation.addedNodes[0].id + " > input"
-        );
-        var label = document.querySelector("#label-" + node.id);
-        label.addEventListener("click", function() {
-          if (label.classList.contains("active")) {
-            if (!node.checked) {
-              label.classList.remove("active");
+        if (mutation.addedNodes.length > 0) {
+          let node = document.querySelector(`#${mutation.addedNodes[0].id} > input`);
+
+          if (node) {
+            let label = document.querySelector(`#label-${node.id}`);
+
+            if (label) {
+              label.addEventListener("click", function() {
+                if (label.classList.contains("active")) {
+                  if (!node.checked) {
+                    label.classList.remove("active");
+                  }
+                } else {
+                  if (node.checked) {
+                    label.classList.add("active");
+                  }
+                }
+              });
             }
           }
-          if (!label.classList.contains("active")) {
-            if (node.checked) {
-              label.classList.add("active");
-            }
-          }
-        });
+        }
       });
     });
 
-    var setup = { attributes: true, childList: true, characterData: true };
+    const setup = { attributes: true, childList: true, characterData: true };
     observer.observe(form, setup);
   },
 

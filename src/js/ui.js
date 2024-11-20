@@ -56,7 +56,7 @@ export default class UI {
     browser.storage.local.get(keys.preferences.autoClose).then(preference => {
       if (String(preference.autoCloseTabs) === "true") {
         let close = ServiceFactory.convertActionToProvider("close");
-        close = new close();
+        close = new close([tab]);
         close.doActionToTab(tab);
       }
     });
