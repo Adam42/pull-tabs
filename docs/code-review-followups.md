@@ -1,0 +1,109 @@
+# Code Review Follow-ups (services layer)
+
+Status reconciliation of the earlier services-layer code review checklist
+against the working tree on `refactor/async-services` (checked 2026-07-05).
+That review is what spawned the WIP on this branch — roughly a third of it
+got implemented before work stopped.
+
+Master list for bugs/priorities is [backlog.md](../backlog.md); this doc
+tracks only the review-specific remainder so nothing from the checklist is
+lost.
+
+## ✅ Already done (mostly by the uncommitted WIP — commit it to bank these)
+
+- ServiceFactory: `const`/`let` throughout, `Object.keys().map()` in
+  `getActions()`, input validation + missing-provider error in
+  `convertActionToProvider` (ServiceFactory.js:25-52).
+- ServiceProvider: constructor validates tabs is an array
+  (ServiceProvider.js:8), abstract methods are `async` and throw
+  "must be implemented" instead of `console.log` (ServiceProvider.js:18-28),
+  `@abstract` JSDoc tag present (ServiceProvider.js:4).
+- Bookmark: method casing is consistently `bookmarkTab`; tab validation
+  (url/title) added; `async`/`await` + try/catch around
+  `browser.bookmarks.create()` — **modulo the duplicated `doActionToTab`
+  with the mangled template string, which must be fixed before commit**
+  (backlog: Bugs #1).
+
+## 📋 Still valid, already captured in backlog.md
+
+| Checklist item | Where captured |
+|---|---|
+| `forEachTabDo` returns after first iteration | Bugs — "bulk-action layer is broken" (HIGH) |
+| `.call(this)` invoked-instead-of-passed in Bookmark/Close/Pocket | same item |
+| `Promise.all`/batching in `bookmarkTabs` | same item (fix-or-delete decision) |
+| Validate bookmark folder id exists in storage | Bugs — "Pulltabs folder never created…" (bookmarks silently land in default folder) |
+| `localStorage["pullTabsFolderId"]` direct access | Improvements — consolidate `localStorage` → `browser.storage.local` (supersedes the `getItem` suggestion) |
+| Unit tests for providers + factory | Bugs — "Jest can't run"; Improvements — "grow the test suite" |
+
+## 🔲 Still valid, NOT previously captured — the new todo list
+
+Ordered by (impact ÷ effort). All S unless noted.
+
+- [ ] **Async/await consistency across remaining providers** — Close,
+  Download, Pocket*, Clipboard still use sync methods / bare `.then`
+  (Download.js:39,72). Finish what the WIP started in Bookmark/ServiceProvider.
+  (*Pocket only if it survives the removal decision — see backlog Questions #1.)
+  DoD: every provider's `doActionToTab`/`doActionToTabs` is `async` and
+  returns a settled-able promise; UI callers unchanged or simplified.
+- [ ] **Standardize error handling & message format across providers** —
+  today a mix of `throw new Error("Failed to bookmark…")`,
+  `Promise.reject(new Error("fail"))` (Download.js:56, Clipboard.js:45), and
+  silent catch-and-log. DoD: one pattern (throw from async methods, real
+  messages), no `"fail"` strings.
+- [ ] **`validateTab()` helper on ServiceProvider** — Bookmark now validates
+  url/title inline; hoist to the base class so Close/Download/Clipboard get
+  it too. DoD: shared helper, Bookmark's inline check replaced.
+- [ ] **Aggregated results summary in `UI.doActionToTabForTabs`**
+  (ui.js:33-48) — success/fail counts surfaced after a batch, e.g. "7
+  bookmarked, 2 failed". Also revives the 2017 todo.txt "summary view" idea
+  in minimal form. Effort M. DoD: batch actions end with a single summary
+  status message.
+- [ ] **Input validation in `UI.doActionToTabForTabs`** — validate tabs
+  array, action string, and that `view` implements
+  `updateUIWithSuccess`/`updateUIWithFail` (the implicit view contract,
+  currently unchecked). DoD: bad calls fail loudly with clear messages.
+- [ ] **`Object.freeze(Providers)`** (providers.js:7-13) + JSDoc typedef for
+  the registry shape. DoD: registry immutable at runtime, typed.
+- [ ] **Abstract-class enforcement** — `new.target === ServiceProvider` check
+  in the constructor so the base class can't be instantiated directly.
+  DoD: direct instantiation throws; providers unaffected.
+- [ ] **Remove redundant `constructor(tabs) { super(tabs); }`** in all five
+  providers (Bookmark.js:8, Clipboard.js:7, Close.js:7, Download.js:9,
+  Pocket.js:8). DoD: constructors deleted, behavior identical.
+- [ ] **JSDoc completeness pass** — `@param`/`@returns`/`@throws` on public
+  service-layer methods; kill the leftover `[description]` placeholders.
+  DoD: no empty JSDoc placeholders in `src/js/services/`.
+
+## ❌ Reviewed and declined (recorded so they don't resurface)
+
+- **Batch/parallel processing options in `forEachTabDo`, retry logic,
+  AbortSignal cancellation, progress callbacks** — over-engineering for a
+  popup acting on one window's tabs (typically < 100, and browser APIs
+  queue internally). Revisit only if real users report hangs.
+- **ProviderRegistry pattern / provider metadata** — YAGNI; the frozen
+  static registry is the right size. The 2017 `service.js` prototype tried
+  dynamic registration and was abandoned.
+- **TypeScript migration** — not worth the toolchain churn for this codebase;
+  the JSDoc pass above is the 80/20. Reconsider if the build tool is
+  replaced anyway (backlog Improvements) and appetite exists.
+
+## Answers to the review's open questions
+
+1. **Other providers with BookmarkProvider-style issues?** Yes — the same
+   immediately-invoked `.call(this)` bug exists in Close.js:27 and
+   Pocket.js:66; Download's bulk path references a nonexistent
+   `this.updateUI` (Download.js:41). All under the backlog bulk-layer item.
+2. **Does UI have proper interface contracts providers depend on?**
+   Inverted: providers don't call UI; UIs pass themselves as `view` into
+   `UI.doActionToTabForTabs`, which implicitly requires
+   `updateUIWithSuccess`/`updateUIWithFail`. Unvalidated — see new todo above.
+3. **Test coverage that might break?** None in practice — the only suite
+   (ServiceFactory) can't even run until the Jest ESM config is fixed
+   (backlog). Change freely; fix Jest first to bank regression protection.
+4. **Existing patterns to respect?** Registry-driven providers (adding to
+   providers.js auto-populates UIs and options), promise-based `browser.*`
+   only, no framework, un-minified releases. Codified in CLAUDE.md.
+5. **Is `browser.bookmarks` correct vs `chrome.bookmarks`/browserUtils?**
+   Yes — project convention is the promise-based `browser.*` namespace with
+   webextension-polyfill prepended for Chrome builds. `browserUtils` wraps
+   helpers, not API namespaces. Keep `browser.bookmarks`.

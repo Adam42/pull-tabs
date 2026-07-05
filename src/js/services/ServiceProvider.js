@@ -6,7 +6,7 @@
 export default class ServiceProvider {
   constructor(tabs) {
     if (!Array.isArray(tabs)) {
-      throw new TypeError('tabs must be an array');
+      throw new TypeError("tabs must be an array");
     }
     this.tabs = tabs;
   }
@@ -15,16 +15,16 @@ export default class ServiceProvider {
    * Perform an action on a single tab
    * @param  {object} tab Browser tab object
    */
-  doActionToTab(tab) {
-    console.log(tab);
+  async doActionToTab(tab) {
+    throw new Error("doActionToTab must be implemented by child class");
   }
 
   /**
    * Perform an action on multiple tabs
    * @param  {array} tabs Collection of tab objects
    */
-  doActionToTabs(tabs) {
-    console.log(tabs);
+  async doActionToTabs(tabs) {
+    throw new Error("doActionToTabs must be implemented by child class");
   }
 
   /**

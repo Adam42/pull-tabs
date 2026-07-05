@@ -27,7 +27,7 @@ export default class ClipboardProvider extends ServiceProvider {
     const reducer = (text, currentTab) =>
       text + String(currentTab.title) + ": " + String(currentTab.url) + "\n";
 
-    let clipboardText = tabs.reduce(reducer, text);
+    const clipboardText = tabs.reduce(reducer, text);
 
     let tempElem = document.createElement("textarea");
 
@@ -36,7 +36,7 @@ export default class ClipboardProvider extends ServiceProvider {
     tempElem.id = "temp-clipboard-text";
     tempElem.value = clipboardText;
     document.body.appendChild(tempElem);
-    var copyText = document.getElementById("temp-clipboard-text");
+    const copyText = document.getElementById("temp-clipboard-text");
     copyText.select();
 
     try {

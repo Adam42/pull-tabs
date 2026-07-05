@@ -4,6 +4,15 @@ This browser extension gathers the current window's tabs and offers actions to t
 
 There are two ways of interacting with tabs, a simple bulk method and a more advanced per-tab layout. For more info or to install the extension for normal use visit the [extension site](https://adam42.github.io/pull-tabs/).
 
+## Current Status
+
+The extension works for its core actions: download, bookmark, close, and copy-to-clipboard. Two things to know:
+
+- **Pocket integration is defunct.** Mozilla shut down the Pocket service in July 2025, so the Pocket save/login features no longer function. Removal is tracked in [backlog.md](backlog.md).
+- **Tests are not yet runnable.** A Jest setup exists but the ESM/Babel wiring is incomplete (see backlog.md).
+
+See [docs/architecture.md](docs/architecture.md) for a map of the codebase and [backlog.md](backlog.md) for known issues and planned work.
+
 ## Contributor Setup
 
 This extension uses the promise based [browser web extensions API](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API) with a polyfill for callback style browsers.
@@ -14,7 +23,7 @@ To load the extension locally for development, git clone this repo and then run:
 npm install
 ```
 
-While npm finishes installing, create a Pocket app and get a Pocket consumer key. Then in the src/js directory, copy the config-sample.js to a file named config.js. Open config.js and enter your consumer key as the value for the "consumer_key" field.
+While npm finishes installing, copy `src/js/config-sample.js` to a file named `src/js/config.js`. This file is required for the build to succeed because it is imported by the source modules — even though the Pocket service it configures has shut down, the placeholder value is fine. (Historically this held a Pocket consumer key; `config.js` is gitignored and must never be committed.)
 
 
 Once npm finishes installing, build an install that npm watches and re-compiles when changes are made with
