@@ -26,6 +26,18 @@ matter; enterprise process does not.
   it in both UIs and the options page.
 - See `docs/architecture.md` for the full component map.
 
+## Roadmap & session context
+
+- `docs/plan.md` — the 7-phase roadmap (move, safety net, bug patch,
+  amputations, polish, new providers, toolchain, nice-to-haves).
+- `docs/specs/phase-*.md` — self-contained specs for Phases 1–5, written
+  for /auto-dev. `backlog.md` is the master findings list.
+- `docs/sessions/` — session logs with kickoff prompts; read the latest
+  one when resuming work.
+- Design docs: `docs/read-later-services.md` (Pocket replacements),
+  `docs/share-providers.md` (social compose intents),
+  `docs/code-review-followups.md` (services-layer polish checklist).
+
 ## Commands
 
 - `npm run watch` — dev build with rebuild on change
