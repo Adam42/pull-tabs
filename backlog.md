@@ -97,8 +97,13 @@ what's captured here, and the remaining polish items not repeated below.
   `displayAdvancedLayout` runs stages in parallel by accident
   (`src/js/uiAdvanced.js:170-205`); HEAD-request XHRs
   (`src/js/uiAdvanced.js:44-77`) lack host permissions under MV3 and will be
-  CORS-blocked. DoD: decision made (finish or delete — see Questions); code
-  matches the decision.
+  CORS-blocked. **DECIDED 2026-07-05: delete** — network mime detection
+  would cost `<all_urls>` host permissions under MV3 and pings every open
+  tab's server; the options-page mime panel is decorative today (prefs
+  saved but never applied — `pref` hardcoded to "ignore",
+  uiAdvanced.js:130). Successor: URL-type smart defaults (Improvements).
+  DoD: mime fetch code, `retrieveFullMimeType` pref, and the options mime
+  panel deleted in Phase 3; advanced layout otherwise unaffected.
 - [ ] **MEDIUM / S — Pulltabs bookmark folder never created when the target
   folder has no children**, and the `tree[0].children[1]` root assumption
   differs between Chrome/Firefox (`src/js/browser.js:79-103`). Fallout:
@@ -141,16 +146,42 @@ what's captured here, and the remaining polish items not repeated below.
   updating too. **Needs owner sign-off — see Questions.** DoD: extension
   builds and works with no Pocket references; manifest permissions shrink to
   `tabs, downloads, bookmarks, storage`; version bumped and released.
-- [ ] **HIGH impact / M — Add Raindrop.io + Instapaper save providers**
-  (Pocket's replacement). Full design in
+- [ ] **HIGH impact / M — Add Raindrop.io + Instapaper + Readwise Reader
+  save providers, plus a generic webhook provider** (Pocket's replacement).
+  Full design + second-round candidate screen in
   [docs/read-later-services.md](docs/read-later-services.md): user-pasted
-  Raindrop test token + Instapaper Basic Auth — no OAuth, no secrets in the
-  repo or shipped zip; Raindrop gets a true bulk `doActionToTabs`. Requires
-  new `host_permissions` (api.raindrop.io, www.instapaper.com) — batch with
-  the Pocket-removal release as a permission swap. DoD: both services
+  tokens / Basic Auth — no OAuth, no secrets in the repo or shipped zip;
+  Raindrop gets a true bulk `doActionToTabs`; the webhook provider covers
+  Zapier/n8n/self-hosted targets. Requires new `host_permissions`
+  (api.raindrop.io, www.instapaper.com, readwise.io) — batch with the
+  Pocket-removal release as a permission swap. Demand-driven follow-ups:
+  Pinboard, linkding, Karakeep, Wallabag. DoD: all first-class services
   save from both layouts with verified credentials; disabled by default
   until configured. **Mailist: blocked — no public API** (verified
-  2026-07-05); watch item, ask contact@mailist.app.
+  2026-07-05); watch item, ask contact@mailist.app. **Omnivore: dead**
+  (Nov 2024) despite listicles still recommending it; **Matter: no public
+  API.**
+- [ ] **MEDIUM impact / M — URL-type smart defaults** (successor to the
+  deleted mime feature). Infer a tab's type from its URL — static
+  extension→bucket map (`.pdf`→pdf, `.jpg/.png/.webp`→image,
+  `.mp4/.mp3`→media, no extension→page) — and pre-select each tab's action
+  in the advanced layout from a per-type preference panel in options
+  ("images → download", "PDFs → Raindrop"…). Zero network, zero new
+  permissions — the reason the fetch-based version was deleted. Gets more
+  valuable as Phase 5 adds destinations. Build after Phase 5. DoD: advanced
+  layout pre-selects per user's type prefs; options panel actually applies
+  (unlike the old decorative one); lookup covered by tests.
+- [ ] **MEDIUM impact / M-L — Dropbox provider** via `/2/files/save_url` —
+  Dropbox's servers fetch the URL and store the file; ideal for the
+  "PDFs → Dropbox" flow with smart defaults. Feasible without a
+  client_secret via **OAuth2 + PKCE** (Dropbox's recommended flow for
+  browser apps; app key is public). Costs: the **`identity` permission
+  comes back** (`launchWebAuthFlow` for the PKCE dance), short-lived
+  (~4h) access tokens + refresh-token storage/refresh logic in
+  credentials.js, and `api.dropboxapi.com` host permission. The most
+  complex provider planned — see docs/read-later-services.md for the tier
+  decision. DoD: connect via PKCE from options, tab URLs saved to a chosen
+  folder, token auto-refresh survives weeks of disuse.
 - [ ] **MEDIUM impact / M — Share-to-social providers** (Bluesky, Threads,
   Reddit; more on request). Compose-intent URLs — no auth, no new manifest
   permissions; one shared `ShareIntentProvider` + tiny subclasses. Design
@@ -229,16 +260,15 @@ what's captured here, and the remaining polish items not repeated below.
 
 ## Questions for the owner (blocking the marked items)
 
-1. **Pocket removal** — remove entirely (recommended), or keep the provider
-   behind a disabled flag for nostalgia? Removal changes the store listing
-   description.
-2. **Mime-type advanced feature** — finish it (needs host permissions +
-   real fetch logic) or delete it (recommended; it's been broken and off by
-   default for years)?
-3. **2017 prototype files** — confirm deletion; anything in `todo.txt` you
-   still want preserved beyond what's absorbed above?
+1. ~~**Pocket removal**~~ — **RESOLVED 2026-07-05: remove entirely**;
+   replacements planned in docs/read-later-services.md.
+2. ~~**Mime-type advanced feature**~~ — **RESOLVED 2026-07-05: delete** the
+   network-mime implementation; successor is URL-type smart defaults (see
+   Improvements).
+3. ~~**2017 prototype files**~~ — **RESOLVED 2026-07-05: deleted** (staged
+   in the WIP landing).
 4. **Build tool swap** — OK to replace laravel-mix? It changes contributor
-   commands in the README.
+   commands in the README. *(Still open — blocks Phase 6 only.)*
 
 ## Remediation plan (proposed session sequence)
 

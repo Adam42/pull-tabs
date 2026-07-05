@@ -81,7 +81,7 @@ manual smoke test in Firefox + Chrome, release.
 
 Exit criteria: all five reproducible bugs verified fixed in both browsers.
 
-### Phase 3 — Amputations, v0.18.0 (1–2 evenings) ⛔ decisions #1 and #2
+### Phase 3 — Amputations, v0.18.0 (1–2 evenings) — ✅ decisions #1 & #2 resolved (remove Pocket; delete mime feature)
 
 Goal: shrink the codebase by deleting everything that's dead.
 
@@ -91,7 +91,8 @@ Goal: shrink the codebase by deleting everything that's dead.
   block, and the config.js consumer-key requirement (keep config.js import
   chain or remove it entirely — removing kills a landmine). Update store
   listing text.
-- ⛔ **Mime-type feature**: delete (recommended) or finish. Deleting removes
+- ✅ **Mime-type feature — DECIDED: delete** (successor: URL-type smart
+  defaults in backlog, built post-P5). Deleting removes
   `getContentType`/`addMimeTypeToTabs` (uiAdvanced.js:21-77), the broken
   `Promise.all` path, and the options-page mime panel.
 - **Bulk-action layer**: delete the broken `forEachTabDo` + fake bulk
@@ -135,7 +136,17 @@ and sub-phases (5a–5d) in [read-later-services.md](read-later-services.md).
 - RaindropProvider: single save + true bulk endpoint (first real
   `doActionToTabs` besides Clipboard).
 - InstapaperProvider: single save via the Simple API.
-- Mailist: no public API — blocked watch item, not built.
+- ReadwiseProvider: single save via `api/v3/save/` (token paste, same
+  pattern as Raindrop).
+- WebhookProvider: `POST {url, title}` to a user-supplied HTTPS URL —
+  universal escape hatch (Zapier/n8n/self-hosted).
+- **Dropbox (optional 5f)**: `save_url` endpoint + OAuth2 PKCE — the one
+  provider that re-adds `identity` and needs refresh-token logic. Decide at
+  Phase 5 start whether to bundle here (one Chrome permission re-approval
+  event) or ship later (second re-approval). Design in
+  read-later-services.md.
+- Mailist: no public API — blocked watch item, not built. Omnivore dead,
+  Matter API-less; full candidate screen in the design doc.
 - **5e — Share-to-social providers** (Bluesky, Threads, Reddit first): one
   `ShareIntentProvider` base opening pre-filled composer tabs — no auth, no
   new permissions, ~10 lines per target. Design + bulk-UX guard in
@@ -182,7 +193,7 @@ In rough order of value:
 ```
 Commit staged work ─▶ MOVE to ~/Herd ─▶ P1 safety net ─▶ P2 bug patch (v0.17.2)
                                                               │
-                              ⛔ decisions #1,#2 ─▶ P3 amputations (v0.18.0)
+                              ✅ resolved      ─▶ P3 amputations (v0.18.0)
                                                               │
                                                    P4 services polish
                                                               │

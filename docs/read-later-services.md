@@ -113,6 +113,61 @@ permission *swap*, not two changes.
 - All calls HTTPS. No third-party analytics, no server of ours in the middle.
 - Never log tokens/passwords; error messages include status codes only.
 
+## Second-round screen (2026-07-05, from owner-supplied listicles)
+
+Screened the candidates from mailist.app's and Zapier's "Pocket
+alternatives" roundups against the same bar: public API + paste-able auth
+(no distributable client_secret).
+
+| Candidate | API / auth | Verdict |
+|---|---|---|
+| **Readwise Reader** | `POST readwise.io/api/v3/save/`, `Authorization: Token` (user copies from readwise.io/access_token), 50 req/min | ✅ **Build — promote to first-class alongside Raindrop/Instapaper.** Major Pocket-refugee destination; identical pattern to Raindrop's token paste |
+| **Pinboard** | `posts/add` with user auth token; API stable 15+ years | ⚪ Cheap optional; add on request |
+| **linkding** (self-hosted) | REST + user token | ⚪ Self-hosted tier, cleanest of the three; on request |
+| **Karakeep** (ex-Hoarder, self-hosted) | REST + API key | ⚪ Self-hosted tier; on request |
+| **Wallabag** (self-hosted) | OAuth2, but the *user* owns the server and creates the client — pasting serverURL + client id/secret + user/pass is acceptable for self-hosters | ⚪ Self-hosted tier; clunkiest setup; on request |
+| **Generic webhook** | User pastes any HTTPS URL; we `POST {url, title}` | ✅ **Build — tiny and high-leverage.** Covers Zapier/n8n/IFTTT/Make (the Zapier article's actual answer), and any future self-hosted PullTabs server (backlog parking lot) |
+| Chrome Reading List | Native `chrome.readingList` extension API — zero account | ⚪ Interesting but Chrome-only (no Firefox parity) + new `readingList` permission; parking lot |
+| Omnivore | **Dead** — shut down Nov 2024 (ElevenLabs acquihire), data deleted; some listicles still recommend it | ❌ |
+| Matter | No public API (unofficial reverse-engineered only) | ❌ |
+| Evernote / OneNote / Notion | OAuth platforms w/ secrets; Notion *could* work via user-created internal-integration token but needs a database-picker UX and is a notes tool, not read-later | ❌ (Notion → parking lot at most) |
+| Feedly / Inoreader | OAuth w/ secret; RSS readers where save-URL is secondary | ❌ |
+| Safari Reading List | No extension API exposed | ❌ |
+
+Net effect on the build: **three first-class providers** (Raindrop,
+Instapaper, Readwise Reader) plus the **webhook escape hatch**, all on the
+same credentials.js foundation; self-hosted tier and Pinboard as
+demand-driven follow-ups. Still nothing that needs `identity` or a secret.
+
+## Dropbox (owner-requested, third round — 2026-07-05)
+
+Different shape from everything above, and worth it:
+
+- **The endpoint is a gift**: `POST /2/files/save_url` makes *Dropbox's
+  servers* fetch the URL and store the file — no client-side download,
+  async job with a status-check endpoint
+  ([docs](https://www.dropbox.com/developers/documentation/http/documentation),
+  [dropbox.tech writeup](https://dropbox.tech/developers/programmatically-saving-a-url-to-dropbox)).
+  Pairs perfectly with URL-type smart defaults ("PDFs → Dropbox").
+- **No secret needed** — Dropbox explicitly recommends **OAuth2 + PKCE**
+  for browser apps ([PKCE guide](https://dropbox.tech/developers/pkce--what-and-why-));
+  the app key is public by design.
+- **But it's the one provider that re-needs `identity`**: PKCE requires a
+  real authorization redirect (`identity.launchWebAuthFlow`), and Dropbox
+  issues **short-lived (~4h) access tokens + long-lived refresh tokens**
+  ([offline access guide](https://dropbox.tech/developers/using-oauth-2-0-with-offline-access)),
+  so credentials.js grows token-refresh logic. No paste-a-permanent-token
+  path exists (long-lived tokens were retired in 2021).
+
+**Tier decision**: build *after* the token-paste providers (5a–5d ship
+first), as its own sub-phase. Permission strategy: since Chrome disables an
+extension pending user re-approval when permissions grow, either (a) bundle
+Dropbox into the same release as the other new host permissions (one
+re-approval event — requires building it in Phase 5), or (b) ship it later
+and accept a second re-approval prompt. Owner's call when Phase 5 starts;
+the P3 `identity` drop stays correct either way — never ship an unused
+permission, re-request with justification when the feature lands.
+
 ## Mailist
 
 No public API (verified against their FAQ, 2026-07-05 — manual entry, their
@@ -143,9 +198,20 @@ they land in Raindrop "Unsorted".
 manifest host permission, 403 handling. Tests: Basic-Auth header
 construction, 201/403 paths.
 
+**5c′ — Readwise Reader (S):** provider class (single save; 50 req/min is
+ample), icon, registry entry, `https://readwise.io/*` host permission,
+401 handling + token-verify via `GET /api/v2/auth/`. Tests: Token header,
+payload shape.
+
+**5c″ — Generic webhook (S):** options field for an HTTPS URL,
+`POST {url, title}` per tab; no icon dependency (generic send icon); no new
+host permission possible (user-defined host) — document that it relies on
+the target's CORS or an `optional_host_permissions` request at save time.
+Tests: payload, non-2xx error path.
+
 **5d — Release (S):** version bump (both files), README + store listings
-("save tabs to Raindrop or Instapaper"), screenshots, AMO/CWS submission
-with the permission-swap notes.
+("save tabs to Raindrop, Instapaper, or Readwise Reader"), screenshots,
+AMO/CWS submission with the permission-swap notes.
 
 Prerequisites: Phase 3 (Pocket amputation) and ideally Phase 4 (async/error
 polish) — new providers should be born async with standardized errors, not
