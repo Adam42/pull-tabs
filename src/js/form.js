@@ -126,9 +126,9 @@ export var form = form || {
   getSelectedTabs: function(tabs) {
     var inputs = tabs.length;
 
-    let actions = ServiceFactory.getActions();
+    const actions = ServiceFactory.getActions();
 
-    let selected = [];
+    const selected = [];
 
     actions.forEach(function(action) {
       selected[action] = [];
@@ -153,7 +153,7 @@ export var form = form || {
 
         for (x = 0; x < radios.length; x++) {
           if (radios[x].checked) {
-            let action = radios[x].value;
+            const action = radios[x].value;
             selected[action].push(tabs[i]);
             break;
           }

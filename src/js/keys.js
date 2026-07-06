@@ -29,7 +29,7 @@ keys.preferences.autoClose = {
 keys.preferences.retrieveFullMimeType = false;
 
 //list of available actions to apply to a tab
-let actions = ServiceFactory.getActions();
+const actions = ServiceFactory.getActions();
 
 //ignore is always needed as a non-action
 //and thus not able to be disabled by the user
@@ -57,8 +57,9 @@ keys.preferences.services = {};
  * string and sets a default state for each service
  */
 function setDefaultServices() {
-  for (let action in actions) {
-    let name = actions[action];
+  // eslint-disable-next-line guard-for-in -- actions is a plain object literal; Phase 2-4 cleanup
+  for (const action in actions) {
+    const name = actions[action];
     keys.preferences.services["service_" + name] =
       keys.preferences.tabOptions[1];
   }

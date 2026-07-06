@@ -13,7 +13,7 @@ var aboutPullTabs = aboutPullTabs || {
 
     for (i = 0; i < len; i++) {
       links[i].addEventListener("click", function(e) {
-        let tab = {
+        const tab = {
           url: e.target.href,
           active: false
         };

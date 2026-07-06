@@ -2,8 +2,6 @@
  * Wrapper around browser promise-based local storage calls
  */
 export default class storage {
-  constructor() {}
-
   /**
      * Store an object into browser local storage
      * @param  {object} object [description]
@@ -18,8 +16,8 @@ export default class storage {
      *
      * @param  {string} key    Local storage key
      * @param  {object} object The object to save
-     * @return {[type]}        [description]
      */
+  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: storage consolidation
   save(key, object) {
     try {
       browser.storage.local.set(object, function() {

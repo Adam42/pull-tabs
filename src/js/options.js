@@ -50,7 +50,7 @@ export var options =
       var optionsForm = document.getElementById("file-type-destinations");
 
       for (var i = 0; i < opt.numOfmimeTypes; i++) {
-        let mimeType = opt.mimeTypes[i];
+        const mimeType = opt.mimeTypes[i];
 
         var panel = document.createElement("div");
         panel.setAttribute("class", "panel panel-default row");
@@ -64,7 +64,7 @@ export var options =
         headerDiv.appendChild(header);
         panel.appendChild(headerDiv);
 
-        let radioInputs = createRadioInputs(mimeType);
+        const radioInputs = createRadioInputs(mimeType);
         panel.appendChild(radioInputs);
 
         optionsForm.appendChild(panel);
@@ -72,20 +72,20 @@ export var options =
     }
 
     function createRadioInputs(name) {
-      let div = document.createElement("div");
+      const div = document.createElement("div");
       div.setAttribute("class", "panel-body col-md-10");
 
       for (var x = 0; x < opt.numOftabActions; x++) {
-        let label = document.createElement("label");
-        let input = document.createElement("input");
-        let action = keys.preferences.tabActions[x];
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        const action = keys.preferences.tabActions[x];
 
         input.type = "radio";
         input.id = action;
         input.name = name;
         input.value = action;
 
-        let span = document.createElement("span");
+        const span = document.createElement("span");
         span.textContent = capitalize(action);
 
         label.appendChild(input);
@@ -99,21 +99,21 @@ export var options =
     /**
      * Create a checkbox element for services
      * @param  {[type]} name [description]
-     * @return {HTMLButtonElement} [description]
+     * @param  {[type]} form [description]
      */
     function addServiceCheckBox(name, form) {
-      let body = document.createElement("div");
+      const body = document.createElement("div");
       body.setAttribute("class", "panel-body col-md-8");
-      let input = document.createElement("input");
+      const input = document.createElement("input");
       input.type = "checkbox";
       input.name = "service-checkbox";
       input.id = name;
       input.title = name;
       input.value = keys.preferences.services[name];
       input.checked =
-        String(keys.preferences.services[name]) === "enabled" ? true : false;
+        String(keys.preferences.services[name]) === "enabled";
 
-      let label = document.createElement("label");
+      const label = document.createElement("label");
       label.setAttribute("for", name);
       label.insertAdjacentText(
         "beforeEnd",
@@ -234,13 +234,13 @@ export var options =
 
     opt.setServices = function(services) {
       services = Object.entries(services);
-      let num = services.length;
+      const num = services.length;
 
       for (var i = 0; i < num; i++) {
-        let service = services[i];
-        let name = service[0];
-        let value = service[1];
-        let serviceInput = document.getElementById(name);
+        const service = services[i];
+        const name = service[0];
+        const value = service[1];
+        const serviceInput = document.getElementById(name);
 
         if (String(value) === "enabled") {
           serviceInput.checked = true;
@@ -292,8 +292,6 @@ export var options =
 
     /**
      * Persist user's autoclose preference to storage
-     *
-     * @return {Promise} Promise represents storage update result
      */
     opt.saveAutoClose = function() {
       var autoCloseButton = document.getElementById(
@@ -314,8 +312,8 @@ export var options =
      * @return {Promise} Promise represents result of storage action
      */
     opt.saveLayout = function() {
-      let simpleCheckbox = document.getElementById("preference-input-simple");
-      let advancedCheckbox = document.getElementById(
+      const simpleCheckbox = document.getElementById("preference-input-simple");
+      const advancedCheckbox = document.getElementById(
         "preference-input-advanced"
       );
 
@@ -363,7 +361,6 @@ export var options =
 
     /**
      * Persist user's mimeType preference to storage
-     * @return {Promise} Promise represents result of storage action
      */
     opt.saveFullMimeType = function() {
       var isChecked = document.getElementById(
@@ -414,7 +411,7 @@ export var options =
      *
      */
     opt.enableOverlay = function() {
-      let overlay = document.getElementById("overlay");
+      const overlay = document.getElementById("overlay");
       overlay.style.display = "block";
     };
 
@@ -422,7 +419,7 @@ export var options =
      * Remove the overlay thus allowing user input again
      */
     opt.disableOverlay = function() {
-      let overlay = document.getElementById("overlay");
+      const overlay = document.getElementById("overlay");
       overlay.style.display = "none";
     };
 
@@ -458,20 +455,19 @@ export var options =
     /**
      * Save service providers status ( enabled/disabled )
      * @param  {[type]} evt [description]
-     * @return {[type]}     [description]
      */
     opt.saveServices = function(evt) {
-      let target = evt.target;
-      let name = target.htmlFor ? target.htmlFor : target.id;
+      const target = evt.target;
+      const name = target.htmlFor ? target.htmlFor : target.id;
       target.value = target.checked ? "enabled" : "disabled";
 
       if (keys.preferences.services.hasOwnProperty(name)) {
-        let serviceObj = {};
+        const serviceObj = {};
         serviceObj[name] = target.value;
         opt.storeOption(serviceObj, "Services");
       }
 
-      target.checked = target.value == "enabled" ? true : false;
+      target.checked = target.value == "enabled";
     };
 
     return opt;

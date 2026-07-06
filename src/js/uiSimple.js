@@ -16,18 +16,18 @@ import UI from "./ui.js";
 export var uiSimple = uiSimple || {
   doActionToAllTabs: function(evt) {
     evt.preventDefault();
-    let action = evt.target.id.toString();
+    const action = evt.target.id.toString();
     uiSimple.processButton(action);
   },
 
   processButton: function(action) {
     //retrieve the ServiceProvider corresponding to this action
-    let service = ServiceFactory.convertActionToProvider(action);
-    service = new service(popup.tabs);
+    const Service = ServiceFactory.convertActionToProvider(action);
+    const service = new Service(popup.tabs);
 
     switch (action) {
-      case "download":
-        let callback = uiSimple.handleChangedDownloads;
+      case "download": {
+        const callback = uiSimple.handleChangedDownloads;
         service.registerCallback(callback);
 
         //Loop through each tab and perform the ServiceProvider's action on it
@@ -45,6 +45,7 @@ export var uiSimple = uiSimple || {
         });
 
         break;
+      }
 
       case "clipboard":
         service.doActionToTabs().then(
@@ -79,22 +80,21 @@ export var uiSimple = uiSimple || {
 
   /**
    * Get the provider actions and create a button for each of them
-   * @return {[type]} [description]
    */
   displayButtons: function() {
-    let simpleForm = document.getElementById("simple-ui");
+    const simpleForm = document.getElementById("simple-ui");
 
-    let actions = ServiceFactory.getActions();
+    const actions = ServiceFactory.getActions();
 
-    let getServices = browser.storage.local.get(keys.preferences.services);
+    const getServices = browser.storage.local.get(keys.preferences.services);
 
     getServices.then(services => {
       actions.forEach(function(action) {
-        let status = services["service_" + action];
+        const status = services["service_" + action];
 
         if (String(status) === "enabled") {
-          let label = document.createElement("label");
-          let button = this.renderActionButton(action);
+          const label = document.createElement("label");
+          const button = this.renderActionButton(action);
 
           label.appendChild(button);
           simpleForm.appendChild(label);
@@ -118,8 +118,8 @@ export var uiSimple = uiSimple || {
    * @return {HTMLButtonElement}        An action Button
    */
   renderActionButton: function(action) {
-    let button = document.createElement("button");
-    let img = document.createElement("img");
+    const button = document.createElement("button");
+    const img = document.createElement("img");
 
     button.id = action;
     img.setAttribute("height", "16px");
@@ -137,7 +137,7 @@ export var uiSimple = uiSimple || {
    * and pass the event for further processing
    */
   watchButtons: function() {
-    let buttons = document.getElementById("simple-ui");
+    const buttons = document.getElementById("simple-ui");
 
     buttons.addEventListener("click", function(event) {
       uiSimple.doActionToAllTabs(event);
@@ -147,7 +147,7 @@ export var uiSimple = uiSimple || {
   /**
    * [updateUI description]
    * @param  {object} tab     Browser tab object
-   * @param  {string} message - a message describing the action result
+   * @param  {string} messageText - a message describing the action result
    * @param  {string} status  corresponds to UI context
    */
   updateUI: function(tab, messageText, status) {
@@ -176,10 +176,9 @@ export var uiSimple = uiSimple || {
    *
    * @param  {object} tab    A browser tab object
    * @param  {string} action Represents the ServiceProvider and its action
-   * @return {[type]}        [description]
    */
   updateUIWithSuccess: function(tab, action) {
-    let actioned = action + "ed";
+    const actioned = action + "ed";
     uiSimple.updateUI(tab, "Successfuly " + actioned + " ", "success");
   },
 
@@ -190,10 +189,9 @@ export var uiSimple = uiSimple || {
    *
    * @param  {object} tab    A browser tab object
    * @param  {string} action Represents the ServiceProvider and its action
-   * @return {[type]}        [description]
    */
   updateUIWithFail: function(tab, action) {
-    let actioning = action + "ing";
+    const actioning = action + "ing";
     uiSimple.updateUI(tab, "Failed " + actioning + " ", "danger");
   },
 
@@ -205,7 +203,7 @@ export var uiSimple = uiSimple || {
     var name = "downloadTabItem-" + delta.id;
 
     browser.storage.local.get(name).then(function(result) {
-      let tab = result[name];
+      const tab = result[name];
 
       if (delta.state && delta.state.current === "complete") {
         uiSimple.updateUI(tab, "Completed downloading ", "success");

@@ -1,12 +1,4 @@
 module.exports = {
-  transform: {
-  },
-  transformIgnorePatterns: [
-    'node_modules/(?!YOUR_MODULE_HERE)',
-  ],
-  globals: {
-    'babel-jest': {
-      useESM: true,
-    },
-  },
+  testEnvironment: "node",
+  testMatch: ["<rootDir>/src/tests/**/*.test.js"],
 };

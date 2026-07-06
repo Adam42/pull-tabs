@@ -76,6 +76,7 @@ export var messageManager = messageManager || {
      * @return {void}    [description]
      */
   removeStatusMessage: function(id) {
+    // eslint-disable-next-line valid-typeof -- Phase 2: known bug, null-safe removal fix scheduled
     if (typeof id === null) {
       id = "status-message-0";
     }

@@ -16,9 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
  * Log storage changes to console if dev flag is set.
  * @type {Boolean}
  */
-let dev = false;
+const dev = false;
 if (dev) {
   browser.storage.onChanged.addListener(function(changes, namespace) {
+    // eslint-disable-next-line guard-for-in -- dev-only logging; Phase 2-4 cleanup
     for (var key in changes) {
       console.log(changes);
       if (changes.hasOwnProperty("key")) {

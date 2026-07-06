@@ -15,6 +15,7 @@ export default class ServiceProvider {
    * Perform an action on a single tab
    * @param  {object} tab Browser tab object
    */
+  // eslint-disable-next-line class-methods-use-this, require-await -- abstract stub for child classes
   async doActionToTab(tab) {
     throw new Error("doActionToTab must be implemented by child class");
   }
@@ -23,6 +24,7 @@ export default class ServiceProvider {
    * Perform an action on multiple tabs
    * @param  {array} tabs Collection of tab objects
    */
+  // eslint-disable-next-line class-methods-use-this, require-await -- abstract stub for child classes
   async doActionToTabs(tabs) {
     throw new Error("doActionToTabs must be implemented by child class");
   }
@@ -31,8 +33,9 @@ export default class ServiceProvider {
    * Do an action for each tab in a collection of tabs
    * @param  {array} tabs   Collection of browser tab objects
    * @param  {function} action Function to call on each tab
-   * @return Promise        Returns promise returned by action function
+   * @return {Promise}        Returns promise returned by action function
    */
+  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: broken bulk layer, slated for fix-or-delete
   forEachTabDo(tabs, action) {
     var numTabs = tabs.length;
     var i;

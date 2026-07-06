@@ -4,10 +4,6 @@ import ServiceProvider from "./ServiceProvider.js";
  * Provides copying to clipboard actions to tabs
  */
 export default class ClipboardProvider extends ServiceProvider {
-  constructor(tabs) {
-    super(tabs);
-  }
-
   doActionToTab(tab) {
     return this.copyTabToClipboard(tab);
   }
@@ -19,13 +15,14 @@ export default class ClipboardProvider extends ServiceProvider {
   /**
    * Copies the Title & URL of every tab into the clipboard
    *
+   * @param  {array} tabs Collection of tab objects
    * @return {Promise} Rejects with Error or resolves if successful
    */
   copyAllTabsToClipboard(tabs) {
-    let text = "";
+    const text = "";
 
-    const reducer = (text, currentTab) =>
-      text + String(currentTab.title) + ": " + String(currentTab.url) + "\n";
+    const reducer = (acc, currentTab) =>
+      acc + String(currentTab.title) + ": " + String(currentTab.url) + "\n";
 
     const clipboardText = tabs.reduce(reducer, text);
 
@@ -57,6 +54,7 @@ export default class ClipboardProvider extends ServiceProvider {
    * @param  {object} element The hidden HTML element
    * @return {object}         Returns the HTML element with hidden styles applied
    */
+  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: services-layer polish
   hideClipboardElement(element) {
     //Just setting display or visibility to none interferes with selecting the text to copy
     //https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript

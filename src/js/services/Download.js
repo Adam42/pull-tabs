@@ -6,10 +6,6 @@ import { browserUtils } from "../browser.js";
  * Provides downloading actions to tabs
  */
 export default class DownloadProvider extends ServiceProvider {
-  constructor(tabs) {
-    super(tabs);
-  }
-
   doActionToTab(tab) {
     return this.downloadTab(tab);
   }
@@ -31,7 +27,6 @@ export default class DownloadProvider extends ServiceProvider {
      * to check status
      *
      * @param  {array} tabs Collection of tab objects
-     * @return {[type]}      [description]
      */
   downloadTabs(tabs) {
     tabs.forEach(function(tab) {
@@ -70,8 +65,8 @@ export default class DownloadProvider extends ServiceProvider {
     }
 
     return browser.downloads.download(file).then(e => {
-      let downloadItem = "downloadTabItem-" + e;
-      let obj = {};
+      const downloadItem = "downloadTabItem-" + e;
+      const obj = {};
 
       obj[downloadItem] = tab;
 
@@ -83,7 +78,6 @@ export default class DownloadProvider extends ServiceProvider {
    * Setup a callback to apply when the download item's
    * status changes
    * @param  {Function} callback Function to call when status changes
-   * @return {[type]}            [description]
    */
   registerCallback(callback) {
     this.watchDownloads(callback);
@@ -91,8 +85,9 @@ export default class DownloadProvider extends ServiceProvider {
 
   /**
    * Setup up a listener to watch for changes to DownloadItem
-   * @return {[type]} [description]
+   * @param  {Function} callback Function to call when status changes
    */
+  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: services-layer polish
   watchDownloads(callback) {
     browser.downloads.onChanged.addListener(callback);
   }

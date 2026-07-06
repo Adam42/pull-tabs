@@ -21,6 +21,7 @@ export default class UI {
     return storage.retrieve(keys.preferences.autoClose);
   }
 
+  // eslint-disable-next-line class-methods-use-this -- stub overridden by layout views
   displayLayout() {}
 
   /**
@@ -31,8 +32,8 @@ export default class UI {
    * @param  {class} view    A UI type, simple or advanced
    */
   static doActionToTabForTabs(tabs, action, view) {
-    let service = ServiceFactory.convertActionToProvider(action);
-    service = new service(tabs);
+    const Service = ServiceFactory.convertActionToProvider(action);
+    const service = new Service(tabs);
 
     tabs.forEach(function(tab) {
       service.doActionToTab(tab).then(
@@ -55,8 +56,8 @@ export default class UI {
   static autoCloseIfEnabled(tab) {
     browser.storage.local.get(keys.preferences.autoClose).then(preference => {
       if (String(preference.autoCloseTabs) === "true") {
-        let close = ServiceFactory.convertActionToProvider("close");
-        close = new close([tab]);
+        const Close = ServiceFactory.convertActionToProvider("close");
+        const close = new Close([tab]);
         close.doActionToTab(tab);
       }
     });

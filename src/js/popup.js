@@ -16,8 +16,6 @@ export var popup = popup || {
   /**
    * Get user's UI layout preferences and then
    * get tabs if advanced layout is active
-   *
-   * @return {[type]} [description]
    */
   init: function() {
     //Force user to go to options page on initial load
@@ -74,7 +72,7 @@ export var popup = popup || {
 
   /**
      * Determine which layouts are enabled and perform initial setup for those layouts
-     * @return {void} [description]
+     * @param  {object} layout Layout preference object
      */
   displayLayout: function(layout) {
     if (String(layout.simple) == "true") {
@@ -118,7 +116,7 @@ export var popup = popup || {
    * @param  {object} autoCloseStatus The stored autoclose preference object
    */
   displayAutoCloseStatus: function(autoCloseStatus) {
-    let autoCloseElem = document.getElementById("autoclose-status");
+    const autoCloseElem = document.getElementById("autoclose-status");
     if (String(autoCloseStatus.autoCloseTabs) === "true") {
       autoCloseElem.classList.remove("hidden");
     } else {

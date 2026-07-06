@@ -1,3 +1,5 @@
+/* eslint-disable */
+// Phase 3: this file is slated for deletion (Pocket removal / mime-feature removal) — not worth lint churn.
 import ServiceProvider from "./ServiceProvider.js";
 import { config } from "../config.js";
 

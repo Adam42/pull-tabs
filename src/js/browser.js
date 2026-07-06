@@ -5,7 +5,7 @@ import { form } from "./form.js";
 
 //Make sure the browser namespace is set to something
 //supported msBrowser is Edge, browser is Firefox/W3C, chrome is Google Chrome
-if ("undefined" == typeof browser) {
+if (typeof browser == "undefined") {
   window.browser = (function() {
     return window.msBrowser || window.browser || window.chrome;
   })();
@@ -74,10 +74,9 @@ export var browserUtils = {
       *  AND if it does not find one then creates one
       *
       * @param  {object} tree -  array representing tree of bookmarks
-      * @return {[type]}            [description]
       */
   findPulltabsBookmarkFolder: function(tree) {
-    let bookmarks = tree[0].children[1];
+    const bookmarks = tree[0].children[1];
 
     var count = bookmarks.children.length;
     var i;
@@ -132,7 +131,7 @@ export var browserUtils = {
      *
      */
   login: function(pocket) {
-    let redirect = this.extensionGetURL("pocket.html");
+    const redirect = this.extensionGetURL("pocket.html");
     pocket.auth = pocket.auth + encodeURIComponent(redirect);
     window.open(pocket.auth);
   },
