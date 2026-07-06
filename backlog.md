@@ -111,6 +111,20 @@ what's captured here, and the remaining polish items not repeated below.
   folder (`parentId: undefined`, `src/js/services/Bookmark.js:44`). DoD:
   folder found-or-created on both browsers including the empty case;
   bookmarks land in "Pulltabs".
+- [ ] **LOW / S — Bookmark folder search is index-based and shallow, not
+  metadata-driven** (`src/js/browser.js:82`). The `children?.[1] ?? children?.[0]`
+  fallback (added in 436dd86) still picks root child 1 unconditionally when it
+  exists and only searches that one root for an existing "Pulltabs" folder.
+  Consequence: a user's pre-existing "Pulltabs" folder under a different root
+  (e.g. Firefox Bookmarks Menu at index 0) is missed → a duplicate is created;
+  and which top-level folder Pulltabs lives under differs by browser (Chrome
+  index 1 = Other Bookmarks, Firefox index 1 = Toolbar). Pre-existing design
+  limitation, not a regression — the extension works because the created
+  folder's id is saved and reused consistently. From Codex review of 436dd86.
+  DoD: search all `root.children` for an existing "Pulltabs" folder before
+  creating one; resolve the create-parent by stable root metadata rather than a
+  raw index; regression test where the target parent is not index 1 while index
+  1 also exists.
 - [ ] **LOW / S — `PocketProvider.doActionToTabs` is a console.log stub**
   (`src/js/services/Pocket.js:16-18`). Superseded by Pocket removal.
 - [ ] **LOW / S — Download bulk path references nonexistent `this.updateUI`**
