@@ -48,14 +48,14 @@ what's captured here, and the remaining polish items not repeated below.
   because the second definition shadows the first. DoD: single correct
   `async doActionToTab`, change committed (this is the WIP on
   `refactor/async-services`).
-- [ ] **HIGH / S — Clicking a simple-view button's *icon* throws.**
+- [x] **HIGH / S — Clicking a simple-view button's *icon* throws.**
   `doActionToAllTabs` reads `evt.target.id` (`src/js/uiSimple.js:19`), but
   clicking the `<img>` inside the button yields an empty id →
   `convertActionToProvider("")` throws `TypeError`
   (`src/js/services/ServiceFactory.js:40-42`) and nothing happens. DoD: use
   `evt.target.closest("button")` (or listen on buttons), icon clicks perform
   the action.
-- [ ] **HIGH / S — Loading spinner image 404s on case-sensitive systems.**
+- [x] **HIGH / S — Loading spinner image 404s on case-sensitive systems.**
   `src/popup.html:27` references `img/pacman.svg`; the file is
   `src/img/Pacman.svg`. Broken for every Linux user. DoD: filename and
   reference match; spinner renders on Linux.
@@ -69,13 +69,13 @@ what's captured here, and the remaining polish items not repeated below.
   rather than a live fault. DoD: either fix `forEachTabDo` + callers with a
   test, or delete the unused bulk methods (Clipboard keeps its real
   `doActionToTabs`).
-- [ ] **MEDIUM / S — Simple-view download shows status prematurely.**
+- [x] **MEDIUM / S — Simple-view download shows status prematurely.**
   `.then(uiSimple.updateUI(tab, "Started downloading ", "info"))` invokes
   `updateUI` immediately and passes `undefined` to `.then`
   (`src/js/uiSimple.js:36-44`) — "Started downloading" renders even when the
   download promise rejects, alongside the later "Failed" message. DoD: pass a
   function; message appears only on resolution.
-- [ ] **MEDIUM / S — `removeStatusMessage` crashes on already-removed
+- [x] **MEDIUM / S — `removeStatusMessage` crashes on already-removed
   messages.** `typeof id === null` is always false
   (`src/js/message.js:79`) and `document.getElementById(id)` can be null when
   a timeout fires after manual removal (`src/js/message.js:82-84`). Likely
@@ -104,7 +104,7 @@ what's captured here, and the remaining polish items not repeated below.
   uiAdvanced.js:130). Successor: URL-type smart defaults (Improvements).
   DoD: mime fetch code, `retrieveFullMimeType` pref, and the options mime
   panel deleted in Phase 3; advanced layout otherwise unaffected.
-- [ ] **MEDIUM / S — Pulltabs bookmark folder never created when the target
+- [x] **MEDIUM / S — Pulltabs bookmark folder never created when the target
   folder has no children**, and the `tree[0].children[1]` root assumption
   differs between Chrome/Firefox (`src/js/browser.js:79-103`). Fallout:
   `pullTabsFolderId` stays unset and bookmarks silently land in the default

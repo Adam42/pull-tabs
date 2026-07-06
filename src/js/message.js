@@ -76,12 +76,14 @@ export var messageManager = messageManager || {
      * @return {void}    [description]
      */
   removeStatusMessage: function(id) {
-    // eslint-disable-next-line valid-typeof -- Phase 2: known bug, null-safe removal fix scheduled
-    if (typeof id === null) {
+    if (id === null || typeof id === "undefined") {
       id = "status-message-0";
     }
-    var status = document.getElementById(id);
-    var parent = status.parentNode;
+    const status = document.getElementById(id);
+    if (!status) {
+      return;
+    }
+    const parent = status.parentNode;
     status.remove();
 
     if (parent.children.length <= 0) {

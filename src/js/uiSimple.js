@@ -16,8 +16,11 @@ import UI from "./ui.js";
 export var uiSimple = uiSimple || {
   doActionToAllTabs: function(evt) {
     evt.preventDefault();
-    const action = evt.target.id.toString();
-    uiSimple.processButton(action);
+    const button = evt.target.closest("button");
+    if (!button) {
+      return;
+    }
+    uiSimple.processButton(button.id);
   },
 
   processButton: function(action) {
@@ -34,7 +37,7 @@ export var uiSimple = uiSimple || {
         popup.tabs.forEach(function(tab) {
           service
             .doActionToTab(tab)
-            .then(
+            .then(() =>
               //Display a message that the download has begun
               uiSimple.updateUI(tab, "Started downloading ", "info")
             )

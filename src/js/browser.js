@@ -76,29 +76,27 @@ export var browserUtils = {
       * @param  {object} tree -  array representing tree of bookmarks
       */
   findPulltabsBookmarkFolder: function(tree) {
-    const bookmarks = tree[0].children[1];
-
-    var count = bookmarks.children.length;
-    var i;
+    const root = tree?.[0];
+    //Chrome/Firefox roots differ: prefer the second child
+    //("Other bookmarks" / toolbar), fall back to the first
+    const bookmarks = root?.children?.[1] ?? root?.children?.[0];
+    if (!bookmarks) {
+      return;
+    }
 
     //look for an existing bookmark folder called Pulltabs
-    for (i = 0; i < count; i++) {
-      //We already have a bookmark folder created
-      //so just save that folder id
-      if (bookmarks.children[i].title === "Pulltabs") {
-        this.saveBookmarkFolder(bookmarks.children[i].id);
-        break;
-      }
-      //We've reached the end of the bookmark folders
-      //and did not find an existing pulltabs folder
-      if (i == count - 1) {
-        var folder = {
-          parentId: bookmarks.id,
-          title: "Pulltabs"
-        };
-        this.createPulltabsBookmarkFolder(folder);
-      }
+    const existing = (bookmarks.children ?? []).find(
+      child => child.title === "Pulltabs"
+    );
+    if (existing) {
+      this.saveBookmarkFolder(existing.id);
+      return;
     }
+
+    this.createPulltabsBookmarkFolder({
+      parentId: bookmarks.id,
+      title: "Pulltabs"
+    });
   },
 
   createPulltabsBookmarkFolder: function(folder) {
