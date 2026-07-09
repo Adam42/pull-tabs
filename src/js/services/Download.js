@@ -6,12 +6,24 @@ import { browserUtils } from "../browser.js";
  * Provides downloading actions to tabs
  */
 export default class DownloadProvider extends ServiceProvider {
-  doActionToTab(tab) {
-    return this.downloadTab(tab);
+  /**
+   * Download a single tab
+   * @param  {object} tab A browser tab object
+   * @return {Promise} Resolves once the download has been started and tracked
+   * @throws {Error} If the tab is invalid or the download cannot be started
+   */
+  async doActionToTab(tab) {
+    try {
+      ServiceProvider.validateTab(tab);
+      const result = await this.downloadTab(tab);
+      return result;
+    } catch (error) {
+      throw new Error(`Download failed: ${error.message}`);
+    }
   }
 
   /**
-   * Download a single Tab
+   * Start downloading a single tab and record it for status tracking
    *
    * Note that the promise is resolved when a download is
    * started; the DownloadItem's state will change to either
@@ -19,18 +31,19 @@ export default class DownloadProvider extends ServiceProvider {
    * if something prevented the download from completing,
    * thus we must watch for changes to DownloadItem to check status.
    * @param  {object} tab A browser tab object
-   * @return {Promise}     Promise representing whether download started
+   * @return {Promise} Resolves once the download record is stored
+   * @throws {Error} If the tab is an internal browser page
    */
-  downloadTab(tab) {
+  // eslint-disable-next-line class-methods-use-this -- worker calls browser.*/module helpers only, no instance state
+  async downloadTab(tab) {
     //Internal Firefox pages will halt all downloading
     //so we'll skip any URLs that start with "about:"
     if (tab.url.substring(0, 6) === "about:") {
-      //throw new Error("Cannot download internal Firefox pages");
-      return Promise.reject(new Error("fail"));
+      throw new Error("cannot download internal browser pages");
     }
 
-    var file = {
-      url: tab.url
+    const file = {
+      url: tab.url,
     };
 
     //If the file doesn't have an filename ending save it as an HTML file
@@ -42,20 +55,18 @@ export default class DownloadProvider extends ServiceProvider {
       file.method = "GET";
     }
 
-    return browser.downloads.download(file).then(e => {
-      const downloadItem = "downloadTabItem-" + e;
-      const obj = {};
+    const downloadId = await browser.downloads.download(file);
+    const obj = { [`downloadTabItem-${downloadId}`]: tab };
+    const result = await browser.storage.local.set(obj);
 
-      obj[downloadItem] = tab;
-
-      return browser.storage.local.set(obj);
-    }, this);
+    return result;
   }
 
   /**
    * Setup a callback to apply when the download item's
    * status changes
    * @param  {Function} callback Function to call when status changes
+   * @return {void}
    */
   registerCallback(callback) {
     this.watchDownloads(callback);
@@ -64,8 +75,9 @@ export default class DownloadProvider extends ServiceProvider {
   /**
    * Setup up a listener to watch for changes to DownloadItem
    * @param  {Function} callback Function to call when status changes
+   * @return {void}
    */
-  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: services-layer polish
+  // eslint-disable-next-line class-methods-use-this -- worker calls browser.* only, no instance state
   watchDownloads(callback) {
     browser.downloads.onChanged.addListener(callback);
   }

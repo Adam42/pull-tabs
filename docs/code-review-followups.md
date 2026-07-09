@@ -39,39 +39,58 @@ lost.
 
 Ordered by (impact ÷ effort). All S unless noted.
 
-- [ ] **Async/await consistency across remaining providers** — Close,
+All nine resolved in **Phase 4** (services-layer polish, done 2026-07-09;
+ships with Phase 5's 0.19.0). Suite green (44 tests), lint clean (0 errors),
+`npm run dev` builds, no manifest/version change.
+
+- [x] **Async/await consistency across remaining providers** — Close,
   Download, Clipboard still use sync methods / bare `.then` (Download.js).
   Finish what the WIP started in Bookmark/ServiceProvider.
   DoD: every provider's `doActionToTab`/`doActionToTabs` is `async` and
   returns a settled-able promise; UI callers unchanged or simplified.
-- [ ] **Standardize error handling & message format across providers** —
+  Done (2026-07-09): Close/Download/Clipboard entry methods are `async`;
+  Download's `.then` chain + stray `this` handler rewritten to `await`.
+- [x] **Standardize error handling & message format across providers** —
   today a mix of `throw new Error("Failed to bookmark…")`,
   `Promise.reject(new Error("fail"))` (Download.js:56, Clipboard.js:45), and
   silent catch-and-log. DoD: one pattern (throw from async methods, real
   messages), no `"fail"` strings.
-- [ ] **`validateTab()` helper on ServiceProvider** — Bookmark now validates
+  Done (2026-07-09): one format `"<Action> failed: <reason>"`, wrapped once
+  per public entry; workers throw unprefixed reasons; no `"fail"` strings.
+- [x] **`validateTab()` helper on ServiceProvider** — Bookmark now validates
   url/title inline; hoist to the base class so Close/Download/Clipboard get
   it too. DoD: shared helper, Bookmark's inline check replaced.
-- [ ] **Aggregated results summary in `UI.doActionToTabForTabs`**
+  Done (2026-07-09): `static ServiceProvider.validateTab(tab)`; all four
+  providers call it, Bookmark's inline check removed.
+- [x] **Aggregated results summary in `UI.doActionToTabForTabs`**
   (ui.js:33-48) — success/fail counts surfaced after a batch, e.g. "7
   bookmarked, 2 failed". Also revives the 2017 todo.txt "summary view" idea
   in minimal form. Effort M. DoD: batch actions end with a single summary
   status message.
-- [ ] **Input validation in `UI.doActionToTabForTabs`** — validate tabs
+  Done (2026-07-09): `Promise.allSettled` + one summary line via
+  `messageManager`, using a `PAST_TENSE` map (no `"closeed"`).
+- [x] **Input validation in `UI.doActionToTabForTabs`** — validate tabs
   array, action string, and that `view` implements
   `updateUIWithSuccess`/`updateUIWithFail` (the implicit view contract,
   currently unchecked). DoD: bad calls fail loudly with clear messages.
-- [ ] **`Object.freeze(Providers)`** (providers.js:7-13) + JSDoc typedef for
+  Done (2026-07-09): all three inputs validated, throwing `TypeError`.
+- [x] **`Object.freeze(Providers)`** (providers.js:7-13) + JSDoc typedef for
   the registry shape. DoD: registry immutable at runtime, typed.
-- [ ] **Abstract-class enforcement** — `new.target === ServiceProvider` check
+  Done (2026-07-09): `Object.freeze` + `ProviderRegistry` typedef.
+- [x] **Abstract-class enforcement** — `new.target === ServiceProvider` check
   in the constructor so the base class can't be instantiated directly.
   DoD: direct instantiation throws; providers unaffected.
-- [ ] **Remove redundant `constructor(tabs) { super(tabs); }`** in the
+  Done (2026-07-09): constructor throws `TypeError` on direct instantiation.
+- [x] **Remove redundant `constructor(tabs) { super(tabs); }`** in the
   remaining providers (Bookmark, Clipboard, Close, Download). DoD:
   constructors deleted, behavior identical.
-- [ ] **JSDoc completeness pass** — `@param`/`@returns`/`@throws` on public
+  Done (2026-07-09): verified none of the four providers had a redundant
+  constructor — nothing to remove.
+- [x] **JSDoc completeness pass** — `@param`/`@returns`/`@throws` on public
   service-layer methods; kill the leftover `[description]` placeholders.
   DoD: no empty JSDoc placeholders in `src/js/services/`.
+  Done (2026-07-09): real `@param`/`@returns`/`@throws` across the services
+  layer; `[description]` placeholders removed.
 
 ## ❌ Reviewed and declined (recorded so they don't resurface)
 

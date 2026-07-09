@@ -4,19 +4,43 @@ import ServiceProvider from "./ServiceProvider.js";
  * Provides copying to clipboard actions to tabs
  */
 export default class ClipboardProvider extends ServiceProvider {
-  doActionToTab(tab) {
-    return this.copyTabToClipboard(tab);
+  /**
+   * Copy a single tab's Title & URL to the clipboard
+   * @param  {object} tab A browser tab object
+   * @return {Promise} Resolves once the tab is copied
+   * @throws {Error} If the tab is invalid or the copy fails
+   */
+  async doActionToTab(tab) {
+    try {
+      ServiceProvider.validateTab(tab);
+      const result = await this.copyAllTabsToClipboard([tab]);
+      return result;
+    } catch (error) {
+      throw new Error(`Clipboard failed: ${error.message}`);
+    }
   }
 
-  doActionToTabs() {
-    return this.copyAllTabsToClipboard(this.tabs);
+  /**
+   * Copy every tab's Title & URL to the clipboard in one operation
+   * @return {Promise} Resolves once every tab is copied
+   * @throws {Error} If any tab is invalid or the copy fails
+   */
+  async doActionToTabs() {
+    try {
+      this.tabs.forEach((tab) => ServiceProvider.validateTab(tab));
+      const result = await this.copyAllTabsToClipboard(this.tabs);
+      return result;
+    } catch (error) {
+      throw new Error(`Clipboard failed: ${error.message}`);
+    }
   }
 
   /**
    * Copies the Title & URL of every tab into the clipboard
    *
-   * @param  {array} tabs Collection of tab objects
-   * @return {Promise} Rejects with Error or resolves if successful
+   * @param  {object[]} tabs Collection of tab objects
+   * @return {void}
+   * @throws {Error} If the copy command fails
    */
   copyAllTabsToClipboard(tabs) {
     const text = "";
@@ -39,12 +63,10 @@ export default class ClipboardProvider extends ServiceProvider {
     try {
       document.execCommand("Copy");
     } catch (err) {
-      return Promise.reject(new Error("fail"));
+      throw new Error("could not copy tabs to clipboard");
     }
 
     document.body.removeChild(tempElem);
-
-    return Promise.resolve();
   }
 
   /**
@@ -54,7 +76,7 @@ export default class ClipboardProvider extends ServiceProvider {
    * @param  {object} element The hidden HTML element
    * @return {object}         Returns the HTML element with hidden styles applied
    */
-  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: services-layer polish
+  // eslint-disable-next-line class-methods-use-this -- pure DOM helper, no instance state
   hideClipboardElement(element) {
     //Just setting display or visibility to none interferes with selecting the text to copy
     //https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
