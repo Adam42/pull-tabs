@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-// Factory mocks keep the real modules (and their config.js import chain,
-// which does not exist in CI at test time) from loading at all.
+// Factory mocks keep the real modules from loading at all.
 jest.mock("../js/browser.js", () => ({ browserUtils: {} }));
 jest.mock("../js/popup.js", () => ({ popup: { tabs: [] } }));
 jest.mock("../js/ui.js", () => ({

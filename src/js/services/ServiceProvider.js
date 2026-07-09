@@ -28,19 +28,4 @@ export default class ServiceProvider {
   async doActionToTabs(tabs) {
     throw new Error("doActionToTabs must be implemented by child class");
   }
-
-  /**
-   * Do an action for each tab in a collection of tabs
-   * @param  {array} tabs   Collection of browser tab objects
-   * @param  {function} action Function to call on each tab
-   * @return {Promise}        Returns promise returned by action function
-   */
-  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: broken bulk layer, slated for fix-or-delete
-  forEachTabDo(tabs, action) {
-    var numTabs = tabs.length;
-    var i;
-    for (i = 0; i < numTabs; i++) {
-      return action(tabs[i]);
-    }
-  }
 }

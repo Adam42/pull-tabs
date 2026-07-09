@@ -12,27 +12,6 @@ export default class storage {
   }
 
   /**
-     * Save an object to local storage via a key
-     *
-     * @param  {string} key    Local storage key
-     * @param  {object} object The object to save
-     */
-  // eslint-disable-next-line class-methods-use-this -- Phase 2-4: storage consolidation
-  save(key, object) {
-    try {
-      browser.storage.local.set(object, function() {
-        var status = document.getElementById("status");
-        status.textContent = key + " saved.";
-        setTimeout(function() {
-          status.textContent = "";
-        }, 750);
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  /**
      * Get an object from local storage
      *
      * @param  {string}   key      The name of key in local storage

@@ -13,19 +13,6 @@ export default class BookmarkProvider extends ServiceProvider {
     }
   }
 
-  doActionToTabs() {
-    return this.bookmarkTabs(this.tabs);
-  }
-
-  /**
-   * Bookmark collection of tabs
-   * @param  {array} tabs Collection of tab objects
-   */
-  bookmarkTabs(tabs) {
-    // eslint-disable-next-line no-useless-call -- Phase 2-4: broken bulk layer, slated for fix-or-delete
-    this.forEachTabDo(tabs, this.bookmarkTab.call(this));
-  }
-
   /**
    * Bookmark a single tab
    * @param  {object}   tab      A browser tab object

@@ -8,21 +8,6 @@ export default class CloseProvider extends ServiceProvider {
     return this.closeTab(tab);
   }
 
-  doActionToTabs() {
-    return this.closeTabs(this.tabs);
-  }
-
-  /**
-     * For each tab in a collection of tab object's
-     * close that tab
-     *
-     * @param  {array} tabs Collection of tabs
-     */
-  closeTabs(tabs) {
-    // eslint-disable-next-line no-useless-call -- Phase 2-4: broken bulk layer, slated for fix-or-delete
-    this.forEachTabDo(tabs, this.closeTab.call(this));
-  }
-
   /**
      * Close an individual tab
      * @param  {object} tab A browser tab object

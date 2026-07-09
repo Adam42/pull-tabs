@@ -5,8 +5,9 @@ Project constitution for AI-assisted sessions. Read this before changing code.
 ## What this is
 
 A Manifest V3 browser extension (Firefox + Chrome) that lists the current
-window's tabs and performs actions on them: download, bookmark, close,
-copy-to-clipboard, and (defunct) save-to-Pocket. Hobby open-source project,
+window's tabs and performs actions on them: download, bookmark, close, and
+copy-to-clipboard. (A save-to-Pocket action existed but was removed in 0.18.0
+when the Pocket service shut down.) Hobby open-source project,
 GPL-licensed, distributed via addons.mozilla.org / Chrome Web Store.
 Calibrate changes to that bar: shipped-extension correctness and user safety
 matter; enterprise process does not.
@@ -18,8 +19,7 @@ matter; enterprise process does not.
   intermediate output in `build/`, final unpacked extensions in
   `dist/browser/` (Firefox) and `dist/chrome/` (Chrome, gets the
   webextension-polyfill prepended).
-- Entry pages: `src/popup.html`, `src/options.html`, `src/about.html`,
-  `src/pocket.html` (Pocket OAuth callback — defunct).
+- Entry pages: `src/popup.html`, `src/options.html`, `src/about.html`.
 - Service layer: `src/js/services/` — `ServiceProvider` base class,
   one provider per action, `ServiceFactory` maps action names ↔ providers.
   Adding a provider to `src/js/services/providers.js` automatically surfaces
@@ -44,10 +44,11 @@ matter; enterprise process does not.
 - `npm run dev` — one-shot development build (**also used for release builds**)
 - `npm run production` — exists but is NOT used for releases (stores prefer
   un-minified code; see README Deployment section)
-- `npx jest` — currently broken (ESM transform not wired up; see backlog.md)
-- There is no lint script. `.eslintrc.json` exists but eslint is not in
-  devDependencies. README asks for prettier formatting; prettier is not a
-  dependency either — format with a global/editor prettier.
+- `npm test` — runs the Jest suite (green in CI; ESM transform wired up in
+  Phase 1).
+- `npm run lint` — eslint over `src/js` and `src/tests`; `npm run format` —
+  prettier `--write`. Both eslint and prettier are devDependencies as of
+  Phase 1.
 
 ## Landmines — do not trip these
 
@@ -56,25 +57,21 @@ matter; enterprise process does not.
   chrome fragments into a valid `manifest.json`. Editing any of them requires
   keeping the concatenation valid. Verify with:
   `python3 -c "import json; json.load(open('dist/browser/manifest.json'))"`
-- **`src/js/config.js` is gitignored and must never be committed** (it held a
-  real Pocket consumer key). `config-sample.js` is the committed template.
-  The build fails without `config.js` because modules import it.
+- **The `config.js` mechanism was removed in 0.18.0.** It previously held a
+  Pocket consumer key and was gitignored; no module imports it anymore and
+  there is no `config-sample.js`. Don't reintroduce it.
 - **Version lives in two places**: `package.json` and `src/manifest-base.json`.
   Bump both.
 - **Do not minify release builds** — Mozilla source-review policy; releases
   use `npm run dev` (see README).
-- **Bulk-action code paths are broken and unused.** `ServiceProvider.forEachTabDo`
-  returns on the first loop iteration, and its callers pass `fn.call(this)`
-  (immediate invocation) instead of a function reference. The real UIs loop
-  per-tab via `UI.doActionToTabForTabs` / provider `doActionToTab` instead
-  (Clipboard is the exception: it genuinely uses `doActionToTabs`). Don't
-  build new features on the bulk methods without fixing them first.
-- **Pocket is dead** (service shut down July 2025). Don't extend
-  `pocket.js` / `auth.js` / `services/Pocket.js`; removal is planned.
+- **Real UIs loop per-tab** via `UI.doActionToTabForTabs` / provider
+  `doActionToTab`; only `Clipboard` implements a genuine bulk
+  `doActionToTabs`. The broken `forEachTabDo` bulk layer was deleted in
+  0.18.0 — don't reintroduce fake bulk methods.
 - **Storage is split**: some state is in `localStorage` of extension pages
-  (`pullTabsFolderId`, `initialSetup`, Pocket tokens) and some in
-  `browser.storage.local` (preferences, download-tracking objects). They are
-  not interchangeable; consolidation to `browser.storage` is a backlog item.
+  (`pullTabsFolderId`, `initialSetup`) and some in `browser.storage.local`
+  (preferences, download-tracking objects). They are not interchangeable;
+  consolidation to `browser.storage` is a backlog item.
 - `src/js/service.js`, `src/js/pulltabs-app.js`, `src/service.html` are
   abandoned 2017 prototypes, not referenced by the build. Don't wire them in.
 

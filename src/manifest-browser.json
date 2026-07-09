@@ -5,7 +5,6 @@
     "permissions": [
         "tabs",
         "downloads",
-        "identity",
         "bookmarks",
         "storage"
     ],

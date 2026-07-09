@@ -11,7 +11,7 @@ export var messageManager = messageManager || {
      * it for a specified duration
      *
      * @param  {string|object} message  Either the text of the message or an element object
-     * @param  {string} duration - short,medium,long, dependent or re-stack
+     * @param  {string} duration - short, medium, long or dependent
      * @param  {string} type     The type of message, e.g. primary,success,info,warning,danger
      * @return {void|number}      A dependent message returns a numeric ID, others void.
      */
@@ -60,9 +60,6 @@ export var messageManager = messageManager || {
 
       case "dependent":
         return statusMessage.id;
-
-      case "restack":
-        break;
 
       default:
         setTimeout(this.removeStatusMessage, 3000, statusMessage.id);

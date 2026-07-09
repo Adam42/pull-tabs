@@ -4,8 +4,7 @@ import { Providers } from '../../js/services/providers';
 // Mock the Providers to ensure controlled test environment
 jest.mock('../../js/services/providers', () => ({
   Providers : {
-    BookmarkProvider: jest.fn(),
-    PocketProvider: jest.fn()
+    BookmarkProvider: jest.fn()
   }
 }));
 

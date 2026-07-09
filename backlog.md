@@ -31,14 +31,14 @@ what's captured here, and the remaining polish items not repeated below.
   `npm audit fix` brings dev vulns to ~0 without breaking `npm run dev`, or
   the build is migrated off laravel-mix (see Improvements) which eliminates
   the chain wholesale.
-- [ ] **LOW / S — Pocket access token stored in page `localStorage`**
-  (`src/js/pocket.js:210-212`). Moot once Pocket is removed; listed for
-  completeness. DoD: token storage code deleted with the Pocket removal.
-- [ ] **LOW / S — Malformed `web_accessible_resources`** exposes
+- [x] **LOW / S — Pocket access token stored in page `localStorage`**
+  (`src/js/pocket.js:210-212`). Done (Phase 3, 0.18.0): `pocket.js` deleted
+  with the Pocket removal.
+- [x] **LOW / S — Malformed `web_accessible_resources`** exposes
   `pocket.html` and lists an https URL as a "resource"
   (`src/manifest-base.json:8-12`); `matches: []` makes it inert today, but
-  it's copy-paste-away from exposing extension pages. DoD: block removed (or
-  correctly scoped) and both dist manifests still validate & load.
+  it's copy-paste-away from exposing extension pages. Done (Phase 3, 0.18.0):
+  block removed; both dist manifests validate & load.
 
 ## Bugs & Incomplete
 
@@ -59,7 +59,9 @@ what's captured here, and the remaining polish items not repeated below.
   `src/popup.html:27` references `img/pacman.svg`; the file is
   `src/img/Pacman.svg`. Broken for every Linux user. DoD: filename and
   reference match; spinner renders on Linux.
-- [ ] **HIGH / M — Entire bulk-action layer is broken (dead code today).**
+- [x] **HIGH / M — Entire bulk-action layer is broken (dead code today).**
+  Done (Phase 3, 0.18.0): `forEachTabDo` and the fake bulk methods on
+  Bookmark/Close/Download deleted; Clipboard keeps its real `doActionToTabs`.
   `forEachTabDo` returns on the first loop iteration
   (`src/js/services/ServiceProvider.js:40`), and all callers pass
   `this.method.call(this)` — invoking immediately with `undefined` instead
@@ -88,7 +90,9 @@ what's captured here, and the remaining polish items not repeated below.
   `YOUR_MODULE_HERE` template placeholder (`jest.config.cjs:5`,
   `src/tests/services/ServiceFactory.test.js`). DoD: `npm test` runs green
   with the existing ServiceFactory suite; wired into CI if CI exists.
-- [ ] **MEDIUM / M — Mime-type advanced layout is broken end-to-end**
+- [x] **MEDIUM / M — Mime-type advanced layout is broken end-to-end**
+  Done (Phase 3, 0.18.0): mime-fetch code, `retrieveFullMimeType` pref, and
+  the options mime panel deleted; advanced layout otherwise unaffected.
   (feature is off by default, so users don't hit it):
   `Promise.all(uiAdvanced.addMimeTypeToTabs)` passes a function, not an
   iterable (`src/js/uiAdvanced.js:179`); `getFullMimeType` reads the
@@ -125,14 +129,16 @@ what's captured here, and the remaining polish items not repeated below.
   creating one; resolve the create-parent by stable root metadata rather than a
   raw index; regression test where the target parent is not index 1 while index
   1 also exists.
-- [ ] **LOW / S — `PocketProvider.doActionToTabs` is a console.log stub**
-  (`src/js/services/Pocket.js:16-18`). Superseded by Pocket removal.
-- [ ] **LOW / S — Download bulk path references nonexistent `this.updateUI`**
+- [x] **LOW / S — `PocketProvider.doActionToTabs` is a console.log stub**
+  (`src/js/services/Pocket.js:16-18`). Done (Phase 3, 0.18.0): superseded by
+  Pocket removal.
+- [x] **LOW / S — Download bulk path references nonexistent `this.updateUI`**
   (`src/js/services/Download.js:41`) and passes `this` as a `.then` rejection
-  handler (`src/js/services/Download.js:72-79`). Dead path via the bulk-layer
-  item above. DoD: covered by the bulk-layer fix/delete.
-- [ ] **LOW / S — `form.getSelectedGroup` calls `getElementById()` with no
-  argument** — dead, broken function (`src/js/form.js:114-116`). DoD: deleted.
+  handler (`src/js/services/Download.js:72-79`). Done (Phase 3, 0.18.0):
+  removed with the bulk-layer deletion.
+- [x] **LOW / S — `form.getSelectedGroup` calls `getElementById()` with no
+  argument** — dead, broken function (`src/js/form.js:114-116`). Done
+  (Phase 3, 0.18.0): deleted.
 - [ ] **LOW / S — Duplicate DOM ids in the advanced form**: every radio for a
   tab shares `id="tab-pref-<index>"` (`src/js/form.js:48`), and
   `input.checked` is assigned the string `"checked"`/`""`
@@ -150,7 +156,10 @@ what's captured here, and the remaining polish items not repeated below.
 
 ## Improvements
 
-- [ ] **HIGH impact / M — Remove the Pocket integration.** The service shut
+- [x] **HIGH impact / M — Remove the Pocket integration.** Done (Phase 3,
+  0.18.0): all Pocket code/pages/config removed, permissions shrunk to
+  `tabs, downloads, bookmarks, storage`, version bumped to 0.18.0. Store
+  listing text update is manual/out-of-repo. The service shut
   down July 2025; login and save now fail against a dead API. Removal
   deletes `src/js/pocket.js`, `src/js/auth.js`,
   `src/js/services/Pocket.js`, `src/pocket.html`, the `identity` permission
@@ -245,9 +254,10 @@ what's captured here, and the remaining polish items not repeated below.
   commit. DoD: clean `git status`, branch pushed.
 - [ ] **S — Single-source the version number** (currently `package.json` +
   `src/manifest-base.json`). DoD: one place to bump, build injects it.
-- [ ] **S — Delete dead code flagged above** (form.js:73-83 thumbnail block,
+- [x] **S — Delete dead code flagged above** (form.js:73-83 thumbnail block,
   message.js `restack` no-op case, storage.js unused `save()` instance
-  method, uiSimple.js misleading docblock at lines 11-15).
+  method, uiSimple.js misleading docblock at lines 11-15). Done (Phase 3,
+  0.18.0).
 - [ ] **M — Add GitHub Actions CI**: install, build, lint, test on PR. DoD:
   green check on PRs to master.
 - [ ] **S — Update README deployment section** if/when the bundler or Pocket

@@ -10,36 +10,14 @@ export default class DownloadProvider extends ServiceProvider {
     return this.downloadTab(tab);
   }
 
-  doActionToTabs() {
-    return this.downloadTabs(this.tabs);
-  }
-
-  /**
-     * Download a resource represented via a tab's URL
-     * to local disk either as an HTML file or with
-     * the URL's extension if it has one
-     *
-     * Note that the promise is resolved when a download is
-     * started, DownloadItem's state will change to either
-     * "complete" when the download is successful or to "interrupted"
-     * if something prevented the download from completing
-     * thus we must watch for changes to DownloadItem
-     * to check status
-     *
-     * @param  {array} tabs Collection of tab objects
-     */
-  downloadTabs(tabs) {
-    tabs.forEach(function(tab) {
-      return this.downloadTab(tab)
-        .then(e => {})
-        .catch(e => {
-          this.updateUI(tab, "fail");
-        });
-    }, this);
-  }
-
   /**
    * Download a single Tab
+   *
+   * Note that the promise is resolved when a download is
+   * started; the DownloadItem's state will change to either
+   * "complete" when the download is successful or to "interrupted"
+   * if something prevented the download from completing,
+   * thus we must watch for changes to DownloadItem to check status.
    * @param  {object} tab A browser tab object
    * @return {Promise}     Promise representing whether download started
    */

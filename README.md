@@ -1,15 +1,15 @@
 # Pull Tabs
 
-This browser extension gathers the current window's tabs and offers actions to take on them, either in bulk or on a per-tab basis. Possible actions include saving to Pocket, bookmarking, downloading, closing and ignoring.
+This browser extension gathers the current window's tabs and offers actions to take on them, either in bulk or on a per-tab basis. Possible actions include downloading, bookmarking, copying to the clipboard, closing and ignoring.
 
 There are two ways of interacting with tabs, a simple bulk method and a more advanced per-tab layout. For more info or to install the extension for normal use visit the [extension site](https://adam42.github.io/pull-tabs/).
 
 ## Current Status
 
-The extension works for its core actions: download, bookmark, close, and copy-to-clipboard. Two things to know:
+The extension works for its core actions: download, bookmark, close, and copy-to-clipboard.
 
-- **Pocket integration is defunct.** Mozilla shut down the Pocket service in July 2025, so the Pocket save/login features no longer function. Removal is tracked in [backlog.md](backlog.md).
-- **Tests are not yet runnable.** A Jest setup exists but the ESM/Babel wiring is incomplete (see backlog.md).
+- **Pocket support was removed in 0.18.0.** Mozilla shut down the Pocket service in July 2025; the save/login integration and its `identity`/host permissions have been deleted.
+- **Tests run via `npm test`** (Jest, green in CI).
 
 See [docs/architecture.md](docs/architecture.md) for a map of the codebase and [backlog.md](backlog.md) for known issues and planned work.
 
@@ -22,9 +22,6 @@ To load the extension locally for development, git clone this repo and then run:
 ```
 npm install
 ```
-
-While npm finishes installing, copy `src/js/config-sample.js` to a file named `src/js/config.js`. This file is required for the build to succeed because it is imported by the source modules — even though the Pocket service it configures has shut down, the placeholder value is fine. (Historically this held a Pocket consumer key; `config.js` is gitignored and must never be committed.)
-
 
 Once npm finishes installing, build an install that npm watches and re-compiles when changes are made with
 

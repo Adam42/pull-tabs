@@ -28,9 +28,9 @@ lost.
 
 | Checklist item | Where captured |
 |---|---|
-| `forEachTabDo` returns after first iteration | Bugs — "bulk-action layer is broken" (HIGH) |
-| `.call(this)` invoked-instead-of-passed in Bookmark/Close/Pocket | same item |
-| `Promise.all`/batching in `bookmarkTabs` | same item (fix-or-delete decision) |
+| ✅ `forEachTabDo` returns after first iteration | Resolved 0.18.0 (Phase 3): bulk layer deleted |
+| ✅ `.call(this)` invoked-instead-of-passed in Bookmark/Close/Pocket | Resolved 0.18.0 (Phase 3): fake bulk methods deleted (Pocket removed) |
+| ✅ `Promise.all`/batching in `bookmarkTabs` | Resolved 0.18.0 (Phase 3): `bookmarkTabs` deleted |
 | Validate bookmark folder id exists in storage | Bugs — "Pulltabs folder never created…" (bookmarks silently land in default folder) |
 | `localStorage["pullTabsFolderId"]` direct access | Improvements — consolidate `localStorage` → `browser.storage.local` (supersedes the `getItem` suggestion) |
 | Unit tests for providers + factory | Bugs — "Jest can't run"; Improvements — "grow the test suite" |
@@ -40,9 +40,8 @@ lost.
 Ordered by (impact ÷ effort). All S unless noted.
 
 - [ ] **Async/await consistency across remaining providers** — Close,
-  Download, Pocket*, Clipboard still use sync methods / bare `.then`
-  (Download.js:39,72). Finish what the WIP started in Bookmark/ServiceProvider.
-  (*Pocket only if it survives the removal decision — see backlog Questions #1.)
+  Download, Clipboard still use sync methods / bare `.then` (Download.js).
+  Finish what the WIP started in Bookmark/ServiceProvider.
   DoD: every provider's `doActionToTab`/`doActionToTabs` is `async` and
   returns a settled-able promise; UI callers unchanged or simplified.
 - [ ] **Standardize error handling & message format across providers** —
@@ -67,9 +66,9 @@ Ordered by (impact ÷ effort). All S unless noted.
 - [ ] **Abstract-class enforcement** — `new.target === ServiceProvider` check
   in the constructor so the base class can't be instantiated directly.
   DoD: direct instantiation throws; providers unaffected.
-- [ ] **Remove redundant `constructor(tabs) { super(tabs); }`** in all five
-  providers (Bookmark.js:8, Clipboard.js:7, Close.js:7, Download.js:9,
-  Pocket.js:8). DoD: constructors deleted, behavior identical.
+- [ ] **Remove redundant `constructor(tabs) { super(tabs); }`** in the
+  remaining providers (Bookmark, Clipboard, Close, Download). DoD:
+  constructors deleted, behavior identical.
 - [ ] **JSDoc completeness pass** — `@param`/`@returns`/`@throws` on public
   service-layer methods; kill the leftover `[description]` placeholders.
   DoD: no empty JSDoc placeholders in `src/js/services/`.
@@ -89,10 +88,12 @@ Ordered by (impact ÷ effort). All S unless noted.
 
 ## Answers to the review's open questions
 
-1. **Other providers with BookmarkProvider-style issues?** Yes — the same
-   immediately-invoked `.call(this)` bug exists in Close.js:27 and
-   Pocket.js:66; Download's bulk path references a nonexistent
-   `this.updateUI` (Download.js:41). All under the backlog bulk-layer item.
+1. **Other providers with BookmarkProvider-style issues?** ✅ Resolved in
+   0.18.0 (Phase 3). The immediately-invoked `.call(this)` bug (Close,
+   Bookmark, and the removed Pocket provider) and Download's broken bulk path
+   (`this.updateUI`) all lived in the never-working bulk layer, which was
+   deleted wholesale along with `ServiceProvider.forEachTabDo`. Clipboard's
+   genuine `doActionToTabs` is the only bulk method that remains.
 2. **Does UI have proper interface contracts providers depend on?**
    Inverted: providers don't call UI; UIs pass themselves as `view` into
    `UI.doActionToTabForTabs`, which implicitly requires

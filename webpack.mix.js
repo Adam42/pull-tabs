@@ -19,21 +19,17 @@ mix
     ["node_modules/bootswatch/yeti/bootstrap.css", "src/css/styles.css"],
     "build/style.css"
   )
-  //Copy Pocket Image to build
-  .copy("node_modules/simple-icons/icons/pocket.svg", "build/img/pocket.svg")
   //Copy img dir to browser and chrome dist
   .copyDirectory("src/img/", "dist/browser/img/")
   .copyDirectory("src/img/", "dist/chrome/img/")
   //Copy HTML files
   .copy("src/about.html", "build/about.html")
   .copy("src/options.html", "build/options.html")
-  .copy("src/pocket.html", "build/pocket.html")
   .copy("src/popup.html", "build/popup.html")
   //Create JS file for each page
-  .js(["src/js/config.js", "src/js/about.js"], "build/about-page.js")
+  .js(["src/js/about.js"], "build/about-page.js")
   .js(["src/js/options-init.js"], "build/options-page.js")
-  .js(["src/js/popup-init.js", "src/js/auth.js"], "build/pocket-page.js")
-  .js(["src/js/popup-init.js", "src/js/config.js"], "build/popup-page.js")
+  .js(["src/js/popup-init.js"], "build/popup-page.js")
   //Create a dist for browser compatible web-extensions
   //aka Mozilla Firefox
   .copyDirectory("build", "dist/browser/")
@@ -68,13 +64,6 @@ mix
   .combine(
     [
       "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
-      "build/pocket-page.js"
-    ],
-    "dist/chrome/pocket-page.js"
-  )
-  .combine(
-    [
-      "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
       "build/popup-page.js"
     ],
     "dist/chrome/popup-page.js"
@@ -82,7 +71,7 @@ mix
 // Full API
 // mix.js(src, output);
 // mix.react(src, output); <-- Identical to mix.js(), but registers React Babel compilation.
-// mix.ts(src, output); <-- Requires tsconfig.json to exist in the same folder as webpack.mix.js
+// mix.ts(src, output); <-- Requires a tsconfig in the same folder as this mix file
 // mix.extract(vendorLibs);
 // mix.sass(src, output);
 // mix.standaloneSass('src', output); <-- Faster, but isolated from Webpack.
@@ -102,7 +91,7 @@ mix
 // mix.setPublicPath('path/to/public');
 // mix.setResourceRoot('prefix/for/resource/locators');
 // mix.autoload({}); <-- Will be passed to Webpack's ProvidePlugin.
-// mix.webpackConfig({}); <-- Override webpack.config.js, without editing the file directly.
+// mix.webpackConfig({}); <-- Override the underlying webpack config, without editing the file directly.
 // mix.then(function () {}) <-- Will be triggered each time Webpack finishes building.
 // mix.options({
 //   extractVueStyles: false, // Extract .vue component styling to file, rather than inline.

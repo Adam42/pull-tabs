@@ -11,21 +11,6 @@
         <div id="overlay"></div>
         <div id="content">
             <div class="container" role="button">
-                <h3 class="page-header">Services</h3>
-
-                 <div id="api-options">
-                     <div class="panel-heading col-md-2">
-                        <h4>Pocket</h4>
-                    </div>
-
-                    <div class="panel-body col-md-6">
-                        <label class="active"></label>
-                        <a id="pocket-status" href="#pocket-login">You are not authorized, please sign in.</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container" role="button">
                 <h3 class="page-header">Layout</h3>
 
                  <div id="preference-layout">
@@ -66,41 +51,8 @@
                     </div>
 
                 </form>
-            </div>
 
-
-            <div class="container">
-
-           <h2 class="page-header">Advanced view options</h2>
-
-                <div id="preference-mime-type">
-                    <div class="panel-heading col-md-10">
-                        <h4>Choose whether to retrieve mime type via an additional call</h4>
-                        <p>Choosing to retrieve the full mime type will allow you to set the advanced options to
-                            automatically perform a set action based on the mime type of the page, however
-                            doing so will require an additional HEAD request to retrieve the mime type.
-                        </p>
-                        <p><strong>tl;dr:</strong>Enabling this option will allow automatic handling of tabs but will take longer to load</p>
-                    </div>
-                    <div class="panel-body col-md-8">
-                        <label for="preference-input-full-mime-types">
-                            <input disabled type="checkbox" id="preference-input-full-mime-types" value="yes"><span>Get full mime types?</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container" role="main">
-                <h3 class="page-header">Default actions per mime-type</h3>
-                 <form id="preference-settings" action="" method="post">
-
-                    <div id="file-type-destinations">
-                    </div>
-
-                    <div id="status"></div>
-                    <button>Submit</button>
-
-                </form>
+                <div id="status"></div>
             </div>
 
         </div>

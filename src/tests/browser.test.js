@@ -1,9 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-// config.js is gitignored and absent in CI at test time — the virtual mock
-// satisfies browser.js's import without the file existing on disk.
-jest.mock("../js/config.js", () => ({ config: {} }), { virtual: true });
 // form.js pulls in the whole popup module graph; sever it here.
 jest.mock("../js/form.js", () => ({ form: {} }));
 

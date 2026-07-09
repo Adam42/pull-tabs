@@ -24,12 +24,6 @@ jobs:
       - name: Test
         run: npm test
 
-      # config.js is gitignored (it held a real Pocket consumer key locally);
-      # the build imports it, so create it from the sample template.
-      # This step dies with the Pocket removal in Phase 3.
-      - name: Create config.js from sample
-        run: cp src/js/config-sample.js src/js/config.js
-
       - name: Build
         run: npm run dev
 

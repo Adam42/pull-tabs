@@ -1,10 +1,9 @@
 /* eslint-disable */
-// Phase 3: this file is slated for deletion (Pocket removal / mime-feature removal) — not worth lint churn.
+// Legacy per-tab advanced view; full lint cleanup deferred to a later phase.
 "use strict";
 import { form } from "./form.js";
 import { keys } from "./keys.js";
 import storage from "./storage.js";
-import { PocketAPILayer } from "./pocket.js";
 import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import { messageManager } from "./message.js";
@@ -18,193 +17,80 @@ import UI from "./ui.js";
 export var uiAdvanced = uiAdvanced || {
   prefs: "",
 
-  mimeTypesMap: {},
-
-  getFullMimeType: function() {
-    return storage.retrieve(keys.preferences.fullMimeType);
-  },
-
-  addMimeTypeToTabs: function() {
-    return this.tabs.map(function(tab) {
-      uiAdvanced
-        .getContentType(tab.url)
-        .then(function(mimeType) {
-          var id = "tab" + tab.id.toString();
-          uiAdvanced.setMimeTypesMap(id, mimeType);
-        })
-        .catch(function(e) {
-          console.log(e);
-        });
-    });
-  },
-
-  /**
-     * Retrieve content type of a tab/URL
-     * @param  {string} url - URL of a tab
-     * @return {string}     the content type of the resource
-     */
-  getContentType: function(url) {
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          var contentType = xhr.getResponseHeader("Content-Type");
-
-          //strip off everything but the first part of the Content-Type
-          //unless it is null which is often due to internal tabs
-          //like for instance a chrome-extension:// tab
-          if (contentType !== null) {
-            resolve(
-              contentType
-                .split(";")
-                .shift()
-                .split("/")
-                .shift()
-                .toLowerCase()
-            );
-          } else {
-            resolve("unknown");
-          }
-        }
-        reject(Error(xhr.statusText));
-      };
-
-      xhr.onerror = function() {
-        reject(Error(xhr.statusText));
-      };
-
-      xhr.open("HEAD", url);
-      xhr.send();
-    });
-  },
-
   /**
    * Loop through each tab and create an advanced
    * form input view for it with each action
    * available as a form input
    *
-   * @param  {array} tabs      [description]
-   * @param  {object} prefs     [description]
-   * @param  {object} mimeTypes [description]
-   * @return {[type]}           [description]
+   * @param  {array} tabs      Collection of browser tab objects
+   * @param  {object} services Enabled/disabled state keyed per service
    */
-  assembleForm: function(tabs, prefs, mimeTypes) {
+  assembleForm: function(tabs, services) {
     tabs.forEach(function(tab) {
-      if (mimeTypes.length > 0) {
-        //            var mT = mimeTypes.filter(function(item) { return item.name === 'tab-2196'; });
-      }
-
-      uiAdvanced.displayDefaultAdvancedLayout(tab);
-
-      /*
-            if(fullMimeType){
-                popup.getContentType().then(function ( value ) {
-                    console.log(value);
-                }).catch(function(e){
-                    console.log(e);
-                });
-                //tab.url, function(response){
-                 //   this.mType = response;
-               // });
-            }
-
-/*            if(typeof(this.mType) !== 'undefined'){
-                fullType = this.mType.split(";").shift();
-                type = this.mType.split("/").shift().toLowerCase();
-                pref = prefs[type] ? prefs[type] : 'ignore';
-
-            }
-            else{
-  */
+      uiAdvanced.displayDefaultAdvancedLayout(tab, services);
     });
   },
 
   /**
    * Display a default advanced view for a tab
-   *  without checking nor acting on mimeType of the tab
    *
-   * @param  {object} tab - A browser tab object
-   * @return {[type]}     [description]
+   * @param  {object} tab      A browser tab object
+   * @param  {object} services Enabled/disabled state keyed per service
    */
-  displayDefaultAdvancedLayout: function(tab) {
+  displayDefaultAdvancedLayout: function(tab, services) {
     var resources = document.getElementById("resources");
-    var fullType = "unknown";
     var pref = "ignore";
     var checked = "";
     var active = "";
 
-    if (pref !== "ignore") {
-      checked = "checked";
-      active = "active";
-    }
-
-    var checkbox = form.createCheckbox(tab, fullType, checked);
-    var label = form.createLabel(tab, fullType, active);
+    var checkbox = form.createCheckbox(tab, checked);
+    var label = form.createLabel(tab, active);
     label.appendChild(checkbox);
-
-    let getServices = browser.storage.local.get(keys.preferences.services);
 
     let actions = ServiceFactory.getActions();
 
-    getServices.then(services => {
-      actions.forEach(function(action) {
-        let status = services["service_" + action];
-        if (String(status) === "enabled") {
-          let radioButton = form.createRadioInput(tab, action, pref);
-          label.appendChild(radioButton);
-          resources.appendChild(label);
-        }
-      });
+    actions.forEach(function(action) {
+      let status = services["service_" + action];
+      if (String(status) === "enabled") {
+        let radioButton = form.createRadioInput(tab, action, pref);
+        label.appendChild(radioButton);
+        resources.appendChild(label);
+      }
     });
   },
 
   /**
-   * Display the advanced view for all tabs and check
-   * the mimeType and set actions based on its type
+   * Display the advanced view for all tabs
    *
    * @param  {array} tabs Collection of browser tab objects
-   * @return {[type]}      [description]
+   * @return {Promise}    Resolves once the form is rendered and wired
    */
   displayAdvancedLayout: function(tabs) {
     this.tabs = tabs;
     var advanced = document.getElementById("advanced");
     advanced.classList.remove("hidden");
-    this.getOptions()
+
+    return this.getOptions()
       .then(function(value) {
         uiAdvanced.setOptions(value);
+        // A legacy disabled-service key from the removed read-later
+        // integration may still linger in storage for existing users; it is
+        // intentionally ignored (queries use the current defaults object as
+        // keys, so a stale key is never read) and not migrated.
+        return browser.storage.local.get(keys.preferences.services);
       })
-      .then(
-        uiAdvanced
-          .getFullMimeType()
-          .then(function(fullMimeType) {
-            if (fullMimeType.retrieveFullMimeType) {
-              Promise.all(uiAdvanced.addMimeTypeToTabs).then(function() {
-                uiAdvanced.assembleForm(
-                  uiAdvanced.tabs,
-                  uiAdvanced.pref,
-                  uiAdvanced.mimeTypesMap
-                );
-              });
-            } else {
-              uiAdvanced.assembleForm(
-                uiAdvanced.tabs,
-                uiAdvanced.pref,
-                uiAdvanced.mimeTypesMap
-              );
-            }
-          })
-          .then(function() {
-            uiAdvanced.watchSubmit();
+      .then(function(services) {
+        uiAdvanced.assembleForm(uiAdvanced.tabs, services);
+        uiAdvanced.watchSubmit();
 
-            var numFormTabs = document
-              .getElementById("resources")
-              .getElementsByClassName("list-group-item");
+        var numFormTabs = document
+          .getElementById("resources")
+          .getElementsByClassName("list-group-item");
 
-            uiAdvanced.watchCheckBoxes(numFormTabs);
-            uiAdvanced.observeCheckboxes();
-            uiAdvanced.setActions();
-          })
-      );
+        uiAdvanced.watchCheckBoxes(numFormTabs);
+        uiAdvanced.observeCheckboxes();
+        uiAdvanced.setActions();
+      });
   },
 
   /**
@@ -304,10 +190,6 @@ export var uiAdvanced = uiAdvanced || {
         }
       );
     });
-  },
-
-  setMimeTypesMap: function(id, mimeType) {
-    uiAdvanced.mimeTypesMap[id] = mimeType;
   },
 
   //returns a promise

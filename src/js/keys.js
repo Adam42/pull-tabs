@@ -21,13 +21,6 @@ keys.preferences.autoClose = {
   autoCloseTabs: false
 };
 
-/**
- * Preference key for whether to use additional HTTP requests
- * to get tabs again in order to determine their content-type
- * @type {Boolean}
- */
-keys.preferences.retrieveFullMimeType = false;
-
 //list of available actions to apply to a tab
 const actions = ServiceFactory.getActions();
 
@@ -45,7 +38,7 @@ keys.preferences.tabOptions = ["disabled", "enabled"];
  * {
  *   service_download: "enabled",
  *   service_bookmark: "enabled",
- *   service_pocket: "disabled"
+ *   service_close: "enabled"
  *   etc...
  *  }
  * @type {Object}
@@ -65,13 +58,4 @@ function setDefaultServices() {
   }
 }
 
-//Make this more dynamic but for now just disable the pocket service
-//this just disables the service from the initial keys used to make
-//the persistent service object so it only disables a service initially one time
-function disableDefaultServices(service_name) {
-  keys.preferences.services["service_" + service_name] =
-    keys.preferences.tabOptions[0];
-}
-
 setDefaultServices();
-disableDefaultServices("pocket");

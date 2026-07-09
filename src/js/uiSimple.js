@@ -9,8 +9,8 @@ import { keys } from "./keys.js";
 import UI from "./ui.js";
 
 /**
- * Displays the advanced bulk view where users can
- * activate or de-activate each tab and set actions on it
+ * Displays the simple bulk view: one button per enabled service
+ * that performs its action on every tab in the current window.
  * @type {[type]}
  */
 export var uiSimple = uiSimple || {
@@ -70,7 +70,6 @@ export var uiSimple = uiSimple || {
 
         break;
 
-      case "pocket":
       case "bookmark":
       case "close":
         UI.doActionToTabForTabs(popup.tabs, action, uiSimple);
@@ -89,6 +88,10 @@ export var uiSimple = uiSimple || {
 
     const actions = ServiceFactory.getActions();
 
+    // A legacy disabled-service key from the removed read-later integration
+    // may still linger in storage for existing users; it is intentionally
+    // ignored (we query using the current defaults object as keys, so any
+    // stale key is never read) and not migrated.
     const getServices = browser.storage.local.get(keys.preferences.services);
 
     getServices.then(services => {

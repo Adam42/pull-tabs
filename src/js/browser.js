@@ -1,6 +1,5 @@
 "use strict";
 import { messageManager } from "./message.js";
-import { config } from "./config.js";
 import { form } from "./form.js";
 
 //Make sure the browser namespace is set to something
@@ -116,22 +115,6 @@ export var browserUtils = {
    */
   saveBookmarkFolder: function(id) {
     localStorage["pullTabsFolderId"] = id;
-  },
-
-  /**
-     * Login to getpocket.com
-     *
-     * @param  {object} pocket [description]
-     * @return {void}        [description]
-     *
-     * @todo should be made generic
-     * @todo  should try to use loginViaWebAuthFlow first & fallback to this method
-     *
-     */
-  login: function(pocket) {
-    const redirect = this.extensionGetURL("pocket.html");
-    pocket.auth = pocket.auth + encodeURIComponent(redirect);
-    window.open(pocket.auth);
   },
 
   /**

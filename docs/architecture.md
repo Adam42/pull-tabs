@@ -1,13 +1,13 @@
 # Pull Tabs — Architecture
 
 Manifest V3 browser extension, vanilla ES modules, no background script —
-everything runs in extension page contexts (popup, options, about, pocket
-callback). Last audited 2026-07-05.
+everything runs in extension page contexts (popup, options, about).
+Last audited 2026-07-05; Pocket/mime/bulk layers removed in 0.18.0 (Phase 3).
 
 ## Component map
 
 ```
-popup.html ──▶ popup-page.js (popup-init.js + config.js)
+popup.html ──▶ popup-page.js (popup-init.js)
                  │
                  ▼
               popup.js ── decides layout(s) from stored prefs
@@ -31,8 +31,7 @@ popup.html ──▶ popup-page.js (popup-init.js + config.js)
        ├─ Download.js   → browser.downloads.download + onChanged callback
        ├─ Bookmark.js   → browser.bookmarks.create (into "Pulltabs" folder)
        ├─ Close.js      → browser.tabs.remove (refuses active tab)
-       ├─ Clipboard.js  → document.execCommand("Copy") via hidden textarea
-       └─ Pocket.js     → getpocket.com/v3/add  [DEFUNCT — service shut down 2025]
+       └─ Clipboard.js  → document.execCommand("Copy") via hidden textarea
 ```
 
 Supporting modules:
@@ -42,16 +41,14 @@ Supporting modules:
   at import time.
 - `storage.js` — thin wrapper over `browser.storage.local` (`store`/`retrieve`).
 - `keys.js` — canonical preference keys & defaults (layout, autoClose,
-  per-service enabled flags, mime-type prefs). Derives the action list from
+  per-service enabled flags). Derives the action list from
   `ServiceFactory.getActions()` at import time.
 - `message.js` (`messageManager`) — transient status messages in a `#status`
   element with duration-based auto-removal.
 - `form.js` — DOM builders for the advanced per-tab form; collects selected
   tabs grouped by chosen action on submit.
 - `options.js` + `options-init.js` — options page: layout toggles, autoclose,
-  per-service enable/disable, per-mime-type default actions, Pocket login.
-- `pocket.js` + `auth.js` — Pocket OAuth flow (request token →
-  `identity.launchWebAuthFlow` → access token in `localStorage`). Defunct.
+  per-service enable/disable.
 - `helpers.js` — `capitalize()`.
 - `watchOptionsLink.js`, `about.js` — small page glue.
 
@@ -59,8 +56,6 @@ Dead / vestigial (not referenced by the build):
 
 - `src/js/service.js`, `src/js/pulltabs-app.js`, `src/service.html` —
   2017 prototypes of a service-registry idea, superseded by `services/`.
-- The mime-type-driven advanced layout (`retrieveFullMimeType`) is disabled
-  by default and its code path is broken (see backlog).
 
 ## Data flow
 
@@ -84,8 +79,8 @@ Two stores, historically grown:
 
 | Store | Keys | Notes |
 |-------|------|-------|
-| `browser.storage.local` | layout, autoCloseTabs, `service_*` enabled flags, mime prefs, `downloadTabItem-*`, Pocket token copies | canonical preference store |
-| page `localStorage` | `pullTabsFolderId`, `initialSetup`, Pocket `access_token`/`user_name` | popup/options page scoped; consolidation pending |
+| `browser.storage.local` | layout, autoCloseTabs, `service_*` enabled flags, `downloadTabItem-*` | canonical preference store (a legacy `service_pocket` key may linger for old users; ignored, not migrated) |
+| page `localStorage` | `pullTabsFolderId`, `initialSetup` | popup/options page scoped; consolidation pending |
 
 ## Build pipeline
 
@@ -102,8 +97,7 @@ Two stores, historically grown:
    `browser.*` calls work.
 
 Release = `npm run dev` (intentionally un-minified per store policy), then zip
-the relevant `dist/` directory. `src/js/config.js` (gitignored) must exist for
-the build; template at `src/js/config-sample.js`.
+the relevant `dist/` directory.
 
 ## Key decisions & why
 
@@ -121,9 +115,9 @@ the build; template at `src/js/config-sample.js`.
 
 ## External dependencies
 
-- Browser APIs: `tabs`, `downloads`, `bookmarks`, `storage`, `identity`
-  (identity is Pocket-only and removable with it).
-- getpocket.com API — **shut down July 2025**; all Pocket calls fail.
+- Browser APIs: `tabs`, `downloads`, `bookmarks`, `storage` (the `identity`
+  permission was removed with Pocket in 0.18.0).
 - Runtime npm deps that actually ship: `webextension-polyfill`,
-  `sanitize-filename-ts`, `bootswatch` (CSS), `simple-icons` (one build-time
-  SVG copy). `del`, `es6-map`, `xmlhttprequest` are unused (backlog: remove).
+  `sanitize-filename-ts`, `bootswatch` (CSS). `simple-icons` is now unused
+  (its only consumer was the Pocket SVG copy); `del`, `es6-map`,
+  `xmlhttprequest` are unused too (backlog: remove).

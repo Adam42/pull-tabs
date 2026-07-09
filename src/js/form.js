@@ -13,12 +13,12 @@ export var form = form || {
     this.options = values;
   },
 
-  createCheckbox: function(tab, type, checked) {
+  createCheckbox: function(tab, checked) {
     var input = document.createElement("input");
     input.type = "checkbox";
     input.id = "tab-" + tab.index;
     input.name = "tabs" + tab.index;
-    input.title = tab.title.toString() + type;
+    input.title = tab.title.toString();
     input.value = tab.url.toString();
     input.checked = checked;
 
@@ -62,25 +62,13 @@ export var form = form || {
     return label;
   },
 
-  createLabel: function(tab, type, active) {
+  createLabel: function(tab, active) {
     var label = document.createElement("label");
     label.setAttribute("class", "list-group-item " + active);
     label.setAttribute("id", "label-tab-" + tab.index);
     var title = document.createElement("p");
     title.textContent = "Title: " + tab.title.toString();
     label.appendChild(title);
-    //if Full Mime Type add mimetype
-    //@to-do Pull the setting from Options page
-    //label.innerHTML = label.innerHTML + "<p> Type: " + type + "</p>";
-
-    //Dead code without enabling mime type option in user preferences
-    if (type.split("/").shift() === "image") {
-      var image = document.createElement("img");
-      image.classList.add("img-thumbnail");
-      image.style = "width: 150px; height: 150px;";
-      image.src = tab.url.toString();
-      label.appendChild(image);
-    }
 
     return label;
   },
@@ -109,10 +97,6 @@ export var form = form || {
   setLabelStatus: function(tab, status) {
     var label = document.getElementById("label-tab-" + tab.labelTabId);
     label.setAttribute("class", label.className + " " + status);
-  },
-
-  getSelectedGroup: function() {
-    var group = document.getElementById();
   },
 
   /**
