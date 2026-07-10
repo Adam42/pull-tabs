@@ -202,6 +202,27 @@ what's captured here, and the remaining polish items not repeated below.
   valuable as Phase 5 adds destinations. Build after Phase 5. DoD: advanced
   layout pre-selects per user's type prefs; options panel actually applies
   (unlike the old decorative one); lookup covered by tests.
+- [ ] **MEDIUM impact / M — Re-investigate OAuth for integrations**
+  (Raindrop first; Instapaper full API later). The 0.19.0 token-paste design
+  rejected OAuth partly on security grounds, but the threat model was
+  re-examined post-ship (2026-07-10): a leaked `client_secret` exposes no
+  user data — the realistic worst case is app impersonation (phishing under
+  the Pull Tabs name) plus a revoke-and-reissue cycle that bricks all users
+  until a store-reviewed update ships. For a hobby bookmarks extension
+  that's a modest, acceptable risk (Pocket's key shipped in open-source
+  apps, including Firefox, for a decade). The *real* cost is the
+  engineering: re-register an app, re-add the `identity` permission
+  (Chrome re-approval prompt + store friction), `launchWebAuthFlow`
+  redirect quirks, and Raindrop's ~2-week access-token expiry forcing
+  refresh-token storage/renewal — versus saving a 30-second one-time token
+  paste (which never expires). **Revisit trigger: real user friction**
+  (store reviews / complaints about Raindrop setup), not PKCE availability
+  as docs/read-later-services.md currently frames it. Overlaps with the
+  parking-lot server idea (server-side secret custody) and the Dropbox
+  PKCE item below — if either lands, reuse its auth plumbing. DoD: decision
+  memo in docs/read-later-services.md (build / don't build / defer with
+  trigger), and if building: consent-screen flow from options page, token
+  refresh surviving weeks of disuse, paste-token kept as fallback.
 - [ ] **MEDIUM impact / M-L — Dropbox provider** via `/2/files/save_url` —
   Dropbox's servers fetch the URL and store the file; ideal for the
   "PDFs → Dropbox" flow with smart defaults. Feasible without a
