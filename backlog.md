@@ -154,6 +154,20 @@ what's captured here, and the remaining polish items not repeated below.
 
 ## Improvements
 
+- [ ] **MEDIUM impact / S–M — Add Firefox `data_collection_permissions` to the
+  manifest before the next release** (AMO warning on the 0.20.0 upload; will
+  become a hard requirement for new versions). The straightforward fix is
+  `browser_specific_settings.gecko.data_collection_permissions.required:
+  ["browsingActivity"]` in `src/manifest-browser.json` — accurate because the
+  read-later saves transmit tab URL/title to user-configured services — but
+  required means Firefox shows a one-time consent line at install for all
+  users, including those who never connect a service. The fancier alternative:
+  declare `browsingActivity` as `optional` and request it at runtime
+  (`browser.permissions.request`) when a user connects a read-later service in
+  Options — needs code changes and Firefox 140+ — worth considering during the
+  redesign, not now. The `required` variant was briefly committed (9203f1f)
+  and reverted to keep master matching the 0.20.0 store upload. DoD: next
+  Firefox release carries one of the two variants and uploads warning-free.
 - [x] **HIGH impact / M — Remove the Pocket integration.** Done (Phase 3,
   0.18.0): all Pocket code/pages/config removed, permissions shrunk to
   `tabs, downloads, bookmarks, storage`, version bumped to 0.18.0. Store
