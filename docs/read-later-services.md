@@ -216,3 +216,31 @@ AMO/CWS submission with the permission-swap notes.
 Prerequisites: Phase 3 (Pocket amputation) and ideally Phase 4 (async/error
 polish) — new providers should be born async with standardized errors, not
 retrofitted.
+
+## Implementation deviations (Phase 5 / 0.19.0)
+
+Recorded as built; the design above is otherwise accurate.
+
+- **Instapaper politeness gap dropped.** The spec suggested a ~250ms gap
+  between per-tab saves. Enforcing it needs a sequential await-loop (trips the
+  `no-await-in-loop` lint rule) or a bulk branch that loses the per-tab
+  feedback/autoclose semantics of `UI.doActionToTabForTabs`. Instapaper has no
+  published rate limit and one window's tabs is a small burst, so saves fire in
+  parallel like the other per-tab providers.
+- **Webhook enablement is gated on a real save-schema test POST, not just a URL
+  shape check.** `credentials.verify("webhook", …)` sends the exact
+  `{url, title}` payload (no extra fields, so strict endpoints don't
+  false-fail) to prove the endpoint is reachable and CORS-capable. Consequence:
+  only CORS-capable HTTPS endpoints can be connected, and **Verify may trigger
+  downstream automations** — the options copy warns about this.
+- **Raindrop bulk reports chunk-level partial results.** `doActionToTabs`
+  returns `{succeeded, failed}` built from `Promise.allSettled` over the
+  100-item chunks, mapping each settled chunk back to its own tabs.
+  `UI.doBulkActionForTabs` then applies per-tab success/fail feedback and
+  autoclose only to saved tabs and summarizes mixed outcomes
+  ("X saved to Raindrop, Y failed"). Granularity is per-chunk, not per-item
+  (the plural endpoint returns an aggregate); true idempotency/dedup is out of
+  scope (Raindrop has no client-supplied dedup key).
+- **Credential-gated services are managed only in "Connected services".** They
+  get no checkbox in the generic Services list, so the sole enable path is a
+  successful Verify. Their `service_<action>` flag defaults to `"disabled"`.

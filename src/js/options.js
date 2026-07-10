@@ -3,7 +3,8 @@ import { messageManager } from "./message.js";
 import UI from "./ui.js";
 import capitalize from "./helpers.js";
 import storage from "./storage.js";
-import { keys } from "./keys.js";
+import { CREDENTIAL_GATED, keys } from "./keys.js";
+import credentials from "./services/credentials.js";
 
 /**
  * Settings/preferences interface for a user to save
@@ -52,7 +53,13 @@ export var options =
       var servicesForm = document.getElementById("list-of-services");
       for (var service in keys.preferences.services) {
         if (keys.preferences.services.hasOwnProperty(service)) {
-          addServiceCheckBox(service, servicesForm);
+          // Credential-gated services get no generic checkbox — they are
+          // managed only in the "Connected services" section, so the sole
+          // enable path is a successful Verify (no bypass).
+          const action = service.substring("service_".length);
+          if (!CREDENTIAL_GATED.includes(action)) {
+            addServiceCheckBox(service, servicesForm);
+          }
         }
       }
     }
@@ -82,6 +89,8 @@ export var options =
 
       bindGeneratedUI();
 
+      opt.renderConnectedServices();
+
       this.restoreServices().then(opt.setServices);
 
       UI.getLayout().then(function(layout) {
@@ -109,10 +118,12 @@ export var options =
         const value = service[1];
         const serviceInput = document.getElementById(name);
 
-        if (String(value) === "enabled") {
+        // Credential-gated services have no generated checkbox; guard so we
+        // never dereference a null input.
+        if (serviceInput && String(value) === "enabled") {
           serviceInput.checked = true;
           serviceInput.value = "enabled";
-        } else {
+        } else if (serviceInput) {
           serviceInput.checked = false;
           serviceInput.value = "disabled";
         }
@@ -276,6 +287,181 @@ export var options =
       }
 
       target.checked = target.value == "enabled";
+    };
+
+    /**
+     * Read the credential input(s) for a gated service into a plain object.
+     * @param  {string} service Gated service name
+     * @return {object} Credential object matching the service's shape
+     */
+    function readCredentialInputs(service) {
+      if (service === "raindrop") {
+        return { token: document.getElementById("raindrop-token").value.trim() };
+      }
+      if (service === "instapaper") {
+        return {
+          username: document.getElementById("instapaper-username").value.trim(),
+          password: document.getElementById("instapaper-password").value,
+        };
+      }
+      if (service === "readwise") {
+        return { token: document.getElementById("readwise-token").value.trim() };
+      }
+      // webhook
+      return { url: document.getElementById("webhook-url").value.trim() };
+    }
+
+    /**
+     * Prefill a gated service's input(s) from stored credentials.
+     * @param  {string} service Gated service name
+     * @param  {object} creds   Stored credential object
+     */
+    function fillCredentialInputs(service, creds) {
+      if (service === "raindrop") {
+        document.getElementById("raindrop-token").value = creds.token || "";
+      } else if (service === "instapaper") {
+        document.getElementById("instapaper-username").value =
+          creds.username || "";
+        document.getElementById("instapaper-password").value =
+          creds.password || "";
+      } else if (service === "readwise") {
+        document.getElementById("readwise-token").value = creds.token || "";
+      } else if (service === "webhook") {
+        document.getElementById("webhook-url").value = creds.url || "";
+      }
+    }
+
+    /**
+     * Update the status text/style for a gated service.
+     * @param  {string} service Gated service name
+     * @param  {string} text    Status text
+     * @param  {string} state   "connected", "disconnected", or "error"
+     */
+    function setServiceStatus(service, text, state) {
+      const status = document.getElementById("status-" + service);
+      if (status) {
+        status.textContent = text;
+        status.className = "connected-service-status " + state;
+      }
+    }
+
+    /**
+     * Wire up the "Connected services" section: prefill inputs, reflect
+     * current enabled state, and bind Verify/Disconnect buttons.
+     */
+    opt.renderConnectedServices = function() {
+      CREDENTIAL_GATED.forEach(function(service) {
+        const verifyButton = document.getElementById("verify-" + service);
+        const disconnectButton = document.getElementById(
+          "disconnect-" + service
+        );
+
+        if (!verifyButton) {
+          // Section markup absent (e.g. isolated test) — nothing to wire.
+          return;
+        }
+
+        verifyButton.addEventListener("click", function() {
+          opt.verifyService(service);
+        });
+
+        if (disconnectButton) {
+          disconnectButton.addEventListener("click", function() {
+            opt.disconnectService(service);
+          });
+        }
+
+        credentials.get(service).then(function(creds) {
+          fillCredentialInputs(service, creds);
+        });
+
+        storage
+          .retrieve(keys.preferences.services)
+          .then(function(services) {
+            const enabled =
+              String(services["service_" + service]) === "enabled";
+            setServiceStatus(
+              service,
+              enabled ? "Connected" : "Not connected",
+              enabled ? "connected" : "disconnected"
+            );
+          });
+      });
+    };
+
+    /**
+     * Verify a gated service's credentials; on success store them and enable
+     * the service, on failure keep it disabled and surface a status code.
+     * @param  {string} service Gated service name
+     */
+    /**
+     * Persist a gated service's flag as disabled, hiding it in both popup
+     * layouts. Used on verification failure so a previously enabled service
+     * (e.g. one whose token was revoked) does not stay visible.
+     * @param  {string} service Gated service name
+     * @return {Promise} Resolves once the flag is stored
+     */
+    function disableGatedService(service) {
+      const serviceObj = {};
+      serviceObj["service_" + service] = "disabled";
+      return storage.store(serviceObj);
+    }
+
+    /**
+     * Handle a failed verification: disable the service (so a stale, revoked
+     * credential can't leave it enabled), surface a message, and re-enable
+     * input.
+     * @param  {string} service Gated service name
+     * @param  {string} message Human-readable failure message
+     */
+    function handleVerifyFailure(service, message) {
+      disableGatedService(service).then(function() {
+        setServiceStatus(service, "Verification failed", "error");
+        messageManager.updateStatusMessage(message, "medium", "danger");
+        opt.disableOverlay();
+      });
+    }
+
+    opt.verifyService = function(service) {
+      const creds = readCredentialInputs(service);
+
+      opt.enableOverlay();
+
+      credentials
+        .verify(service, creds)
+        .then(function(valid) {
+          if (!valid) {
+            handleVerifyFailure(
+              service,
+              capitalize(service) + " verification failed"
+            );
+            return;
+          }
+
+          credentials.set(service, creds).then(function() {
+            const serviceObj = {};
+            serviceObj["service_" + service] = "enabled";
+            opt.storeOption(serviceObj, capitalize(service));
+            setServiceStatus(service, "Connected", "connected");
+          });
+        })
+        .catch(function(error) {
+          handleVerifyFailure(service, "Error: " + error.message);
+        });
+    };
+
+    /**
+     * Disconnect a gated service: clear its credentials and disable it.
+     * @param  {string} service Gated service name
+     */
+    opt.disconnectService = function(service) {
+      credentials.clear(service).then(function() {
+        fillCredentialInputs(service, {});
+        const serviceObj = {};
+        serviceObj["service_" + service] = "disabled";
+        opt.storeOption(serviceObj, capitalize(service));
+        setServiceStatus(service, "Not connected", "disconnected");
+      });
     };
 
     return opt;

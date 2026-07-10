@@ -2,6 +2,10 @@ import BookmarkProvider from "./Bookmark.js";
 import ClipboardProvider from "./Clipboard.js";
 import CloseProvider from "./Close.js";
 import DownloadProvider from "./Download.js";
+import InstapaperProvider from "./Instapaper.js";
+import RaindropProvider from "./Raindrop.js";
+import ReadwiseProvider from "./Readwise.js";
+import WebhookProvider from "./Webhook.js";
 
 /**
  * Immutable registry mapping provider class names to their classes.
@@ -14,4 +18,8 @@ export const Providers = Object.freeze({
   BookmarkProvider,
   CloseProvider,
   ClipboardProvider,
+  RaindropProvider,
+  InstapaperProvider,
+  ReadwiseProvider,
+  WebhookProvider,
 });

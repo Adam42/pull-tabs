@@ -55,6 +55,73 @@
                 <div id="status"></div>
             </div>
 
+            <div class="container">
+                <h3 class="page-header">Connected services</h3>
+                <p>Save tabs to a read-later service. Credentials are stored
+                   locally on this device only. Each service stays hidden in
+                   the popup until you verify it here.</p>
+
+                <div id="connected-services">
+
+                    <div class="connected-service" id="connected-raindrop">
+                        <h4>Raindrop.io</h4>
+                        <label for="raindrop-token">Test token</label>
+                        <input type="password" id="raindrop-token" autocomplete="off">
+                        <p class="help-block">
+                            Create a test token in the
+                            <a href="https://app.raindrop.io/settings/integrations" target="_blank" rel="noopener">Raindrop app integrations console</a>.
+                        </p>
+                        <button type="button" id="verify-raindrop">Verify</button>
+                        <button type="button" id="disconnect-raindrop">Disconnect</button>
+                        <span id="status-raindrop" class="connected-service-status"></span>
+                    </div>
+
+                    <div class="connected-service" id="connected-instapaper">
+                        <h4>Instapaper</h4>
+                        <label for="instapaper-username">Username / email</label>
+                        <input type="text" id="instapaper-username" autocomplete="off">
+                        <label for="instapaper-password">Password (may be empty)</label>
+                        <input type="password" id="instapaper-password" autocomplete="off">
+                        <p class="help-block">
+                            Use your <a href="https://www.instapaper.com/user" target="_blank" rel="noopener">Instapaper account</a> credentials.
+                        </p>
+                        <button type="button" id="verify-instapaper">Verify</button>
+                        <button type="button" id="disconnect-instapaper">Disconnect</button>
+                        <span id="status-instapaper" class="connected-service-status"></span>
+                    </div>
+
+                    <div class="connected-service" id="connected-readwise">
+                        <h4>Readwise Reader</h4>
+                        <label for="readwise-token">Access token</label>
+                        <input type="password" id="readwise-token" autocomplete="off">
+                        <p class="help-block">
+                            Get your token at
+                            <a href="https://readwise.io/access_token" target="_blank" rel="noopener">readwise.io/access_token</a>.
+                        </p>
+                        <button type="button" id="verify-readwise">Verify</button>
+                        <button type="button" id="disconnect-readwise">Disconnect</button>
+                        <span id="status-readwise" class="connected-service-status"></span>
+                    </div>
+
+                    <div class="connected-service" id="connected-webhook">
+                        <h4>Webhook</h4>
+                        <label for="webhook-url">HTTPS endpoint URL</label>
+                        <input type="url" id="webhook-url" autocomplete="off">
+                        <p class="help-block">
+                            Each saved tab is POSTed as JSON
+                            <code>{url, title}</code>. The endpoint must accept
+                            cross-origin (CORS) POSTs.
+                            <strong>Verify sends a real test event, which may
+                            trigger downstream automations.</strong>
+                        </p>
+                        <button type="button" id="verify-webhook">Verify</button>
+                        <button type="button" id="disconnect-webhook">Disconnect</button>
+                        <span id="status-webhook" class="connected-service-status"></span>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </body>
 </html>

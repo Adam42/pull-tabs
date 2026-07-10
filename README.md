@@ -1,6 +1,6 @@
 # Pull Tabs
 
-This browser extension gathers the current window's tabs and offers actions to take on them, either in bulk or on a per-tab basis. Possible actions include downloading, bookmarking, copying to the clipboard, closing and ignoring.
+This browser extension gathers the current window's tabs and offers actions to take on them, either in bulk or on a per-tab basis. Possible actions include downloading, bookmarking, copying to the clipboard, closing and ignoring. You can also save tabs to Raindrop, Instapaper, or Readwise Reader, or POST them to a generic webhook.
 
 There are two ways of interacting with tabs, a simple bulk method and a more advanced per-tab layout. For more info or to install the extension for normal use visit the [extension site](https://adam42.github.io/pull-tabs/).
 
@@ -8,6 +8,7 @@ There are two ways of interacting with tabs, a simple bulk method and a more adv
 
 The extension works for its core actions: download, bookmark, close, and copy-to-clipboard.
 
+- **Read-later providers added in 0.19.0.** Save tabs to Raindrop, Instapaper, or Readwise Reader, or POST them to a generic webhook. Each is credential-gated: paste your token/credentials in Options → "Connected services" and hit Verify; the action stays hidden in the popup until verification succeeds. Credentials are stored locally on this device only. This release adds `host_permissions` for `api.raindrop.io`, `www.instapaper.com`, and `readwise.io`, so **Chrome users will be prompted to re-approve the extension** after updating.
 - **Pocket support was removed in 0.18.0.** Mozilla shut down the Pocket service in July 2025; the save/login integration and its `identity`/host permissions have been deleted.
 - **Tests run via `npm test`** (Jest, green in CI).
 

@@ -8,6 +8,7 @@ import ServiceProvider from "./services/ServiceProvider.js";
 import ServiceFactory from "./services/ServiceFactory.js";
 import { messageManager } from "./message.js";
 import UI from "./ui.js";
+import { gerund, pastTense } from "./actionLabels.js";
 
 /**
  * Displays the advanced bulk view where users can
@@ -167,6 +168,13 @@ export var uiAdvanced = uiAdvanced || {
           );
         }
       );
+
+      return;
+    }
+
+    //Raindrop is a true bulk provider returning {succeeded, failed}
+    if (String(action) === "raindrop") {
+      UI.doBulkActionForTabs(tabs, action, uiAdvanced);
 
       return;
     }
@@ -397,8 +405,7 @@ export var uiAdvanced = uiAdvanced || {
    * @return {[type]}        [description]
    */
   updateUIWithSuccess: function(tab, action) {
-    let actioned = action + "ed";
-    uiAdvanced.updateUI(tab, "Successfuly " + actioned + " ", "success");
+    uiAdvanced.updateUI(tab, "Successfully " + pastTense(action) + " ", "success");
   },
 
   /**
@@ -411,7 +418,6 @@ export var uiAdvanced = uiAdvanced || {
    * @return {[type]}        [description]
    */
   updateUIWithFail: function(tab, action) {
-    let actioning = action + "ing";
-    uiAdvanced.updateUI(tab, "Failed " + actioning + " ", "fail");
+    uiAdvanced.updateUI(tab, "Failed " + gerund(action) + " ", "fail");
   }
 };

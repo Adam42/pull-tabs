@@ -169,8 +169,16 @@ what's captured here, and the remaining polish items not repeated below.
   updating too. **Needs owner sign-off — see Questions.** DoD: extension
   builds and works with no Pocket references; manifest permissions shrink to
   `tabs, downloads, bookmarks, storage`; version bumped and released.
-- [ ] **HIGH impact / M — Add Raindrop.io + Instapaper + Readwise Reader
+- [x] **HIGH impact / M — Add Raindrop.io + Instapaper + Readwise Reader
   save providers, plus a generic webhook provider** (Pocket's replacement).
+  Done (Phase 5, 0.19.0): all four providers ship, credential-gated behind a
+  new options "Connected services" section (verify-to-enable, credentials in
+  `browser.storage.local` only); Raindrop has a true chunked bulk
+  `doActionToTabs` reporting chunk-level partial results; `host_permissions`
+  added for api.raindrop.io / www.instapaper.com / readwise.io; version bumped
+  to 0.19.0. Implementation deviations recorded in
+  [docs/read-later-services.md](docs/read-later-services.md). Store-listing
+  copy + AMO/CWS submission (Chrome permission re-approval) remain manual.
   Full design + second-round candidate screen in
   [docs/read-later-services.md](docs/read-later-services.md): user-pasted
   tokens / Basic Auth — no OAuth, no secrets in the repo or shipped zip;

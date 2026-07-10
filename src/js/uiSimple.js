@@ -7,6 +7,7 @@ import ServiceFactory from "./services/ServiceFactory.js";
 import capitalize from "./helpers.js";
 import { keys } from "./keys.js";
 import UI from "./ui.js";
+import { gerund, pastTense } from "./actionLabels.js";
 
 /**
  * Displays the simple bulk view: one button per enabled service
@@ -70,12 +71,16 @@ export var uiSimple = uiSimple || {
 
         break;
 
-      case "bookmark":
-      case "close":
-        UI.doActionToTabForTabs(popup.tabs, action, uiSimple);
+      case "raindrop":
+        // Raindrop is a true bulk provider; keep the efficient path while
+        // preserving per-tab feedback and autoclose.
+        UI.doBulkActionForTabs(popup.tabs, action, uiSimple);
         break;
 
       default:
+        // bookmark, close, and the per-tab read-later providers
+        // (instapaper, readwise, webhook) all loop per-tab.
+        UI.doActionToTabForTabs(popup.tabs, action, uiSimple);
         break;
     }
   },
@@ -184,8 +189,7 @@ export var uiSimple = uiSimple || {
    * @param  {string} action Represents the ServiceProvider and its action
    */
   updateUIWithSuccess: function(tab, action) {
-    const actioned = action + "ed";
-    uiSimple.updateUI(tab, "Successfuly " + actioned + " ", "success");
+    uiSimple.updateUI(tab, "Successfully " + pastTense(action) + " ", "success");
   },
 
   /**
@@ -197,8 +201,7 @@ export var uiSimple = uiSimple || {
    * @param  {string} action Represents the ServiceProvider and its action
    */
   updateUIWithFail: function(tab, action) {
-    const actioning = action + "ing";
-    uiSimple.updateUI(tab, "Failed " + actioning + " ", "danger");
+    uiSimple.updateUI(tab, "Failed " + gerund(action) + " ", "danger");
   },
 
   /**
