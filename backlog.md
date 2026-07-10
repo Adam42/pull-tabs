@@ -165,9 +165,11 @@ what's captured here, and the remaining polish items not repeated below.
   declare `browsingActivity` as `optional` and request it at runtime
   (`browser.permissions.request`) when a user connects a read-later service in
   Options — needs code changes and Firefox 140+ — worth considering during the
-  redesign, not now. The `required` variant was briefly committed (9203f1f)
-  and reverted to keep master matching the 0.20.0 store upload. DoD: next
-  Firefox release carries one of the two variants and uploads warning-free.
+  redesign, not now. The `required` variant is on master (re-applied after the
+  0.20.0 upload/source were shipped) and will go out with the next release;
+  this item tracks the optional-variant upgrade. DoD: redesign decides
+  required vs optional; if optional, runtime request wired to the Connected
+  services flow.
 - [x] **HIGH impact / M — Remove the Pocket integration.** Done (Phase 3,
   0.18.0): all Pocket code/pages/config removed, permissions shrunk to
   `tabs, downloads, bookmarks, storage`, version bumped to 0.18.0. Store
