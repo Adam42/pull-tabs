@@ -1,0 +1,268 @@
+/* =====================================================================
+   Pull Tabs UI Kit — "Pull" theme
+   Tactile utility: warm paper + ink, vermilion signal, Space Grotesk +
+   Space Mono, crisp ink borders + hard offset shadows.
+   ===================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --ink: #1A1714;
+  --ink-2: #4F483D;
+  --ink-3: #908775;
+  --paper: #F3EDDF;
+  --paper-2: #EAE2CF;
+  --card: #FCFAF3;
+  --line-soft: #D8CFB9;
+  --signal: #F4502A;
+  --signal-press: #CB3A18;
+  --signal-tint: #FBE4DA;
+  --success: #2E8B57;
+  --success-tint: #DCEFE2;
+  --fail: #C2371F;
+  --fail-tint: #F6DED8;
+  --info: #2C6E7A;
+  --info-tint: #D9E9EC;
+  --on-ink: #F3EDDF;
+  --on-ink-dim: #A89F8C;
+  --r-sm: 6px; --r: 9px; --r-lg: 14px;
+  --shadow: 3px 3px 0 var(--ink);
+  --shadow-lg: 5px 5px 0 var(--ink);
+  --font: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace; /* @kind font */
+  --ease: cubic-bezier(0.2, 0, 0.1, 1); /* @kind other */
+}
+
+html, body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 { font-family: var(--font); color: var(--ink); line-height: 1.12; margin: 0 0 12px; }
+h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 19px; font-weight: 600; }
+h4 { font-size: 16px; font-weight: 600; }
+p { margin: 0 0 12px; color: var(--ink-2); }
+a { color: var(--signal); text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+.muted { color: var(--ink-3); }
+.hidden { display: none !important; }
+
+.meta { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+.label {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--ink-3);
+}
+
+kbd {
+  font-family: var(--mono); font-size: 12px;
+  background: var(--card); border: 1.5px solid var(--ink); border-radius: 5px;
+  box-shadow: 1.5px 1.5px 0 var(--ink); padding: 1px 6px; color: var(--ink);
+}
+
+/* ---- Section header: mono kicker + ruled line ---- */
+.section-header {
+  display: flex; align-items: baseline; gap: 10px;
+  padding-bottom: 8px; margin: 28px 0 16px;
+  border-bottom: 1.5px solid var(--ink);
+}
+.section-header:first-child { margin-top: 0; }
+.section-header h3 { margin: 0; white-space: nowrap; }
+.section-header .kicker {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--ink-3); margin-left: auto;
+}
+
+/* =====================================================================
+   Header (ink bar)
+   ===================================================================== */
+.pt-header {
+  background: var(--ink);
+  color: var(--on-ink);
+  display: flex; align-items: center; gap: 18px;
+  padding: 0 20px; height: 56px;
+}
+.pt-brand { display: inline-flex; align-items: center; gap: 11px; cursor: pointer; flex: 0 0 auto; }
+.pt-brand img { height: 26px; width: 26px; filter: invert(1); flex: 0 0 auto; }
+.pt-brand .name { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: var(--on-ink); white-space: nowrap; }
+.pt-nav { display: flex; gap: 4px; }
+.pt-nav a {
+  font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--on-ink-dim); padding: 8px 12px; border-radius: var(--r-sm);
+  font-weight: 400; transition: color var(--ease) 110ms, background var(--ease) 110ms;
+}
+.pt-nav a:hover { color: var(--on-ink); text-decoration: none; background: rgba(255,255,255,.06); }
+.pt-nav a.active { color: var(--ink); background: var(--signal); }
+.pt-header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.pt-count {
+  font-family: var(--mono); font-size: 12.5px; color: var(--on-ink);
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.pt-count b { color: var(--signal); font-weight: 700; }
+.pt-flag {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink); background: var(--signal); padding: 3px 9px; border-radius: var(--r-pill, 999px);
+}
+
+/* =====================================================================
+   Buttons — tactile, press collapses the hard shadow
+   ===================================================================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--font); font-size: 15px; font-weight: 600; line-height: 1;
+  padding: 11px 16px; border-radius: var(--r);
+  border: 1.5px solid var(--ink); background: var(--card); color: var(--ink);
+  cursor: pointer; text-decoration: none !important; white-space: nowrap; user-select: none;
+  box-shadow: var(--shadow);
+  transition: transform var(--ease) 90ms, box-shadow var(--ease) 90ms, background var(--ease) 110ms;
+}
+.btn:hover { background: #fff; }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.btn:focus-visible { outline: 2.5px solid var(--signal); outline-offset: 2px; }
+.btn img, .btn svg { height: 18px; width: 18px; }
+
+.btn-primary { background: var(--signal); border-color: var(--ink); color: #fff; }
+.btn-primary:hover { background: #ff5d38; }
+
+.btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--ink); padding: 11px 12px; }
+.btn-ghost:hover { background: rgba(26,23,20,.06); }
+.btn-ghost:active { transform: none; box-shadow: none; }
+
+.btn-sm { padding: 7px 11px; font-size: 13px; box-shadow: 2px 2px 0 var(--ink); }
+.btn-sm:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--ink); }
+.btn-lg { padding: 14px 22px; font-size: 16px; box-shadow: var(--shadow-lg); }
+.btn-lg:active { transform: translate(5px,5px); box-shadow: 0 0 0 var(--ink); }
+.btn-block { display: flex; width: 100%; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: var(--shadow); }
+.btn[disabled]:active { transform: none; }
+
+/* =====================================================================
+   Cards / panels
+   ===================================================================== */
+.card {
+  background: var(--card); border: 1.5px solid var(--ink);
+  border-radius: var(--r-lg); box-shadow: var(--shadow);
+}
+.well { background: var(--paper-2); border: 1px solid var(--line-soft); border-radius: var(--r); padding: 16px; }
+
+/* =====================================================================
+   Forms
+   ===================================================================== */
+.field-label { display: block; font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--ink-3); margin-bottom: 6px; }
+.input {
+  display: block; width: 100%; font-family: var(--font); font-size: 15px;
+  padding: 10px 13px; color: var(--ink); background: var(--card);
+  border: 1.5px solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow);
+  transition: box-shadow var(--ease) 90ms;
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus { outline: none; box-shadow: 3px 3px 0 var(--signal); border-color: var(--ink); }
+
+/* tactile checkbox */
+.check { position: relative; display: inline-flex; cursor: pointer; }
+.check input { position: absolute; opacity: 0; width: 22px; height: 22px; margin: 0; cursor: pointer; }
+.check .box {
+  width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 5px;
+  background: var(--card); display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--ease) 90ms;
+}
+.check input:checked + .box { background: var(--signal); }
+.check .box::after {
+  content: ""; width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) scale(0); transform-origin: center; margin-top: -2px;
+  transition: transform var(--ease) 110ms;
+}
+.check input:checked + .box::after { transform: rotate(45deg) scale(1); }
+
+/* toggle switch */
+.switch { position: relative; width: 46px; height: 26px; display: inline-block; cursor: pointer; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch .track {
+  position: absolute; inset: 0; border: 1.5px solid var(--ink); border-radius: 999px;
+  background: var(--paper-2); transition: background var(--ease) 120ms;
+}
+.switch .thumb {
+  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--ink); transition: transform var(--ease) 140ms, background var(--ease) 120ms;
+}
+.switch input:checked ~ .track { background: var(--signal); }
+.switch input:checked ~ .thumb { transform: translateX(20px); background: #fff; }
+
+/* =====================================================================
+   Segmented action picker (per-tab) + select
+   ===================================================================== */
+.seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: var(--r); overflow: hidden; background: var(--card); }
+.seg button {
+  border: none; background: transparent; padding: 7px 9px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-right: 1.5px solid var(--ink); transition: background var(--ease) 90ms;
+}
+.seg button:last-child { border-right: none; }
+.seg button img { height: 17px; width: 17px; display: block; transition: filter var(--ease) 90ms; }
+.seg button:hover { background: var(--paper-2); }
+.seg button.on { background: var(--signal); }
+.seg button.on img { filter: brightness(0) invert(1); }
+
+.select {
+  font-family: var(--font); font-size: 14px; padding: 8px 30px 8px 12px; color: var(--ink);
+  background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--r);
+  box-shadow: 2px 2px 0 var(--ink); cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%231A1714' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 11px center;
+}
+.select:focus { outline: none; box-shadow: 2px 2px 0 var(--signal); }
+
+/* =====================================================================
+   Tab rows (advanced list)
+   ===================================================================== */
+.tablist { display: flex; flex-direction: column; gap: 10px; }
+.tabrow {
+  display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+  background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--r);
+  box-shadow: var(--shadow); transition: box-shadow var(--ease) 110ms, background var(--ease) 110ms, transform var(--ease) 110ms;
+}
+.tabrow.off { opacity: .5; box-shadow: 1.5px 1.5px 0 var(--line-soft); border-color: var(--line-soft); }
+.tabrow.successful { background: var(--success-tint); border-color: var(--success); box-shadow: 3px 3px 0 var(--success); }
+.tabrow.failed { background: var(--fail-tint); border-color: var(--fail); box-shadow: 3px 3px 0 var(--fail); }
+.tabrow .fav { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--ink); flex: 0 0 auto; }
+.fav-real { background: #fff; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; }
+.fav-real img { width: 68%; height: 68%; object-fit: contain; display: block; }
+.tabrow .title { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabrow .url { font-family: var(--mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabrow .result { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.tabrow.successful .result { color: var(--success); }
+.tabrow.failed .result { color: var(--fail); }
+
+/* =====================================================================
+   Status banner
+   ===================================================================== */
+.banner {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  border: 1.5px solid var(--ink); border-radius: var(--r); box-shadow: var(--shadow);
+  font-size: 14.5px; font-weight: 500;
+}
+.banner .dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+.banner-success { background: var(--success-tint); } .banner-success .dot { background: var(--success); }
+.banner-fail { background: var(--fail-tint); } .banner-fail .dot { background: var(--fail); }
+.banner-info { background: var(--info-tint); } .banner-info .dot { background: var(--info); }
+
+/* =====================================================================
+   Chips / badges
+   ===================================================================== */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px;
+  padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--card);
+}
+.chip.on { background: var(--signal); color: #fff; border-color: var(--ink); }
+
+@keyframes pt-chomp { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-12deg); } }
+.pacman-loading { animation: pt-chomp 0.45s var(--ease) infinite; }

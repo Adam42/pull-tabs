@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pull Tabs — Mockup 2A "Pull"</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="mockups.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Resources referenced as strings in JSX (icons + logo) — lifted so the bundler can inline them -->
+<meta name="ext-resource-dependency" content="img/logo.svg" data-resource-id="logo" />
+<meta name="ext-resource-dependency" content="img/instapaper.svg" data-resource-id="icon_instapaper" />
+<meta name="ext-resource-dependency" content="img/bookmark.svg" data-resource-id="icon_bookmark" />
+<meta name="ext-resource-dependency" content="img/download.svg" data-resource-id="icon_download" />
+<meta name="ext-resource-dependency" content="img/clipboard.svg" data-resource-id="icon_clipboard" />
+<meta name="ext-resource-dependency" content="img/close.svg" data-resource-id="icon_close" />
+<meta name="ext-resource-dependency" content="img/ignore.svg" data-resource-id="icon_ignore" />
+<meta name="ext-resource-dependency" content="img/fav/mdnwebdocs.svg" data-resource-id="fav_mdnwebdocs" />
+<meta name="ext-resource-dependency" content="img/fav/instapaper.svg" data-resource-id="fav_instapaper" />
+<meta name="ext-resource-dependency" content="img/fav/googlefonts.svg" data-resource-id="fav_googlefonts" />
+<meta name="ext-resource-dependency" content="img/fav/github.svg" data-resource-id="fav_github" />
+<meta name="ext-resource-dependency" content="img/fav/nounproject.svg" data-resource-id="fav_nounproject" />
+<meta name="ext-resource-dependency" content="img/fav/ycombinator.svg" data-resource-id="fav_ycombinator" />
+
+<template id="__bundler_thumbnail" data-bg-color="#F3EDDF">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#F3EDDF"/>
+    <rect x="420" y="230" width="360" height="340" rx="48" fill="#1A1714"/>
+    <rect x="510" y="320" width="90" height="90" fill="#F3EDDF"/>
+    <circle cx="660" cy="470" r="45" fill="#F4502A"/>
+  </svg>
+</template>
+
+<style>
+  body { margin: 0; background: var(--paper-2); min-height: 100vh; display: grid; place-items: center; padding: 48px 24px; box-sizing: border-box; }
+  .page-note { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); text-align: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div>
+  <div id="mount"></div>
+  <div class="page-note">Pull Tabs · Mockup 2A "Pull" — warm paper + ink + one vermilion signal</div>
+</div>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="popup.jsx"></script>
+<script type="text/babel" src="mockup-refine.jsx"></script>
+<script type="text/babel">
+  ReactDOM.createRoot(document.getElementById("mount")).render(<MockupRefine />);
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="design_doc_mode" content="canvas">
+<title>Pull Tabs — 2A pages: results + options</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="mockups.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Resources referenced as strings in components.jsx (ptAsset → window.__resources) -->
+<meta name="ext-resource-dependency" content="img/logo.svg" data-resource-id="logo" />
+<meta name="ext-resource-dependency" content="img/bookmark.svg" data-resource-id="icon_bookmark" />
+<meta name="ext-resource-dependency" content="img/instapaper.svg" data-resource-id="icon_instapaper" />
+<meta name="ext-resource-dependency" content="img/clipboard.svg" data-resource-id="icon_clipboard" />
+<meta name="ext-resource-dependency" content="img/download.svg" data-resource-id="icon_download" />
+<meta name="ext-resource-dependency" content="img/close.svg" data-resource-id="icon_close" />
+<meta name="ext-resource-dependency" content="img/ignore.svg" data-resource-id="icon_ignore" />
+<meta name="ext-resource-dependency" content="img/raindrop.svg" data-resource-id="prov_raindrop" />
+<meta name="ext-resource-dependency" content="img/readwise.svg" data-resource-id="prov_readwise" />
+<meta name="ext-resource-dependency" content="img/webhook.svg" data-resource-id="prov_webhook" />
+<meta name="ext-resource-dependency" content="img/instapaper.svg" data-resource-id="prov_instapaper" />
+<meta name="ext-resource-dependency" content="img/fav/mdnwebdocs.svg" data-resource-id="fav_mdnwebdocs" />
+<meta name="ext-resource-dependency" content="img/fav/instapaper.svg" data-resource-id="fav_instapaper" />
+<meta name="ext-resource-dependency" content="img/fav/googlefonts.svg" data-resource-id="fav_googlefonts" />
+<meta name="ext-resource-dependency" content="img/fav/github.svg" data-resource-id="fav_github" />
+<meta name="ext-resource-dependency" content="img/fav/nounproject.svg" data-resource-id="fav_nounproject" />
+<meta name="ext-resource-dependency" content="img/fav/ycombinator.svg" data-resource-id="fav_ycombinator" />
+
+<template id="__bundler_thumbnail" data-bg-color="#F3EDDF">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#F3EDDF"/>
+    <rect x="420" y="230" width="360" height="340" rx="48" fill="#1A1714"/>
+    <rect x="510" y="320" width="90" height="90" fill="#F3EDDF"/>
+    <circle cx="660" cy="470" r="45" fill="#F4502A"/>
+  </svg>
+</template>
+</head>
+<body>
+
+<div class="doc-title">
+  <h1>Pull Tabs — 2A pages · results, options &amp; about</h1>
+  <p>The list is the receipt: one summary strip + per-row past-tense results with inline retry — no banner-per-tab spam. Options drops the Simple/Advanced toggles (merged model) and gains "default action" + picker curation. About reframes the whole story around the single list.</p>
+</div>
+
+<div id="3a" style="position: absolute; left: 60px; top: 200px; width: 860px;">
+  <div class="opt-head"><span class="opt-badge">3A</span><span class="opt-name">Results — pulling, done &amp; failed (auto-plays; Replay to re-run)</span></div>
+  <div id="mount-results"></div>
+  <div class="opt-caption">Rows process in sequence: queued → pulling → ✓ past-tense result ("bookmarked", "copied"…). Instapaper fails (not authorized) with an inline Retry; the footer offers "Retry 1 failed". With autoclose on, succeeded rows dim to show the tab is gone.</div>
+</div>
+
+<div id="3b" style="position: absolute; left: 1000px; top: 200px; width: 860px;">
+  <div class="opt-head"><span class="opt-badge">3B</span><span class="opt-name">Options — merged model</span></div>
+  <div id="mount-options"></div>
+  <div class="opt-caption">Simple/Advanced toggles gone (merged model). Connections is now a read-later provider picker — Instapaper, Raindrop, Readwise Reader, or a custom webhook, one active at a time; the extension itself still shows just the active one. Mime-type handling removed. Adds "Default action" + a curate-the-picker chip row.</div>
+</div>
+
+<div id="3c" style="position: absolute; left: 1940px; top: 200px; width: 860px;">
+  <div class="opt-head"><span class="opt-badge">3C</span><span class="opt-name">About — merged-model copy</span></div>
+  <div id="mount-about"></div>
+  <div class="opt-caption">Same window shell as the other pages. Reframed around the single-list model (no Simple/Advanced), Pocket → Instapaper, and a 3-step “Pull · Set · Go” explainer. Credits updated.</div>
+</div>
+
+<div id="mount-tweaks"></div>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="popup.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="mockup-2a-pages.jsx"></script>
+<script type="text/babel">
+  const PAGES_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "density": "regular",
+    "autoclose": true
+  }/*EDITMODE-END*/;
+
+  function PagesApp() {
+    const [t, setTweak] = useTweaks(PAGES_TWEAK_DEFAULTS);
+    const density = t.density === "compact" ? "compact" : undefined;
+    return (
+      <React.Fragment>
+        <MockupResults autoclose={t.autoclose} density={density} />
+        {ReactDOM.createPortal(<MockupOptionsPage density={density} />, document.getElementById("mount-options"))}
+        {ReactDOM.createPortal(<MockupAbout density={density} />, document.getElementById("mount-about"))}
+        <TweaksPanel>
+          <TweakSection label="Both pages" />
+          <TweakRadio label="Density" value={t.density} options={["regular", "compact"]} onChange={(v) => setTweak("density", v)} />
+          <TweakToggle label="Autoclose on" value={t.autoclose} onChange={(v) => setTweak("autoclose", v)} />
+        </TweaksPanel>
+      </React.Fragment>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("mount-results")).render(<PagesApp />);
+</script>
+
+</body>
+</html>

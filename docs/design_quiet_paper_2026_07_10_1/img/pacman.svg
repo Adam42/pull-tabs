@@ -1,0 +1,24 @@
+<svg width="200px" height="200px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-pacman" style="background: none;">
+    <g ng-attr-style="display:{{config.showBean}}" style="display:block">
+      <circle cx="73.8" cy="50" r="4" ng-attr-fill="{{config.c2}}" fill="#5bc0de">
+        
+        
+      </circle>
+      <circle cx="94.2" cy="50" r="4" ng-attr-fill="{{config.c2}}" fill="#5bc0de">
+        
+        
+      </circle>
+      <circle cx="54" cy="50" r="4" ng-attr-fill="{{config.c2}}" fill="#5bc0de">
+        
+        
+      </circle>
+    </g>
+    <g ng-attr-transform="translate({{config.showBeanOffset}} 0)" transform="translate(-15 0)">
+      <path d="M50 50L20 50A30 30 0 0 0 80 50Z" ng-attr-fill="{{config.c1}}" fill="#337ab7" transform="rotate(28.5 50 50)">
+        
+      </path>
+      <path d="M50 50L20 50A30 30 0 0 1 80 50Z" ng-attr-fill="{{config.c1}}" fill="#337ab7" transform="rotate(-28.5 50 50)">
+        
+      </path>
+    </g>
+  </svg>

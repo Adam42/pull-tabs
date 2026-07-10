@@ -1,0 +1,206 @@
+/* Shared styles for the Pull Tabs mockup explorations (rk- = rethink popup, rf- = refined window, opt- = canvas annotations). Extracted from Mockups v2.html; v2 keeps its inline copy. */
+body { margin: 0; background: transparent; }
+
+  /* ---- canvas annotations ---- */
+  .doc-title { position: absolute; left: 60px; top: 48px; width: 720px; }
+  .doc-title h1 { font-size: 26px; margin: 0 0 6px; }
+  .doc-title p { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); margin: 0; }
+  .opt-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .opt-badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    background: var(--ink); color: var(--paper); padding: 3px 9px; border-radius: 6px;
+  }
+  .opt-name { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-2); }
+  .opt-caption { font-family: var(--mono); font-size: 12px; color: var(--ink-2); line-height: 1.6; margin-top: 18px; max-width: 460px; }
+
+  /* =====================================================
+     Mockup A — "Rethink" (rk-)
+     ===================================================== */
+  .rk-popup {
+    width: 420px; height: 640px; display: flex; flex-direction: column;
+    background: var(--paper); border: 1.5px solid var(--ink); border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg); overflow: hidden;
+  }
+  .rk-head { background: var(--ink); color: var(--on-ink); display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 52px; flex: 0 0 auto; }
+  .rk-logo { height: 20px; width: 20px; filter: invert(1); }
+  .rk-brand { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .rk-count { margin-left: auto; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; }
+  .rk-count b { color: var(--signal); }
+  .rk-optlink {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--on-ink-dim); background: transparent; border: none; cursor: pointer; padding: 6px 0 6px 6px;
+  }
+  .rk-optlink:hover { color: var(--on-ink); }
+
+  .rk-dest { padding: 14px 16px 10px; flex: 0 0 auto; }
+  .rk-destlabel { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .rk-destlabel .meta { font-size: 10.5px; }
+  .rk-seg {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border: 1.5px solid var(--ink); border-radius: var(--r); overflow: hidden;
+    background: var(--card); box-shadow: var(--shadow);
+  }
+  .rk-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: 10px 4px 8px; border: none; border-right: 1.5px solid var(--ink);
+    background: transparent; cursor: pointer; transition: background var(--ease) 90ms;
+  }
+  .rk-cell:last-child { border-right: none; }
+  .rk-cell:hover { background: var(--paper-2); }
+  .rk-cell span { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); }
+  .rk-cell.on { background: var(--signal); }
+  .rk-cell.on span { color: #fff; font-weight: 700; }
+
+  .rk-listhead { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 16px 8px; flex: 0 0 auto; }
+  .rk-listhead .meta { font-size: 11px; letter-spacing: 0.08em; }
+  .rk-listtools { display: inline-flex; gap: 7px; align-items: baseline; }
+  .rk-listtools i { color: var(--ink-3); font-style: normal; }
+  .rk-listtools button { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ink); background: none; border: none; padding: 0; cursor: pointer; }
+  .rk-listtools button:hover { color: var(--signal); }
+
+  .rk-list { flex: 1; overflow-y: auto; padding: 2px 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .rk-row {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--r);
+    cursor: pointer; transition: background var(--ease) 110ms, border-color var(--ease) 110ms, opacity var(--ease) 110ms;
+  }
+  .rk-row:hover { background: #fff; }
+  .rk-row.off { opacity: 0.45; border-color: var(--line-soft); }
+  .rk-row.done { background: var(--success-tint); border-color: var(--success); }
+  .rk-row.fail { background: var(--fail-tint); border-color: var(--fail); }
+  .rk-row .check .box { width: 18px; height: 18px; border-radius: 4px; }
+  .rk-row .check input { width: 18px; height: 18px; }
+  .rk-row .check .box::after { width: 5px; height: 9px; }
+  .rk-row .fav { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--ink); flex: 0 0 auto; }
+  .rk-row-text { flex: 1; min-width: 0; }
+  .rk-title { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-url { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-override {
+    display: inline-flex; align-items: center; gap: 5px; flex: 0 0 auto;
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+    border: 1.5px solid var(--line-soft); background: transparent; color: var(--ink-3);
+    border-radius: 999px; padding: 4px 7px; cursor: pointer; transition: border-color var(--ease) 90ms, color var(--ease) 90ms;
+  }
+  .rk-override:hover { border-color: var(--ink); color: var(--ink); }
+  .rk-override.odd { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .rk-result { font-family: var(--mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; flex: 0 0 auto; }
+  .rk-row.done .rk-result { color: var(--success); }
+  .rk-row.fail .rk-result { color: var(--fail); }
+
+  .rk-foot { border-top: 1.5px solid var(--ink); background: var(--paper-2); padding: 12px 16px 10px; flex: 0 0 auto; }
+  .rk-pull { position: relative; }
+  .rk-kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+  .rk-footmeta { display: flex; justify-content: space-between; margin-top: 8px; }
+  .rk-footmeta .meta { font-size: 10px; letter-spacing: 0.06em; }
+
+  .compact .rk-list { gap: 5px; }
+  .compact .rk-row { padding: 5px 9px; border-radius: 7px; }
+  .compact .rk-cell { padding: 7px 4px 6px; }
+
+  /* =====================================================
+     Mockup B — "Refine" (rf-)
+     ===================================================== */
+  .rf-window {
+    width: 860px; display: flex; flex-direction: column;
+    background: var(--paper); border: 1.5px solid var(--ink); border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg); overflow: hidden;
+  }
+  .rf-head { background: var(--ink); color: var(--on-ink); display: flex; align-items: center; gap: 12px; padding: 0 22px; height: 56px; }
+  .rf-logo { height: 24px; width: 24px; filter: invert(1); }
+  .rf-brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; }
+  .rf-count { font-family: var(--mono); font-size: 12px; color: var(--on-ink); margin-left: 8px; }
+  .rf-count b { color: var(--signal); }
+  .rf-nav { margin-left: auto; display: flex; gap: 4px; }
+  .rf-nav a {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--on-ink-dim); padding: 7px 11px; border-radius: var(--r-sm); font-weight: 400;
+  }
+  .rf-nav a:hover { color: var(--on-ink); text-decoration: none; background: rgba(255,255,255,0.06); }
+  .rf-nav a.active { color: #fff; background: var(--signal); }
+
+  .rf-body { padding: 22px 26px 20px; }
+  .rf-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .rf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .rf-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--ink);
+    padding: 7px 13px; border: 1.5px solid var(--ink); border-radius: 999px;
+    background: var(--card); cursor: pointer; box-shadow: 2px 2px 0 var(--ink);
+    transition: transform var(--ease) 90ms, box-shadow var(--ease) 90ms, background var(--ease) 110ms;
+  }
+  .rf-chip:hover { background: #fff; }
+  .rf-chip:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+  .rf-chip.on { background: var(--signal); color: #fff; }
+
+  .rf-card { background: var(--card); border: 1.5px solid var(--ink); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+  .rf-row {
+    display: flex; align-items: center; gap: 13px; padding: 11px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: background var(--ease) 110ms, opacity var(--ease) 110ms;
+  }
+  .rf-row:last-child { border-bottom: none; }
+  .rf-row.off { opacity: 0.45; background: var(--paper-2); }
+  .rf-row.off .fav { filter: grayscale(1); }
+  .rf-row.off .rf-title { color: var(--ink-3); }
+  .rf-row.off .rf-seg { pointer-events: none; opacity: 0.6; }
+  .rf-row.done { background: var(--success-tint); }
+  .rf-row.fail { background: var(--fail-tint); }
+  .rf-row .fav { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ink); flex: 0 0 auto; }
+  .rf-row-text { flex: 1; min-width: 0; cursor: pointer; }
+  .rf-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rf-url { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rf-seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 7px; overflow: hidden; background: var(--card); flex: 0 0 auto; }
+  .rf-seg button {
+    border: none; background: transparent; padding: 6px 8px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-right: 1px solid var(--line-soft); transition: background var(--ease) 90ms;
+  }
+  .rf-seg button:last-child { border-right: none; }
+  .rf-seg button:hover { background: var(--paper-2); }
+  .rf-seg button.on { background: var(--signal); }
+  .rf-result { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; flex: 0 0 auto; }
+  .rf-row.done .rf-result { color: var(--success); }
+  .rf-row.fail .rf-result { color: var(--fail); }
+
+  .rf-foot {
+    border-top: 1.5px solid var(--ink); background: var(--paper-2);
+    padding: 13px 26px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .rf-footright { display: inline-flex; align-items: center; gap: 16px; }
+
+  .compact .rf-row { padding: 7px 15px; }
+
+  /* =====================================================
+     2A pages — results receipt + options (rs- / op-)
+     ===================================================== */
+  .rf-summary {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    padding: 11px 16px; border: 1.5px solid var(--ink); border-radius: var(--r);
+    box-shadow: var(--shadow); background: var(--info-tint);
+    font-weight: 600; font-size: 14.5px;
+  }
+  .rf-summary.ok { background: var(--success-tint); }
+  .rf-summary.bad { background: var(--fail-tint); }
+  .rf-summary .meta { margin-left: auto; color: var(--ink-2); }
+  .rf-spin {
+    width: 13px; height: 13px; border-radius: 50%; flex: 0 0 auto;
+    border: 2.5px solid var(--ink); border-right-color: transparent;
+    animation: rs-spin 0.7s linear infinite;
+  }
+  @keyframes rs-spin { to { transform: rotate(360deg); } }
+  .rf-row.queued { opacity: 0.55; }
+  .rf-row.pending { background: var(--info-tint); }
+  .rf-row.gone .rf-title { color: var(--ink-3); }
+  .rf-row.gone .fav { filter: grayscale(1); opacity: 0.7; }
+  .rf-reason { font-family: var(--mono); font-size: 10.5px; color: var(--fail); display: block; }
+  .rf-reswrap { display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+
+  .op-body { padding: 6px 26px 24px; max-height: 560px; overflow-y: auto; }
+  .op-row {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+    padding: 15px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .op-row:last-child { border-bottom: none; }
+  .op-row-main { max-width: 480px; }
+  .op-row-title { font-weight: 600; font-size: 15px; }
+  .op-row-ctl { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding-top: 2px; }
