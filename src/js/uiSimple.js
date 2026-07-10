@@ -31,10 +31,9 @@ export var uiSimple = uiSimple || {
 
     switch (action) {
       case "download": {
-        const callback = uiSimple.handleChangedDownloads;
-        service.registerCallback(callback);
-
-        //Loop through each tab and perform the ServiceProvider's action on it
+        //Completion tracking + autoclose now live in the background worker
+        //(Phase 7.2); the popup only kicks off the downloads and shows the
+        //"started" line. Final status arrives via downloadStatus.js.
         popup.tabs.forEach(function(tab) {
           service
             .doActionToTab(tab)
@@ -202,30 +201,5 @@ export var uiSimple = uiSimple || {
    */
   updateUIWithFail: function(tab, action) {
     uiSimple.updateUI(tab, "Failed " + gerund(action) + " ", "danger");
-  },
-
-  /**
-   * Trigger UI updates when downloads reach a final state
-   * @param  {object} delta Changes to the downloadItem object
-   */
-  handleChangedDownloads: function(delta) {
-    var name = "downloadTabItem-" + delta.id;
-
-    browser.storage.local.get(name).then(function(result) {
-      const tab = result[name];
-
-      if (delta.state && delta.state.current === "complete") {
-        uiSimple.updateUI(tab, "Completed downloading ", "success");
-
-        browser.storage.local.remove(name);
-        UI.autoCloseIfEnabled(tab);
-      }
-
-      if (delta.state && delta.state.current === "interrupted") {
-        uiSimple.updateUI(tab, "Error: failed downloading ", "danger");
-
-        browser.storage.local.remove(name);
-      }
-    });
   }
 };

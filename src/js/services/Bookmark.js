@@ -1,4 +1,6 @@
 import ServiceProvider from "./ServiceProvider.js";
+import storage from "../storage.js";
+import { PULLTABS_FOLDER_ID } from "../storageKeys.js";
 
 /**
  * Provides bookmarking actions to tabs
@@ -25,10 +27,13 @@ export default class BookmarkProvider extends ServiceProvider {
    * @param  {object} tab A browser tab object
    * @return {Promise} Promise representing the result of bookmarking
    */
-  // eslint-disable-next-line class-methods-use-this -- worker calls browser.* only, no instance state
-  bookmarkTab(tab) {
+  // eslint-disable-next-line class-methods-use-this -- reads storage + calls browser.*, no instance state
+  async bookmarkTab(tab) {
+    //Folder id now lives in browser.storage.local (Phase 7.1).
+    const stored = await storage.retrieve(PULLTABS_FOLDER_ID);
+
     const bookmark = {
-      parentId: localStorage["pullTabsFolderId"],
+      parentId: stored[PULLTABS_FOLDER_ID],
       title: tab.title.toString(),
       url: tab.url,
     };

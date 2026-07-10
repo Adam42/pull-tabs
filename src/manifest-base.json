@@ -1,18 +1,26 @@
 {
-    "manifest_version": 3,
-
-    "name": "Pull Tabs",
-    "description":
-        "Save the current window's open tabs to disk, bookmark them, copy them to the clipboard, or close them.",
-    "version": "0.19.0",
-    "icons": {
-        "16": "img/icon-16.png",
-        "32": "img/icon-32.png",
-        "48": "img/icon-48.png",
-        "128": "img/icon-128.png"
-    },
-    "host_permissions": [
-        "https://api.raindrop.io/*",
-        "https://www.instapaper.com/*",
-        "https://readwise.io/*"
-    ],
+  "manifest_version": 3,
+  "name": "Pull Tabs",
+  "description": "Save the current window's open tabs to disk, bookmark them, copy them to the clipboard, or close them.",
+  "icons": {
+    "16": "img/icon-16.png",
+    "32": "img/icon-32.png",
+    "48": "img/icon-48.png",
+    "128": "img/icon-128.png"
+  },
+  "host_permissions": [
+    "https://api.raindrop.io/*",
+    "https://www.instapaper.com/*",
+    "https://readwise.io/*"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "permissions": [
+    "tabs",
+    "downloads",
+    "bookmarks",
+    "storage"
+  ]
+}

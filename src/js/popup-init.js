@@ -1,13 +1,17 @@
 "use strict";
 /* Setup extension popup*/
+import { browserUtils } from "./browser.js";
 import { popup } from "./popup.js";
 import { watchOptionsLink } from "./watchOptionsLink.js";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
   watchOptionsLink.init();
 
   var popupEl = document.getElementById("popup");
   if (popupEl) {
+    //Await storage migration + bookmark-folder discovery (Phase 7.1) before
+    //rendering, so popup.init() reads from browser.storage.local reliably.
+    await browserUtils.init();
     popup.init();
   }
 });

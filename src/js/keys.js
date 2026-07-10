@@ -1,4 +1,5 @@
 import ServiceFactory from "./services/ServiceFactory.js";
+import { AUTO_CLOSE } from "./storageKeys.js";
 
 export const keys = [];
 
@@ -17,9 +18,7 @@ keys.preferences.layout = {
  * User preference key for whether to close tabs after a successful action
  * @type {Object}
  */
-keys.preferences.autoClose = {
-  autoCloseTabs: false
-};
+keys.preferences.autoClose = AUTO_CLOSE;
 
 //list of available actions to apply to a tab
 const actions = ServiceFactory.getActions();

@@ -7,13 +7,20 @@ jest.mock("../js/form.js", () => ({ form: {} }));
 let browserUtils;
 
 beforeAll(async () => {
-  // Makes browserUtils.init() (runs at import time) skip getTree()
+  // init() no longer auto-runs at import (Phase 7.1); these tests exercise
+  // findPulltabsBookmarkFolder directly.
   localStorage.setItem("pullTabsFolderId", "preset");
-  // Belt-and-braces if init() runs anyway
   window.browser = {
     bookmarks: {
       getTree: jest.fn().mockResolvedValue([]),
       create: jest.fn().mockResolvedValue({ id: "42" })
+    },
+    // saveBookmarkFolder now persists via browser.storage.local (Phase 7.1).
+    storage: {
+      local: {
+        set: jest.fn().mockResolvedValue(),
+        get: jest.fn().mockResolvedValue({})
+      }
     }
   };
   ({ browserUtils } = await import("../js/browser.js"));
@@ -92,5 +99,47 @@ describe("browserUtils.findPulltabsBookmarkFolder", () => {
     }).not.toThrow();
 
     expect(window.browser.bookmarks.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("browserUtils.init", () => {
+  it("resolves only after the discovered folder id is persisted", async () => {
+    // No legacy keys → migration no-ops; storage reports the folder absent.
+    localStorage.removeItem("pullTabsFolderId");
+    localStorage.removeItem("initialSetup");
+    window.browser.storage.local.get.mockResolvedValue({});
+    window.browser.bookmarks.getTree.mockResolvedValue([
+      {
+        children: [
+          { id: "toolbar", children: [] },
+          { id: "other", children: [{ id: "existing", title: "Pulltabs" }] }
+        ]
+      }
+    ]);
+
+    // Park the persistence write until we release it.
+    let resolveSet;
+    window.browser.storage.local.set.mockReturnValue(
+      new Promise(resolve => {
+        resolveSet = resolve;
+      })
+    );
+
+    let resolved = false;
+    const done = browserUtils.init().then(() => {
+      resolved = true;
+    });
+
+    // Drain microtasks: init should be parked on the pending set(), not resolved.
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(window.browser.storage.local.set).toHaveBeenCalledWith({
+      pullTabsFolderId: "existing"
+    });
+    expect(resolved).toBe(false);
+
+    // Release the write → init resolves.
+    resolveSet();
+    await done;
+    expect(resolved).toBe(true);
   });
 });

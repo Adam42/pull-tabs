@@ -41,10 +41,20 @@ Mac users, temporarily use the below to workaround a bug in web-ext:
 web-ext run -f=/Applications/Firefox.app/Contents/MacOS/firefox
 ```
 
+The build is a small [esbuild](https://esbuild.github.io/)-driven `build.js` at
+the repo root (`npm run dev` for a one-shot build, `npm run watch` to rebuild on
+change). It bundles each entry page, merges the per-browser manifest fragments
+into a valid `manifest.json` with the version injected from `package.json`, and
+prepends the webextension-polyfill to every Chrome bundle.
+
 Make all changes in the src directory use npm to build the extension. Load the extension from the dist directory in your browser.
 
 Please use [prettier](https://prettier.io/) to format any Javascript files in the src directory before committing!
 
 ### Deployment
 
-Mostly a note for myself, when releasing a new version simply run `npm run dev`. As browsers prefer un-minified files and minifying local files doesn't provide much performance gain it's best to not use `npm run production` when creating releases.
+Mostly a note for myself, when releasing a new version simply bump the version
+in `package.json` (single source of truth — `build.js` injects it into both dist
+manifests) and run `npm run dev`. The esbuild build emits un-minified output,
+which is what Mozilla's source review prefers, so there is no separate
+production build step.

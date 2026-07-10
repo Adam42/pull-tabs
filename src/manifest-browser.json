@@ -1,21 +1,15 @@
-    "options_ui": {
-        "page": "options.html",
-        "open_in_tab": false
-    },
-    "permissions": [
-        "tabs",
-        "downloads",
-        "bookmarks",
-        "storage"
-    ],
-    "browser_specific_settings": {
-      "gecko": {
-        "id": "{5110d56d-5344-43e2-9db0-01edc142bcd1}"
-      }
-    },
-    "action": {
-        "default_icon": "img/icon.svg",
-        "default_popup": "popup.html",
-        "default_title": "Pull Tabs"
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{5110d56d-5344-43e2-9db0-01edc142bcd1}"
     }
+  },
+  "action": {
+    "default_icon": "img/icon.svg",
+    "default_popup": "popup.html",
+    "default_title": "Pull Tabs"
+  },
+  "background": {
+    "scripts": ["background-page.js"]
+  }
 }

@@ -1,6 +1,9 @@
 "use strict";
 import { browserUtils } from "./browser.js";
 import { messageManager } from "./message.js";
+import storage from "./storage.js";
+import { INITIAL_SETUP } from "./storageKeys.js";
+import { downloadStatus } from "./downloadStatus.js";
 import UI from "./ui.js";
 import { uiAdvanced } from "./uiAdvanced.js";
 import { uiSimple } from "./uiSimple.js";
@@ -18,11 +21,14 @@ export var popup = popup || {
    * get tabs if advanced layout is active
    */
   init: function() {
-    //Force user to go to options page on initial load
-    if (localStorage.getItem("initialSetup") === null) {
-      popup.doInitialSetup();
-      localStorage.initialSetup = "done";
-    }
+    //Force user to go to options page on initial load. State now lives in
+    //browser.storage.local (Phase 7.1); migration ran in browserUtils.init().
+    storage.retrieve(INITIAL_SETUP).then(function(res) {
+      if (typeof res[INITIAL_SETUP] === "undefined") {
+        popup.doInitialSetup();
+        storage.store({ [INITIAL_SETUP]: "done" });
+      }
+    });
 
     var msgID = messageManager.updateStatusMessage(
       "Loading layout",
@@ -75,6 +81,10 @@ export var popup = popup || {
      * @param  {object} layout Layout preference object
      */
   displayLayout: function(layout) {
+    //Subscribe once (regardless of enabled layouts) to download-status
+    //broadcasts from the background worker (Phase 7.2).
+    downloadStatus.init();
+
     if (String(layout.simple) == "true") {
       uiSimple.displaySimpleLayout();
     } else {

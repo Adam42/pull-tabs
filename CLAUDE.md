@@ -15,10 +15,11 @@ matter; enterprise process does not.
 ## Stack & layout
 
 - Vanilla JavaScript ES modules, no framework. Bootstrap 3 (bootswatch/yeti) CSS.
-- Build: laravel-mix (webpack) via `webpack.mix.js`. Source in `src/`,
-  intermediate output in `build/`, final unpacked extensions in
-  `dist/browser/` (Firefox) and `dist/chrome/` (Chrome, gets the
-  webextension-polyfill prepended).
+- Build: **esbuild** driven by a plain-Node `build.js` at the repo root
+  (laravel-mix was removed in 0.20.0). Source in `src/`, intermediate bundles
+  in `build/`, final unpacked extensions in `dist/browser/` (Firefox) and
+  `dist/chrome/` (Chrome, gets the webextension-polyfill prepended to every
+  bundle). `build.js` cleans `build/` + both dists on each full build.
 - Entry pages: `src/popup.html`, `src/options.html`, `src/about.html`.
 - Service layer: `src/js/services/` — `ServiceProvider` base class,
   one provider per action, `ServiceFactory` maps action names ↔ providers.
@@ -40,10 +41,9 @@ matter; enterprise process does not.
 
 ## Commands
 
-- `npm run watch` — dev build with rebuild on change
-- `npm run dev` — one-shot development build (**also used for release builds**)
-- `npm run production` — exists but is NOT used for releases (stores prefer
-  un-minified code; see README Deployment section)
+- `npm run watch` — `node build.js --watch`, dev build with rebuild on change
+- `npm run dev` — `node build.js`, one-shot build (**also used for releases**;
+  esbuild `minify: false`, so output stays un-minified per Mozilla policy)
 - `npm test` — runs the Jest suite (green in CI; ESM transform wired up in
   Phase 1).
 - `npm run lint` — eslint over `src/js` and `src/tests`; `npm run format` —
@@ -52,26 +52,31 @@ matter; enterprise process does not.
 
 ## Landmines — do not trip these
 
-- **`src/manifest-*.json` are NOT standalone JSON.** `manifest-base.json` is
-  an unterminated fragment; the build *concatenates* base + browser or base +
-  chrome fragments into a valid `manifest.json`. Editing any of them requires
-  keeping the concatenation valid. Verify with:
+- **`src/manifest-*.json` are now valid standalone JSON** (changed in 0.20.0;
+  they used to be concatenated fragments). `build.js` shallow-merges
+  `manifest-base.json` with the per-browser `manifest-browser.json` /
+  `manifest-chrome.json` (`action` and `background` are wholly browser-specific)
+  and injects `version` from `package.json`. Editing any of them just requires
+  keeping valid JSON. Verify with:
   `python3 -c "import json; json.load(open('dist/browser/manifest.json'))"`
 - **The `config.js` mechanism was removed in 0.18.0.** It previously held a
   Pocket consumer key and was gitignored; no module imports it anymore and
   there is no `config-sample.js`. Don't reintroduce it.
-- **Version lives in two places**: `package.json` and `src/manifest-base.json`.
-  Bump both.
-- **Do not minify release builds** — Mozilla source-review policy; releases
-  use `npm run dev` (see README).
+- **Version lives in ONE place**: `package.json`. `build.js` injects it into
+  both dist manifests; `src/manifest-*.json` carry no `version` key.
+- **Do not minify release builds** — Mozilla source-review policy; `build.js`
+  runs esbuild with `minify: false`.
 - **Real UIs loop per-tab** via `UI.doActionToTabForTabs` / provider
   `doActionToTab`; only `Clipboard` implements a genuine bulk
   `doActionToTabs`. The broken `forEachTabDo` bulk layer was deleted in
   0.18.0 — don't reintroduce fake bulk methods.
-- **Storage is split**: some state is in `localStorage` of extension pages
-  (`pullTabsFolderId`, `initialSetup`) and some in `browser.storage.local`
-  (preferences, download-tracking objects). They are not interchangeable;
-  consolidation to `browser.storage` is a backlog item.
+- **Storage is consolidated onto `browser.storage.local`** (0.20.0). Page code
+  goes through the `storage.js` wrapper (`storage.store`/`storage.retrieve`);
+  the background worker uses raw `browser.storage.local.*` (it must not import
+  the popup module graph). Key constants live in `src/js/storageKeys.js`.
+  `browserUtils.init()` runs a one-time migration of the two former
+  `localStorage` keys (`pullTabsFolderId`, `initialSetup`) and is awaited in
+  `popup-init.js` before `popup.init()`.
 - `src/js/service.js`, `src/js/pulltabs-app.js`, `src/service.html` are
   abandoned 2017 prototypes, not referenced by the build. Don't wire them in.
 
@@ -91,4 +96,4 @@ matter; enterprise process does not.
   keys (breaks existing users' saved settings).
 - Adding manifest permissions (store review friction) or any new external
   service integration.
-- Changing the build tool or the manifest concatenation scheme.
+- Changing the build tool (`build.js`/esbuild) or the manifest merge scheme.

@@ -184,10 +184,9 @@ export var uiAdvanced = uiAdvanced || {
   },
 
   initDownload: function(service, tabs) {
-    let callback = uiAdvanced.handleChangedDownloads;
-    service.registerCallback(callback);
-
-    //Loop through each tab and start the download or mark it failed
+    //Completion tracking + autoclose now live in the background worker
+    //(Phase 7.2); here we only kick off the downloads and mark the label as
+    //in-progress. Final status arrives via downloadStatus.js.
     tabs.forEach(function(tab) {
       service.doActionToTab(tab).then(
         () => {
@@ -344,33 +343,6 @@ export var uiAdvanced = uiAdvanced || {
   watchSubmit: function() {
     var checked = document.getElementById("advanced-ui");
     checked.addEventListener("submit", uiAdvanced.doActionToSelectedTabs);
-  },
-
-  /**
-   * Trigger UI updates when downloads reach a final state
-   * @param  {object} delta Changes to the downloadItem object
-   */
-  handleChangedDownloads: function(delta) {
-    let name = "downloadTabItem-" + delta.id;
-
-    browser.storage.local.get(name).then(function(result) {
-      let tab = result[name];
-      if (delta.state && delta.state.current === "complete") {
-        form.removeLabelStatus(tab, "list-group-item-info");
-        uiAdvanced.updateUI(tab, "Completed downloading ", "success");
-
-        browser.storage.local.remove(name);
-        UI.autoCloseIfEnabled(tab);
-      }
-
-      if (delta.state && delta.state.current === "interrupted") {
-        form.removeLabelStatus(tab, "list-group-item-info");
-
-        uiAdvanced.updateUI(tab, "Error: failed downloading ", "fail");
-
-        browser.storage.local.remove(name);
-      }
-    });
   },
 
   /**

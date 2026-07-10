@@ -4,10 +4,16 @@ describe("BookmarkProvider", () => {
   const tab = { url: "https://example.com", title: "Example" };
 
   beforeEach(() => {
-    globalThis.localStorage = { pullTabsFolderId: "folder-1" };
+    // Folder id now lives in browser.storage.local (Phase 7.1) and is read
+    // via the storage wrapper (browser.storage.local.get).
     globalThis.browser = {
       bookmarks: {
         create: jest.fn().mockResolvedValue({ id: "bm-1" }),
+      },
+      storage: {
+        local: {
+          get: jest.fn().mockResolvedValue({ pullTabsFolderId: "folder-1" }),
+        },
       },
     };
   });

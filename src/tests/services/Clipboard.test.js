@@ -9,36 +9,52 @@ describe("ClipboardProvider", () => {
     { url: "https://b.com", title: "B" },
   ];
 
+  let writeText;
+
   beforeEach(() => {
     document.body.innerHTML = "";
+    // Primary path (Phase 7.3): the async Clipboard API.
+    writeText = jest.fn().mockResolvedValue();
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    // Fallback path: legacy execCommand.
     document.execCommand = jest.fn().mockReturnValue(true);
   });
 
-  it("copies a single tab as one line", async () => {
+  it("copies a single tab as one line via writeText", async () => {
     const provider = new ClipboardProvider([tabs[0]]);
+
+    await expect(provider.doActionToTab(tabs[0])).resolves.toBeUndefined();
+    expect(writeText).toHaveBeenCalledWith("A: https://a.com\n");
+    expect(document.execCommand).not.toHaveBeenCalled();
+  });
+
+  it("copies every tab as multiple lines in bulk via writeText", async () => {
+    const provider = new ClipboardProvider(tabs);
+
+    await expect(provider.doActionToTabs()).resolves.toBeUndefined();
+    expect(writeText).toHaveBeenCalledWith(
+      "A: https://a.com\nB: https://b.com\n",
+    );
+  });
+
+  it("falls back to execCommand when writeText rejects", async () => {
+    writeText.mockRejectedValue(new Error("not allowed"));
     let copiedValue;
     document.execCommand.mockImplementation(() => {
       copiedValue = document.getElementById("temp-clipboard-text").value;
       return true;
     });
+    const provider = new ClipboardProvider([tabs[0]]);
 
     await expect(provider.doActionToTab(tabs[0])).resolves.toBeUndefined();
     expect(copiedValue).toBe("A: https://a.com\n");
   });
 
-  it("copies every tab as multiple lines in bulk", async () => {
-    const provider = new ClipboardProvider(tabs);
-    let copiedValue;
-    document.execCommand.mockImplementation(() => {
-      copiedValue = document.getElementById("temp-clipboard-text").value;
-      return true;
-    });
-
-    await expect(provider.doActionToTabs()).resolves.toBeUndefined();
-    expect(copiedValue).toBe("A: https://a.com\nB: https://b.com\n");
-  });
-
-  it("wraps an execCommand failure", async () => {
+  it("wraps an execCommand failure in the fallback path", async () => {
+    writeText.mockRejectedValue(new Error("not allowed"));
     document.execCommand.mockImplementation(() => {
       throw new Error("blocked");
     });

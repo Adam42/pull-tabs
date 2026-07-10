@@ -91,11 +91,17 @@ export var form = form || {
 
   removeLabelStatus: function(tab, status) {
     var label = document.getElementById("label-tab-" + tab.labelTabId);
+    if (!label) {
+      return;
+    }
     label.classList.remove(status);
   },
 
   setLabelStatus: function(tab, status) {
     var label = document.getElementById("label-tab-" + tab.labelTabId);
+    if (!label) {
+      return;
+    }
     label.setAttribute("class", label.className + " " + status);
   },
 

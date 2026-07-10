@@ -1,6 +1,8 @@
 "use strict";
 import { messageManager } from "./message.js";
 import { form } from "./form.js";
+import storage from "./storage.js";
+import { INITIAL_SETUP, PULLTABS_FOLDER_ID } from "./storageKeys.js";
 
 //Make sure the browser namespace is set to something
 //supported msBrowser is Edge, browser is Firefox/W3C, chrome is Google Chrome
@@ -22,16 +24,52 @@ export var browserUtils = {
      * Kickoff browser setup
      * to wrap around native APIs
      * Default expectation is around Chrome
+     *
+     * Returns a promise so callers can await storage migration and
+     * bookmark-folder discovery before rendering (see popup-init.js).
      */
-  init: function() {
+  init: async function() {
     this.isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-    //if we don't have pulltabs bookmark id saved, search for an existing one
-    if (typeof localStorage["pullTabsFolderId"] === "undefined") {
-      var gettingTree = browser.bookmarks.getTree();
 
-      gettingTree.then(tree => {
-        this.findPulltabsBookmarkFolder(tree);
-      });
+    //One-time migration of the two legacy page-localStorage keys into
+    //browser.storage.local (Phase 7.1). Each key is migrated independently so
+    //a user who only has one of them still gets it moved.
+    await this.migrateLocalStorageKey(PULLTABS_FOLDER_ID);
+    await this.migrateLocalStorageKey(INITIAL_SETUP);
+
+    //If we still don't have a pulltabs bookmark id saved, search for an
+    //existing folder (or create one).
+    const stored = await storage.retrieve(PULLTABS_FOLDER_ID);
+    if (typeof stored[PULLTABS_FOLDER_ID] === "undefined") {
+      const tree = await browser.bookmarks.getTree();
+      //Await the full discovery→create→persist chain so init() does not
+      //resolve (and the popup does not render) before pullTabsFolderId is
+      //stored — otherwise an immediate bookmark could read undefined.
+      await this.findPulltabsBookmarkFolder(tree);
+    }
+  },
+
+  /**
+     * Move a single legacy key from page localStorage to
+     * browser.storage.local, but only if storage doesn't already have it.
+     *
+     * @param  {string} key - The key to migrate
+     * @return {Promise} Resolves once migration has been attempted
+     */
+  migrateLocalStorageKey: async function(key) {
+    //Service-worker/background contexts have no localStorage; guard for it.
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+
+    const legacyValue = localStorage[key];
+    if (typeof legacyValue === "undefined") {
+      return;
+    }
+
+    const existing = await storage.retrieve(key);
+    if (typeof existing[key] === "undefined") {
+      await storage.store({ [key]: legacyValue });
     }
   },
 
@@ -73,6 +111,7 @@ export var browserUtils = {
       *  AND if it does not find one then creates one
       *
       * @param  {object} tree -  array representing tree of bookmarks
+      * @return {Promise} Resolves once the folder id has been persisted
       */
   findPulltabsBookmarkFolder: function(tree) {
     const root = tree?.[0];
@@ -80,7 +119,7 @@ export var browserUtils = {
     //("Other bookmarks" / toolbar), fall back to the first
     const bookmarks = root?.children?.[1] ?? root?.children?.[0];
     if (!bookmarks) {
-      return;
+      return Promise.resolve();
     }
 
     //look for an existing bookmark folder called Pulltabs
@@ -88,33 +127,36 @@ export var browserUtils = {
       child => child.title === "Pulltabs"
     );
     if (existing) {
-      this.saveBookmarkFolder(existing.id);
-      return;
+      return this.saveBookmarkFolder(existing.id);
     }
 
-    this.createPulltabsBookmarkFolder({
+    return this.createPulltabsBookmarkFolder({
       parentId: bookmarks.id,
       title: "Pulltabs"
     });
   },
 
+  /**
+   * Create the "Pulltabs" bookmark folder and persist its id.
+   * @param  {object} folder - `{ parentId, title }` for the new folder
+   * @return {Promise} Resolves once the created folder id has been persisted
+   */
   createPulltabsBookmarkFolder: function(folder) {
-    browser.bookmarks
+    return browser.bookmarks
       .create(folder)
-      .then(result => {
-        this.saveBookmarkFolder(result.id);
-      })
+      .then(result => this.saveBookmarkFolder(result.id))
       .catch(err => {
         console.log("Creating bookmark failed" + err.message);
       });
   },
 
   /**
-   * Save the id of the "pulltabs" folder to local storage
+   * Save the id of the "pulltabs" folder to browser.storage.local
    * @param  {integer} id - Numeric id
+   * @return {Promise} Resolves once the id has been persisted
    */
   saveBookmarkFolder: function(id) {
-    localStorage["pullTabsFolderId"] = id;
+    return storage.store({ [PULLTABS_FOLDER_ID]: id });
   },
 
   /**
@@ -126,5 +168,3 @@ export var browserUtils = {
       return browser.runtime.getURL(path);
   }
 };
-
-browserUtils.init();

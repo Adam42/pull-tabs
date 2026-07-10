@@ -38,11 +38,16 @@ export default class ClipboardProvider extends ServiceProvider {
   /**
    * Copies the Title & URL of every tab into the clipboard
    *
+   * Prefers the modern async Clipboard API (Phase 7.3); falls back to the
+   * legacy hidden-textarea + execCommand hack when writeText is unavailable
+   * or rejects (older Firefox, missing focus/permission). No new permission
+   * and no Firefox regression.
+   *
    * @param  {object[]} tabs Collection of tab objects
-   * @return {void}
+   * @return {Promise<void>} Resolves once the clipboard has been written
    * @throws {Error} If the copy command fails
    */
-  copyAllTabsToClipboard(tabs) {
+  async copyAllTabsToClipboard(tabs) {
     const text = "";
 
     const reducer = (acc, currentTab) =>
@@ -50,6 +55,21 @@ export default class ClipboardProvider extends ServiceProvider {
 
     const clipboardText = tabs.reduce(reducer, text);
 
+    try {
+      await navigator.clipboard.writeText(clipboardText);
+    } catch (err) {
+      this.copyViaExecCommand(clipboardText);
+    }
+  }
+
+  /**
+   * Legacy clipboard write via a hidden textarea + execCommand("Copy").
+   *
+   * @param  {string} clipboardText The text to place on the clipboard
+   * @return {void}
+   * @throws {Error} If the copy command fails
+   */
+  copyViaExecCommand(clipboardText) {
     let tempElem = document.createElement("textarea");
 
     tempElem = this.hideClipboardElement(tempElem);
