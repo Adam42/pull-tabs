@@ -3,20 +3,20 @@
  */
 export default class storage {
   /**
-     * Store an object into browser local storage
-     * @param  {object} object [description]
-     * @return {Promise}        [description]
-     */
+   * Store an object into browser local storage
+   * @param  {object} object [description]
+   * @return {Promise}        [description]
+   */
   static store(object) {
     return browser.storage.local.set(object);
   }
 
   /**
-     * Get an object from local storage
-     *
-     * @param  {string}   key      The name of key in local storage
-     * @return {Promise}           Promise represents object retrieved from local storage
-     */
+   * Get an object from local storage
+   *
+   * @param  {string}   key      The name of key in local storage
+   * @return {Promise}           Promise represents object retrieved from local storage
+   */
   static retrieve(key) {
     return browser.storage.local.get(key);
   }

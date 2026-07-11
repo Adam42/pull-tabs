@@ -1,52 +1,160 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Pull Tabs</title>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pull Tabs</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="application/javascript" src="about-page.js"></script>
+  </head>
 
-        <link rel="stylesheet" href="style.css" />
-    </head>
+  <body id="about-page">
+    <div class="rf-head">
+      <img class="rf-logo" src="img/logo.svg" alt="" />
+      <span class="rf-brand">Pull Tabs</span>
+      <span class="rf-count">open source</span>
+      <nav class="rf-nav">
+        <a href="popup.html">Pull</a>
+        <a id="options-link" href="options.html">Options</a>
+        <a class="active" href="about.html">About</a>
+      </nav>
+    </div>
 
-    <body id="popup">
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div id="main-nav" class="navbar-header">
-                    <a id="home" href="popup.html" class="navbar-brand">Pull Tabs</a>
-                </div>
-
-                <div class="navbar-collapse collapse">
-
-                    <ul class="nav navbar-nav navbar-left">
-                        <li><a id="options-link" href="options.html">Options</a></li>
-                        <li><a id="about" href="about.html">About</a></li>
-                    </ul>
-
-                </div>
-            </div>
+    <div class="op-body" id="about-credits">
+      <div class="about-hero">
+        <img src="img/logo.svg" alt="" />
+        <div>
+          <div class="about-name">Pull Tabs</div>
+          <div class="meta">Empty your window in one pull.</div>
         </div>
+      </div>
 
-        <div id="content" class="container">
-            <div id="about-credits" role="complementary">
-                <A href="#about"><h3 class="page-header">About & Credits</h3></a>
-                <h4>About</h4>
-                <p>Pulltabs was created to help pull tabs out of your current browser window and perform actions on them. Whether that's saving to your desktop, copying them to your clipboard or bookmarking them locally.</p>
+      <p class="about-lead">
+        Pull Tabs gathers every tab in the current window into one list and lets
+        you act on the whole pile at once — save to a read-later service,
+        bookmark, download, copy the URL, or close.
+      </p>
 
-                <p>There are two views in Pulltabs, a simple view and and advanced view. You can use either or both at the same time. Simply check off which views you'd like chosen in the Options menu. The simple view sends all your tabs to a single destination or performs a single action on each tab. The advanced view is more granular and allows you to choose an action/destination per each tab, including deactivating particular tabs and having Pulltabs ignore them.</p>
-
-                <h4>Credits</h4>
-                <p><a href="https://adam42.github.io/pull-tabs/">Pull Tabs</a></p>
-                <p>Developed by: <a href="https://adamp.com/">Adam Pieniazek</a></p>
-                <p>Icon: Pull Tab designed by <a href="https://www.thenounproject.com/chamaquitopan">Chamaquito Pan de Dulce</a> from the <a href="https://www.thenounproject.com">Noun Project</a></p>
-                <p>Icon: Bookmark by <a href="https://thenounproject.com/mabusafiah/">Muneer A.Safiah</a> from the Noun Project</p>
-                <p>Icon: Close by <a href="https://thenounproject.com/miwa87/">Michael Wallner</a> from the Noun Project</p>
-                <p>Icon: Download by <a href="https://thenounproject.com/alexfuller/"> Alex Fuller</a> from the Noun Project</p>
-                <p>Icon: Ignore by <a href="https://thenounproject.com/riginos/">Konstantinos Riginos</a> from the Noun Project</p>
-                <p>Icon: <a href="https://thenounproject.com/term/copy-to-clipboard/1425165/">Copy To Clipboard</a> by Andrew from <a href="https://thenounproject.com/">the Noun Project</p>
-            </div>
+      <div class="section-header">
+        <h3>How it works</h3>
+        <span class="kicker">the whole idea</span>
+      </div>
+      <div class="about-flow">
+        <div class="well">
+          <div class="num">1</div>
+          <div class="well-title">Pull</div>
+          <div class="meta">
+            Every open tab drops into one list, all checked and set to your
+            default action.
+          </div>
         </div>
+        <div class="well">
+          <div class="num">2</div>
+          <div class="well-title">Set</div>
+          <div class="meta">
+            Change the action for all tabs at once, or override any single row.
+            Uncheck the ones you want to keep.
+          </div>
+        </div>
+        <div class="well">
+          <div class="num">3</div>
+          <div class="well-title">Go</div>
+          <div class="meta">
+            One button runs the whole pile. With autoclose on, tabs clear
+            themselves as each action lands.
+          </div>
+        </div>
+      </div>
+      <p class="meta" style="margin: 14px 0 4px; line-height: 1.6">
+        No more Simple vs. Advanced modes — one list does both. Set everything
+        at once when you want speed, or give individual tabs their own action
+        when you don't. Same list, either way.
+      </p>
 
-        <script type="application/javascript" src="about-page.js"></script>
+      <div class="about-chips">
+        <span class="chip">save to a read-later service</span>
+        <span class="chip">bookmark</span>
+        <span class="chip">download</span>
+        <span class="chip">copy url</span>
+        <span class="chip">close</span>
+      </div>
 
-    </body>
+      <div class="section-header">
+        <h3>Credits</h3>
+        <span class="kicker">attribution</span>
+      </div>
+      <div class="meta" style="margin-bottom: 14px; line-height: 1.8">
+        Built by
+        <a href="https://adamp.com/" target="_blank" rel="noopener">Adam Pieniazek</a>
+        ·
+        <a href="https://adam42.github.io/pull-tabs/" target="_blank" rel="noopener">adam42.github.io/pull-tabs</a>
+        · GPL-3.0-or-later · open source
+      </div>
+      <div class="well">
+        <div class="label" style="margin-bottom: 10px">Icons</div>
+        <div class="about-credit-grid">
+          <div class="about-credit">
+            <span style="font-weight: 600">Pull Tab</span>
+            <span class="meta who">
+              <a href="https://www.thenounproject.com/chamaquitopan" target="_blank" rel="noopener">Chamaquito Pan de Dulce</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Bookmark</span>
+            <span class="meta who">
+              <a href="https://thenounproject.com/mabusafiah/" target="_blank" rel="noopener">Muneer A.Safiah</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Close</span>
+            <span class="meta who">
+              <a href="https://thenounproject.com/miwa87/" target="_blank" rel="noopener">Michael Wallner</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Download</span>
+            <span class="meta who">
+              <a href="https://thenounproject.com/alexfuller/" target="_blank" rel="noopener">Alex Fuller</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Ignore</span>
+            <span class="meta who">
+              <a href="https://thenounproject.com/riginos/" target="_blank" rel="noopener">Konstantinos Riginos</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Copy to clipboard</span>
+            <span class="meta who">
+              <a href="https://thenounproject.com/term/copy-to-clipboard/1425165/" target="_blank" rel="noopener">Andrew</a>
+              · Noun Project
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Service &amp; favicon marks</span>
+            <span class="meta who">
+              <a href="https://simpleicons.org/" target="_blank" rel="noopener">Simple Icons</a>
+              · simpleicons.org
+            </span>
+          </div>
+          <div class="about-credit">
+            <span style="font-weight: 600">Space Grotesk &amp; Space Mono</span>
+            <span class="meta who">
+              <a href="https://github.com/floriankarsten/space-grotesk" target="_blank" rel="noopener">Florian Karsten</a>
+              · SIL OFL 1.1
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rf-foot">
+      <span class="meta">Pull Tabs · GPL-3.0-or-later · open source</span>
+      <span class="meta">MADE FOR TAB HOARDERS</span>
+    </div>
+  </body>
 </html>

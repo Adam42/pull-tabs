@@ -1,13 +1,12 @@
 "use strict";
 import { messageManager } from "./message.js";
-import { form } from "./form.js";
 import storage from "./storage.js";
 import { INITIAL_SETUP, PULLTABS_FOLDER_ID } from "./storageKeys.js";
 
 //Make sure the browser namespace is set to something
 //supported msBrowser is Edge, browser is Firefox/W3C, chrome is Google Chrome
 if (typeof browser == "undefined") {
-  window.browser = (function() {
+  window.browser = (function () {
     return window.msBrowser || window.browser || window.chrome;
   })();
 }
@@ -21,14 +20,14 @@ if (typeof browser == "undefined") {
  */
 export var browserUtils = {
   /*
-     * Kickoff browser setup
-     * to wrap around native APIs
-     * Default expectation is around Chrome
-     *
-     * Returns a promise so callers can await storage migration and
-     * bookmark-folder discovery before rendering (see popup-init.js).
-     */
-  init: async function() {
+   * Kickoff browser setup
+   * to wrap around native APIs
+   * Default expectation is around Chrome
+   *
+   * Returns a promise so callers can await storage migration and
+   * bookmark-folder discovery before rendering (see popup-init.js).
+   */
+  init: async function () {
     this.isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
 
     //One-time migration of the two legacy page-localStorage keys into
@@ -50,13 +49,13 @@ export var browserUtils = {
   },
 
   /**
-     * Move a single legacy key from page localStorage to
-     * browser.storage.local, but only if storage doesn't already have it.
-     *
-     * @param  {string} key - The key to migrate
-     * @return {Promise} Resolves once migration has been attempted
-     */
-  migrateLocalStorageKey: async function(key) {
+   * Move a single legacy key from page localStorage to
+   * browser.storage.local, but only if storage doesn't already have it.
+   *
+   * @param  {string} key - The key to migrate
+   * @return {Promise} Resolves once migration has been attempted
+   */
+  migrateLocalStorageKey: async function (key) {
     //Service-worker/background contexts have no localStorage; guard for it.
     if (typeof localStorage === "undefined") {
       return;
@@ -73,29 +72,24 @@ export var browserUtils = {
     }
   },
 
-  isChrome: function(){
-    return (typeof window.chrome !== 'undefined');
+  isChrome: function () {
+    return typeof window.chrome !== "undefined";
   },
 
-  isFile: function(pathname) {
-    return (
-      pathname
-        .split("/")
-        .pop()
-        .split(".").length > 1
-    );
+  isFile: function (pathname) {
+    return pathname.split("/").pop().split(".").length > 1;
   },
 
   /**
-     * Retrieve the current window's tab objects
-     *
-     * @return {Promise} Promise represents collection of tab object
-     */
-  getTabs: function() {
-    return new Promise(function(resolve, reject) {
+   * Retrieve the current window's tab objects
+   *
+   * @return {Promise} Promise represents collection of tab object
+   */
+  getTabs: function () {
+    return new Promise(function (resolve, reject) {
       var info = { currentWindow: true };
 
-      browser.tabs.query(info).then(function(e) {
+      browser.tabs.query(info).then(function (e) {
         if (typeof e === "object") {
           resolve(e);
           return;
@@ -106,14 +100,14 @@ export var browserUtils = {
   },
 
   /**
-      * Retrieve's a users bookmarks AND
-      *  searches for a "Pulltabs" folder
-      *  AND if it does not find one then creates one
-      *
-      * @param  {object} tree -  array representing tree of bookmarks
-      * @return {Promise} Resolves once the folder id has been persisted
-      */
-  findPulltabsBookmarkFolder: function(tree) {
+   * Retrieve's a users bookmarks AND
+   *  searches for a "Pulltabs" folder
+   *  AND if it does not find one then creates one
+   *
+   * @param  {object} tree -  array representing tree of bookmarks
+   * @return {Promise} Resolves once the folder id has been persisted
+   */
+  findPulltabsBookmarkFolder: function (tree) {
     const root = tree?.[0];
     //Chrome/Firefox roots differ: prefer the second child
     //("Other bookmarks" / toolbar), fall back to the first
@@ -124,7 +118,7 @@ export var browserUtils = {
 
     //look for an existing bookmark folder called Pulltabs
     const existing = (bookmarks.children ?? []).find(
-      child => child.title === "Pulltabs"
+      (child) => child.title === "Pulltabs",
     );
     if (existing) {
       return this.saveBookmarkFolder(existing.id);
@@ -132,7 +126,7 @@ export var browserUtils = {
 
     return this.createPulltabsBookmarkFolder({
       parentId: bookmarks.id,
-      title: "Pulltabs"
+      title: "Pulltabs",
     });
   },
 
@@ -141,11 +135,11 @@ export var browserUtils = {
    * @param  {object} folder - `{ parentId, title }` for the new folder
    * @return {Promise} Resolves once the created folder id has been persisted
    */
-  createPulltabsBookmarkFolder: function(folder) {
+  createPulltabsBookmarkFolder: function (folder) {
     return browser.bookmarks
       .create(folder)
-      .then(result => this.saveBookmarkFolder(result.id))
-      .catch(err => {
+      .then((result) => this.saveBookmarkFolder(result.id))
+      .catch((err) => {
         console.log("Creating bookmark failed" + err.message);
       });
   },
@@ -155,16 +149,16 @@ export var browserUtils = {
    * @param  {integer} id - Numeric id
    * @return {Promise} Resolves once the id has been persisted
    */
-  saveBookmarkFolder: function(id) {
+  saveBookmarkFolder: function (id) {
     return storage.store({ [PULLTABS_FOLDER_ID]: id });
   },
 
   /**
-     * Convert a path to the fully qualified browser extension URL
-     * @param  {string} path - A string to convert into a full URL
-     * @return {[type]}     [description]
-     */
-  extensionGetURL: function(path) {
-      return browser.runtime.getURL(path);
-  }
+   * Convert a path to the fully qualified browser extension URL
+   * @param  {string} path - A string to convert into a full URL
+   * @return {[type]}     [description]
+   */
+  extensionGetURL: function (path) {
+    return browser.runtime.getURL(path);
+  },
 };

@@ -1,5 +1,5 @@
 import ServiceFactory from "./services/ServiceFactory.js";
-import { AUTO_CLOSE } from "./storageKeys.js";
+import { AUTO_CLOSE, SERVICE_SAVE } from "./storageKeys.js";
 
 export const keys = [];
 
@@ -11,7 +11,7 @@ keys.preferences = [];
  */
 keys.preferences.layout = {
   simple: "true",
-  advanced: "false"
+  advanced: "false",
 };
 
 /**
@@ -75,3 +75,9 @@ function setDefaultServices() {
 }
 
 setDefaultServices();
+
+// The "Save" pseudo-action has its own visibility flag (0.21 redesign),
+// separate from any provider's connection state, and is not one of the
+// concrete provider actions above. Default enabled so Save shows out of the
+// box; connecting a provider happens in the Read-later section.
+keys.preferences.services[SERVICE_SAVE] = keys.preferences.tabOptions[1];

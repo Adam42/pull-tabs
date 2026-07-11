@@ -4,7 +4,7 @@ import { browserUtils } from "./browser.js";
 import { popup } from "./popup.js";
 import { watchOptionsLink } from "./watchOptionsLink.js";
 
-document.addEventListener("DOMContentLoaded", async function() {
+document.addEventListener("DOMContentLoaded", async function () {
   watchOptionsLink.init();
 
   var popupEl = document.getElementById("popup");
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async function() {
  */
 const dev = false;
 if (dev) {
-  browser.storage.onChanged.addListener(function(changes, namespace) {
+  browser.storage.onChanged.addListener(function (changes, namespace) {
     // eslint-disable-next-line guard-for-in -- dev-only logging; Phase 2-4 cleanup
     for (var key in changes) {
       console.log(changes);
@@ -34,7 +34,7 @@ if (dev) {
           key,
           namespace,
           storageChange.oldValue,
-          storageChange.newValue
+          storageChange.newValue,
         );
       }
     }

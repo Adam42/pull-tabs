@@ -103,13 +103,10 @@ async function verifyRaindrop(creds) {
 }
 
 async function verifyInstapaper(creds) {
-  const response = await fetch(
-    "https://www.instapaper.com/api/authenticate",
-    {
-      method: "POST",
-      headers: { Authorization: basicAuth(creds.username, creds.password) },
-    },
-  );
+  const response = await fetch("https://www.instapaper.com/api/authenticate", {
+    method: "POST",
+    headers: { Authorization: basicAuth(creds.username, creds.password) },
+  });
   return response.status === 200;
 }
 

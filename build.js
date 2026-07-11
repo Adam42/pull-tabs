@@ -46,8 +46,12 @@ const ENTRIES = [
 
 const HTML = ["about.html", "options.html", "popup.html"];
 
+// Design-system first (tokens + component classes + window layout), then the
+// page-glue overrides in styles.css. Bootstrap/bootswatch was dropped in the
+// 0.21 "quiet paper" redesign.
 const CSS_SOURCES = [
-  path.join(root, "node_modules", "bootswatch", "yeti", "bootstrap.css"),
+  path.join(root, "src", "css", "theme.css"),
+  path.join(root, "src", "css", "mockups.css"),
   path.join(root, "src", "css", "styles.css"),
 ];
 
@@ -72,7 +76,7 @@ function distributeJs() {
   }
 }
 
-// Step 4 — concat bootswatch (Bootstrap 3, yeti) + our styles into style.css.
+// Step 4 — concat the design system (theme + mockups) + page glue into style.css.
 function buildCss() {
   const css = CSS_SOURCES.map((file) => fs.readFileSync(file, "utf8")).join(
     "\n",

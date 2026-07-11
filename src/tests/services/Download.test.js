@@ -126,7 +126,9 @@ describe("DownloadProvider", () => {
     // would show "Completed" then a stale "Started" line (and re-add the
     // advanced in-progress label). Hold the sendMessage reply pending forever;
     // doActionToTab must still resolve, and the nudge must already be dispatched.
-    globalThis.browser.runtime.sendMessage.mockReturnValue(new Promise(() => {}));
+    globalThis.browser.runtime.sendMessage.mockReturnValue(
+      new Promise(() => {}),
+    );
     const provider = new DownloadProvider([tab]);
 
     await expect(provider.doActionToTab(tab)).resolves.toBeUndefined();

@@ -24,9 +24,7 @@ describe("InstapaperProvider", () => {
     const [url, options] = globalThis.fetch.mock.calls[0];
     expect(url).toBe("https://www.instapaper.com/api/add");
     expect(options.method).toBe("POST");
-    expect(options.headers.Authorization).toBe(
-      "Basic " + btoa("me@x.com:pw"),
-    );
+    expect(options.headers.Authorization).toBe("Basic " + btoa("me@x.com:pw"));
     expect(options.headers["Content-Type"]).toBe(
       "application/x-www-form-urlencoded",
     );

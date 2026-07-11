@@ -1,0 +1,19 @@
+Space Grotesk and Space Mono are licensed under the SIL Open Font License,
+Version 1.1.
+
+- Space Grotesk — Copyright (c) 2018 Florian Karsten.
+  https://fonts.google.com/specimen/Space+Grotesk
+- Space Mono — Copyright (c) 2016 Colophon Foundry (colophon-foundry.org).
+  https://fonts.google.com/specimen/Space+Mono
+
+The WOFF2 files in this directory (SpaceGrotesk-*.woff2, SpaceMono-*.woff2)
+are vendored locally so the extension never makes a remote font request. They
+are redistributed unmodified under the terms of the SIL Open Font License 1.1,
+the full text of which is available at:
+
+  https://openfontlicense.org
+  https://scripts.sil.org/OFL
+
+The four SpaceGrotesk-*.woff2 files are the same variable-font subset (Google
+Fonts serves one file covering weights 400–700); they are named per-weight only
+to match the @font-face declarations in theme.css.

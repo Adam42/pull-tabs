@@ -1,30 +1,35 @@
 "use strict";
-import { uiSimple } from "./uiSimple.js";
-import { form } from "./form.js";
 
 //Guard against registering more than one runtime.onMessage listener if init()
-//is called again in the same popup context (e.g. displayLayout re-entered) —
-//otherwise every download-status message would render duplicate lines/labels.
+//is called again in the same popup context — otherwise every download-status
+//message would fire the callback multiple times.
 let initialized = false;
 
 /**
  * Centralized subscriber for `download-status` broadcasts from the background
  * service worker (Phase 7.2).
  *
- * Registered once from popup.displayLayout regardless of which layouts are
- * enabled, so there is exactly one receiver and no duplicate rendering. It
- * always renders one text status line (guaranteeing feedback under any
- * layout) and additionally colors the advanced label when its element exists.
+ * View-agnostic (0.21 redesign): it no longer knows about any layout. A view
+ * (popupView) sets `downloadStatus.onStatus = (tab, state, closed) => {...}`;
+ * `handle()` forwards each broadcast to it. Registered once from popup init so
+ * there is exactly one receiver and no duplicate delivery.
  */
 export var downloadStatus = downloadStatus || {
-  init: function() {
+  /**
+   * Callback invoked with `(tab, state, closed)` for each download-status
+   * broadcast. Set by the active view; null until then.
+   * @type {?function(object, string, boolean): void}
+   */
+  onStatus: null,
+
+  init: function () {
     //Idempotent: only the first call registers the listener.
     if (initialized) {
       return;
     }
     initialized = true;
 
-    browser.runtime.onMessage.addListener(function(message) {
+    browser.runtime.onMessage.addListener(function (message) {
       if (!message || message.type !== "download-status") {
         return;
       }
@@ -33,32 +38,16 @@ export var downloadStatus = downloadStatus || {
   },
 
   /**
-   * Render a single download-status message.
-   * @param {object} message { type, state, tab }
+   * Forward a single download-status broadcast to the registered view.
+   * @param {object} message { type, state, tab, closed }
    */
-  handle: function(message) {
+  handle: function (message) {
     const tab = message.tab;
     if (!tab) {
       return;
     }
-    const complete = message.state === "complete";
-
-    //Always render one text status line via the shared renderer.
-    if (complete) {
-      uiSimple.updateUI(tab, "Completed downloading ", "success");
-    } else {
-      uiSimple.updateUI(tab, "Error: failed downloading ", "danger");
+    if (typeof downloadStatus.onStatus === "function") {
+      downloadStatus.onStatus(tab, message.state, message.closed === true);
     }
-
-    //Additionally update the advanced label, but only when its element is
-    //present (advanced layout active for this tab).
-    if (
-      typeof tab.labelTabId !== "undefined" &&
-      tab.labelTabId !== null &&
-      document.getElementById("label-tab-" + tab.labelTabId)
-    ) {
-      form.removeLabelStatus(tab, "list-group-item-info");
-      form.setLabelStatus(tab, complete ? "successful" : "failed");
-    }
-  }
+  },
 };

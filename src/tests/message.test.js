@@ -37,7 +37,11 @@ describe("messageManager.removeStatusMessage", () => {
 
   it("keeps the parent visible while other messages remain", () => {
     const status = document.getElementById("status");
-    const first = messageManager.updateStatusMessage("one", "dependent", "info");
+    const first = messageManager.updateStatusMessage(
+      "one",
+      "dependent",
+      "info",
+    );
     messageManager.updateStatusMessage("two", "dependent", "info");
 
     messageManager.removeStatusMessage(first);

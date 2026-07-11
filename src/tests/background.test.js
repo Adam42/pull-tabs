@@ -86,6 +86,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "complete",
       tab,
+      closed: true,
     });
   });
 
@@ -102,6 +103,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "interrupted",
       tab,
+      closed: false,
     });
   });
 
@@ -114,7 +116,33 @@ describe("background download tracking", () => {
     await flush();
 
     expect(globalThis.browser.tabs.remove).not.toHaveBeenCalled();
-    expect(globalThis.browser.runtime.sendMessage).toHaveBeenCalled();
+    // The active tab is never removed, so the broadcast reports closed:false
+    // even though autoclose is enabled.
+    expect(globalThis.browser.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "download-status",
+      state: "complete",
+      tab,
+      closed: false,
+    });
+  });
+
+  it("never autocloses an interrupted download even when autoclose is enabled", async () => {
+    // An interrupted download must leave the tab open (the receipt shows it
+    // failed); only a successful "complete" download may autoclose.
+    const tab = { id: 55, active: false, title: "T", url: "https://x" };
+    store[key(7)] = tab;
+    store.autoCloseTabs = "true";
+
+    onChanged({ id: 7, state: { current: "interrupted" } });
+    await flush();
+
+    expect(globalThis.browser.tabs.remove).not.toHaveBeenCalled();
+    expect(globalThis.browser.runtime.sendMessage).toHaveBeenCalledWith({
+      type: "download-status",
+      state: "interrupted",
+      tab,
+      closed: false,
+    });
   });
 
   it("ignores foreign downloads with no record", async () => {
@@ -161,11 +189,13 @@ describe("background download tracking", () => {
     onChanged({ id: 7, state: { current: "complete" } });
     await flush();
 
-    // Broadcast still fired despite the cleanup failure.
+    // Broadcast still fired despite the cleanup failure. Autoclose was off,
+    // so closed is false.
     expect(globalThis.browser.runtime.sendMessage).toHaveBeenCalledWith({
       type: "download-status",
       state: "complete",
       tab,
+      closed: false,
     });
 
     // Listener remains usable: a subsequent download processes normally.
@@ -179,6 +209,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "interrupted",
       tab: tab2,
+      closed: false,
     });
   });
 
@@ -290,6 +321,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "complete",
       tab,
+      closed: true,
     });
     expect(store[key(7)]).toBeUndefined();
   });
@@ -380,6 +412,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "complete",
       tab,
+      closed: false,
     });
     expect(store[key(7)]).toBeUndefined();
   });
@@ -408,7 +441,9 @@ describe("background download tracking", () => {
 
   it("keeps the listener alive after a handler error", async () => {
     // First event: get throws once.
-    globalThis.browser.storage.local.get.mockRejectedValueOnce(new Error("boom"));
+    globalThis.browser.storage.local.get.mockRejectedValueOnce(
+      new Error("boom"),
+    );
     onChanged({ id: 7, state: { current: "complete" } });
     await flush();
 
@@ -425,6 +460,7 @@ describe("background download tracking", () => {
       type: "download-status",
       state: "complete",
       tab,
+      closed: false,
     });
   });
 });

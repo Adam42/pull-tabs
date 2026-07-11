@@ -7,15 +7,15 @@
  */
 export var messageManager = messageManager || {
   /**
-     * Updates a status element with a message and displays
-     * it for a specified duration
-     *
-     * @param  {string|object} message  Either the text of the message or an element object
-     * @param  {string} duration - short, medium, long or dependent
-     * @param  {string} type     The type of message, e.g. primary,success,info,warning,danger
-     * @return {void|number}      A dependent message returns a numeric ID, others void.
-     */
-  updateStatusMessage: function(message, duration, type) {
+   * Updates a status element with a message and displays
+   * it for a specified duration
+   *
+   * @param  {string|object} message  Either the text of the message or an element object
+   * @param  {string} duration - short, medium, long or dependent
+   * @param  {string} type     The type of message, e.g. primary,success,info,warning,danger
+   * @return {void|number}      A dependent message returns a numeric ID, others void.
+   */
+  updateStatusMessage: function (message, duration, type) {
     var status = document.getElementById("status");
     var statusMessage = document.createElement("p");
     var elementIDName = "status-message-";
@@ -68,11 +68,11 @@ export var messageManager = messageManager || {
   },
 
   /**
-     * Remove a previously created status message from DOM via it's ID
-     * @param  {Number} id The ID of the element being removed
-     * @return {void}    [description]
-     */
-  removeStatusMessage: function(id) {
+   * Remove a previously created status message from DOM via it's ID
+   * @param  {Number} id The ID of the element being removed
+   * @return {void}    [description]
+   */
+  removeStatusMessage: function (id) {
     if (id === null || typeof id === "undefined") {
       id = "status-message-0";
     }
@@ -86,5 +86,5 @@ export var messageManager = messageManager || {
     if (parent.children.length <= 0) {
       parent.classList.add("hidden");
     }
-  }
+  },
 };

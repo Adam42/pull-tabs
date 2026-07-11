@@ -1,74 +1,57 @@
 /**
  * @jest-environment jsdom
  */
-// Keep the popup module graph out of this unit test.
-jest.mock("../js/uiSimple.js", () => ({ uiSimple: { updateUI: jest.fn() } }));
-jest.mock("../js/form.js", () => ({
-  form: { removeLabelStatus: jest.fn(), setLabelStatus: jest.fn() },
-}));
-
 import { downloadStatus } from "../js/downloadStatus.js";
-import { uiSimple } from "../js/uiSimple.js";
-import { form } from "../js/form.js";
 
 describe("downloadStatus.handle", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    document.body.innerHTML = "";
+    downloadStatus.onStatus = null;
   });
 
-  it("renders exactly one text line for a completed download", () => {
-    const tab = { title: "T", url: "https://x", labelTabId: null };
+  it("forwards a completed download to the registered view callback", () => {
+    const onStatus = jest.fn();
+    downloadStatus.onStatus = onStatus;
+    const tab = { id: 3, title: "T", url: "https://x" };
 
-    downloadStatus.handle({ type: "download-status", state: "complete", tab });
-
-    expect(uiSimple.updateUI).toHaveBeenCalledTimes(1);
-    expect(uiSimple.updateUI).toHaveBeenCalledWith(
+    downloadStatus.handle({
+      type: "download-status",
+      state: "complete",
       tab,
-      "Completed downloading ",
-      "success",
-    );
-    expect(form.setLabelStatus).not.toHaveBeenCalled();
+      closed: true,
+    });
+
+    expect(onStatus).toHaveBeenCalledTimes(1);
+    expect(onStatus).toHaveBeenCalledWith(tab, "complete", true);
   });
 
-  it("renders an error line for an interrupted download", () => {
-    const tab = { title: "T", url: "https://x" };
+  it("passes closed:false through for an interrupted download", () => {
+    const onStatus = jest.fn();
+    downloadStatus.onStatus = onStatus;
+    const tab = { id: 4, title: "T", url: "https://x" };
 
     downloadStatus.handle({
       type: "download-status",
       state: "interrupted",
       tab,
+      closed: false,
     });
 
-    expect(uiSimple.updateUI).toHaveBeenCalledWith(
-      tab,
-      "Error: failed downloading ",
-      "danger",
-    );
+    expect(onStatus).toHaveBeenCalledWith(tab, "interrupted", false);
   });
 
-  it("updates the advanced label only when its element exists", () => {
-    const tab = { title: "T", url: "https://x", labelTabId: 3 };
+  it("normalizes a missing closed flag to false", () => {
+    const onStatus = jest.fn();
+    downloadStatus.onStatus = onStatus;
+    const tab = { id: 5, title: "T", url: "https://x" };
 
-    // No matching element → text line only.
-    downloadStatus.handle({ type: "download-status", state: "complete", tab });
-    expect(form.setLabelStatus).not.toHaveBeenCalled();
-
-    // With the element present → label is additionally updated.
-    const el = document.createElement("label");
-    el.id = "label-tab-3";
-    document.body.appendChild(el);
     downloadStatus.handle({ type: "download-status", state: "complete", tab });
 
-    expect(form.removeLabelStatus).toHaveBeenCalledWith(
-      tab,
-      "list-group-item-info",
-    );
-    expect(form.setLabelStatus).toHaveBeenCalledWith(tab, "successful");
+    expect(onStatus).toHaveBeenCalledWith(tab, "complete", false);
   });
 
-  it("does not throw when the tab has no label element", () => {
-    const tab = { title: "T", url: "https://x" };
+  it("does not throw when no view callback is registered", () => {
+    const tab = { id: 6, title: "T", url: "https://x" };
 
     expect(() =>
       downloadStatus.handle({
@@ -78,12 +61,21 @@ describe("downloadStatus.handle", () => {
       }),
     ).not.toThrow();
   });
+
+  it("ignores a broadcast with no tab", () => {
+    const onStatus = jest.fn();
+    downloadStatus.onStatus = onStatus;
+
+    downloadStatus.handle({ type: "download-status", state: "complete" });
+
+    expect(onStatus).not.toHaveBeenCalled();
+  });
 });
 
 describe("downloadStatus.init", () => {
   it("registers exactly one listener even when called twice", async () => {
     // Regression (Codex review): init() must be idempotent so a re-entered
-    // displayLayout can't stack duplicate subscribers (which would render every
+    // render can't stack duplicate subscribers (which would render every
     // download-status message multiple times). Import a fresh module so the
     // module-level `initialized` flag starts clean.
     jest.resetModules();
@@ -95,5 +87,30 @@ describe("downloadStatus.init", () => {
     fresh.init();
 
     expect(addListener).toHaveBeenCalledTimes(1);
+  });
+
+  it("routes only download-status messages to handle()", async () => {
+    jest.resetModules();
+    let listener;
+    globalThis.browser = {
+      runtime: {
+        onMessage: {
+          addListener: jest.fn((cb) => {
+            listener = cb;
+          }),
+        },
+      },
+    };
+
+    const { downloadStatus: fresh } = await import("../js/downloadStatus.js");
+    fresh.init();
+    const onStatus = jest.fn();
+    fresh.onStatus = onStatus;
+
+    listener({ type: "something-else", tab: { id: 1 } });
+    expect(onStatus).not.toHaveBeenCalled();
+
+    listener({ type: "download-status", state: "complete", tab: { id: 1 } });
+    expect(onStatus).toHaveBeenCalledTimes(1);
   });
 });
