@@ -40,12 +40,13 @@ what's captured here, and the remaining polish items not repeated below.
 
 ## Bugs & Incomplete
 
-- [ ] **HIGH / S — Uncommitted `Bookmark.js` defines `doActionToTab` twice,
+- [x] **HIGH / S — Uncommitted `Bookmark.js` defines `doActionToTab` twice,
   first copy has a mangled template string** `"Failed to bookmark tab:
   $(error.message}"` (`src/js/services/Bookmark.js:12-25`). Works only
   because the second definition shadows the first. DoD: single correct
   `async doActionToTab`, change committed (this is the WIP on
-  `refactor/async-services`).
+  `refactor/async-services`). Fixed as of current Bookmark.js — a single
+  clean `async doActionToTab` with a correct backtick template string.
 - [x] **HIGH / S — Clicking a simple-view button's *icon* throws.**
   `doActionToAllTabs` reads `evt.target.id` (`src/js/uiSimple.js:19`), but
   clicking the `<img>` inside the button yields an empty id →

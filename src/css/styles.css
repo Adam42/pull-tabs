@@ -2,7 +2,7 @@
    Pull Tabs — page glue (0.21 "quiet paper" redesign)
 
    theme.css supplies the tokens + component classes; mockups.css supplies
-   the window-specific layout (rf-*/op-*). This file is the thin glue that
+   the window-specific layout (rf- / op- prefixes). This file is the thin glue
    wires those onto the three real extension pages (popup / options / about):
    page sizing, a bounded scrollable body with an always-visible footer, the
    Options overlay + #status feedback, and the .alert-* styles message.js
@@ -14,10 +14,12 @@
    footer stay put; the body scrolls between them so the CTA is always
    visible without the whole popup growing past the browser's popup cap.
    --------------------------------------------------------------------- */
+/* No viewport-relative max-width here: Chrome sizes the popup from the
+   content's preferred width starting from a tiny viewport, so a 100vw clamp
+   makes it settle narrow and stack. 800px is the popup cap in both browsers. */
 #popup,
 #about-page {
   width: 800px;
-  max-width: 100vw;
   max-height: 600px;
   margin: 0 auto;
   display: flex;

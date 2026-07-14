@@ -5,6 +5,10 @@ import storage from "./storage.js";
 import { CREDENTIAL_GATED, keys } from "./keys.js";
 import credentials from "./services/credentials.js";
 import {
+  hasHostPermission,
+  requestHostPermission,
+} from "./services/hostPermissions.js";
+import {
   READ_LATER_PROVIDERS,
   UI_ACTIONS,
   getActiveProvider,
@@ -489,13 +493,24 @@ export var options =
           fillCredentialInputs(service, creds);
         });
 
-        storage.retrieve(keys.preferences.services).then(function (services) {
-          const enabled = String(services["service_" + service]) === "enabled";
-          setServiceStatus(
-            service,
-            enabled ? "Connected" : "Not connected",
-            enabled ? "connected" : "disconnected",
-          );
+        Promise.all([
+          storage.retrieve(keys.preferences.services),
+          hasHostPermission(service),
+        ]).then(function (results) {
+          const enabled =
+            String(results[0]["service_" + service]) === "enabled";
+          const granted = results[1];
+          if (enabled && !granted) {
+            // Connected before, but the user revoked the host permission via
+            // the browser's extension UI — Connect re-requests it.
+            setServiceStatus(service, "Permission revoked — reconnect", "error");
+          } else {
+            setServiceStatus(
+              service,
+              enabled ? "Connected" : "Not connected",
+              enabled ? "connected" : "disconnected",
+            );
+          }
         });
       });
     };
@@ -531,6 +546,27 @@ export var options =
     opt.verifyService = function (service) {
       const creds = readCredentialInputs(service);
 
+      // Request the service's optional host permission first, inside the
+      // Connect click — permissions.request only works from a user gesture,
+      // and the verify fetch below needs the grant to clear CORS.
+      requestHostPermission(service)
+        .then(function (granted) {
+          if (!granted) {
+            handleVerifyFailure(
+              service,
+              capitalize(service) +
+                " needs permission to reach its API — request was declined",
+            );
+            return;
+          }
+          verifyWithGrantedPermission(service, creds);
+        })
+        .catch(function (error) {
+          handleVerifyFailure(service, "Error: " + error.message);
+        });
+    };
+
+    function verifyWithGrantedPermission(service, creds) {
       opt.enableOverlay();
 
       credentials
@@ -555,7 +591,7 @@ export var options =
         .catch(function (error) {
           handleVerifyFailure(service, "Error: " + error.message);
         });
-    };
+    }
 
     /**
      * Disconnect a gated service: clear its credentials and disable it.

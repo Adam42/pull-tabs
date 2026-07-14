@@ -73,6 +73,10 @@ describe("options — merged read-later + action chips page", () => {
           remove: jest.fn().mockResolvedValue(),
         },
       },
+      permissions: {
+        request: jest.fn().mockResolvedValue(true),
+        contains: jest.fn().mockResolvedValue(true),
+      },
     };
   });
 

@@ -8,7 +8,7 @@
     "48": "img/icon-48.png",
     "128": "img/icon-128.png"
   },
-  "host_permissions": [
+  "optional_host_permissions": [
     "https://api.raindrop.io/*",
     "https://www.instapaper.com/*",
     "https://readwise.io/*"
