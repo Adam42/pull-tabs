@@ -16,6 +16,27 @@ what's captured here, and the remaining polish items not repeated below.
 > git history; no other secrets in the repo; no injection sinks (all DOM is
 > built with `createElement`/`textContent`, no `innerHTML` with user data).
 
+## Up next
+
+- [ ] **RESEARCH / M — Bring back an OAuth connect flow for read-later
+  providers.** We already shipped one for Pocket (`identity` permission +
+  `browser.identity.launchWebAuthFlow`); it was deleted in `0798380` ("Drop
+  mimetypes and Pocket", 0.18.0) along with `src/js/auth.js`,
+  `src/js/pocket.js`, `src/js/services/Pocket.js`, `src/pocket.html` —
+  recover any of them with `git show 0798380^:src/js/auth.js` etc. Research
+  task: assess whether that flow maps onto today's providers before writing
+  code. Known constraints from the 0.30 optional-permissions work: OAuth does
+  NOT remove the connect-time host-permission prompt (the save POSTs still
+  need CORS-exempt fetch for Instapaper/Readwise); Raindrop OAuth requires a
+  `client_secret` and Instapaper full OAuth requires a consumer key/secret —
+  neither is distributable (the Pocket `config.js` lesson); Readwise offers
+  no third-party OAuth at all. Deliverable: a short feasibility writeup in
+  `docs/read-later-services.md` — which providers (if any) get OAuth, what
+  the recovered Pocket code reusably provides (`launchWebAuthFlow` plumbing,
+  redirect-URI handling, token storage), and whether the UX win over
+  paste-a-token justifies it. DoD: writeup merged; go/no-go decision recorded
+  per provider.
+
 ## Security
 
 - [ ] **MEDIUM / S — Remove unused prod dependencies with known vulns.**

@@ -11,15 +11,14 @@
     <div id="overlay"></div>
     <div id="status" class="hidden"></div>
 
+    <!-- No app nav here: this page renders inside the browser's embedded
+         options panel (options_ui.open_in_tab: false), so it must stay a
+         standalone settings surface — linking to popup.html/about.html would
+         load the whole extension UI into the panel. -->
     <div class="rf-head">
       <img class="rf-logo" src="img/logo.svg" alt="" />
       <span class="rf-brand">Pull Tabs</span>
       <span class="rf-count">changes save automatically</span>
-      <nav class="rf-nav">
-        <a href="popup.html">Pull</a>
-        <a class="active" href="options.html">Options</a>
-        <a href="about.html">About</a>
-      </nav>
     </div>
 
     <div class="op-body">
