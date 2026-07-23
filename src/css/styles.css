@@ -40,16 +40,23 @@
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
+  overscroll-behavior: contain;
 }
 
-/* The tab list is the one bounded, scrollable surface inside the popup body;
-   the section header, toolbar, and summary strip scroll with it. */
+/* The popup body is the one bounded, scrollable surface; the section header,
+   toolbar, and summary strip scroll with it. The card must not flex-shrink:
+   its overflow:hidden (rounded corners) zeroes the automatic flex minimum,
+   so a shrinkable card gets crushed and clips rows instead of the body
+   scrolling. */
 #popup .rf-body {
   display: flex;
   flex-direction: column;
 }
 #popup .rf-card {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+}
+#popup .rf-row {
+  scroll-margin-block: 8px;
 }
 
 /* Keep the section header snug under the toolbar/summary instead of the
