@@ -1,190 +1,317 @@
-body {
-    width: 100%;
+/* =====================================================================
+   Pull Tabs — page glue (0.21 "quiet paper" redesign)
+
+   theme.css supplies the tokens + component classes; mockups.css supplies
+   the window-specific layout (rf- / op- prefixes). This file is the thin glue
+   wires those onto the three real extension pages (popup / options / about):
+   page sizing, a bounded scrollable body with an always-visible footer, the
+   Options overlay + #status feedback, and the .alert-* styles message.js
+   relies on now that Bootstrap is gone.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   Popup + About: a single ~800px column, no outer frame. The header and
+   footer stay put; the body scrolls between them so the CTA is always
+   visible without the whole popup growing past the browser's popup cap.
+   --------------------------------------------------------------------- */
+/* No viewport-relative max-width here: Chrome sizes the popup from the
+   content's preferred width starting from a tiny viewport, so a 100vw clamp
+   makes it settle narrow and stack. 800px is the popup cap in both browsers. */
+#popup,
+#about-page {
+  width: 800px;
+  max-height: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
 }
 
-#resources input[type="checkbox"] {
-    position: absolute;
-    top: 25px;
-    /*display: none;*/
+#popup .rf-head,
+#about-page .rf-head,
+#popup .rf-foot,
+#about-page .rf-foot {
+  flex: 0 0 auto;
 }
 
-button {
-    width: 100%;
-    margin: 10px auto;
+#popup .rf-body,
+#popup .op-body,
+#about-page .op-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
 }
 
-#simple-ui button {
-    width: 120px;
+/* The popup body is the one bounded, scrollable surface; the section header,
+   toolbar, and summary strip scroll with it. The card must not flex-shrink:
+   its overflow:hidden (rounded corners) zeroes the automatic flex minimum,
+   so a shrinkable card gets crushed and clips rows instead of the body
+   scrolling. */
+#popup .rf-body {
+  display: flex;
+  flex-direction: column;
 }
-#simple-ui button img {
-    margin-right: 5px;
+#popup .rf-card {
+  flex: 0 0 auto;
 }
-#simple-ui label {
-    width: 140px;
-    float: left;
-}
-
-#resources label {
-    display: block;
-    z-index: 10;
-}
-#resources label.list-group-item {
-    padding-left: 40px;
-}
-#resources label.list-group-item p {
-    margin-right: 20px;
-    margin-left: 50px;
-}
-#resources label.preferences {
-    display: inline;
-    padding: 10px;
-}
-#resources label.preferences input {
-    margin: 0 10px;
-}
-form#simple-ui {
-    margin-left: 40px;
-}
-.list-group-item.successful {
-    background-color: green;
-}
-.list-group-item.failed {
-    background-color: red;
+#popup .rf-row {
+  scroll-margin-block: 8px;
 }
 
-.list-group-item {
-    width: 750px;
-    margin: 10px 0;
+/* Keep the section header snug under the toolbar/summary instead of the
+   28px gap theme.css uses on documentation pages. */
+#popup .rf-body .section-header,
+.op-body .section-header {
+  margin-top: 18px;
+}
+#popup .rf-body .section-header:first-child,
+.op-body .section-header:first-child {
+  margin-top: 4px;
 }
 
-.panel-heading {
-    padding: 0;
-}
-.panel-body {
-    padding: 0;
+/* Result-cell layout tweaks (the receipt reason sits under "✕ failed"). */
+.rf-reswrap .rf-reason {
+  margin-top: 2px;
 }
 
-#content {
-    margin-top: 40px;
-}
-.page-header {
-    margin: 35px 0 5px 0;
-}
-.container {
-    width: 800px;
-}
-
-#file-type-destinations {
-    padding: 10px 20px;
-}
-
-#main-nav a {
-    margin: 0 20px;
-    padding: 10px 20px;
-}
-.container[role="main"] form {
-}
-#setup {
-    margin-top: 20px;
-}
-.container[role="complementary"] a {
-    padding-top: 20px;
-}
-
-#popup #status {
-    padding: 10px;
-}
-.alert-success a {
-    color: #000;
-}
-.alert-danger a {
-    color: #000;
-}
-.bounce {
-    margin-left: -9999px;
-    height: 0;
-}
-
-.navbar-collapse.collapse {
-    display: block;
-}
-
-.navbar-nav > li,
-.navbar-nav {
-    float: left;
-}
-
-.navbar-nav.navbar-right:last-child {
-    margin-right: -15px;
-}
-
-.navbar-right {
-    float: right;
-}
-
-#numTabs {
-    color: #fff;
-}
-
-#autoclose-status {
-    color: #fff;
-}
-
-#simple-ui:after {
-    content: "";
-    display: block;
-    clear: both;
-}
-
-/**
- * Options page
- */
-
+/* ---------------------------------------------------------------------
+   Options: fills its embedded about:addons frame (open_in_tab:false), so
+   it is fluid rather than a fixed 800px column. Header pinned, body scrolls.
+   --------------------------------------------------------------------- */
 #options-page {
-    margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
 }
-#options-page #content {
-    margin-top: 0px;
+#options-page .rf-head,
+#options-page .rf-foot {
+  flex: 0 0 auto;
 }
-#options-page .container {
-    width: 800px;
-}
-#options-page .list-group-item {
-    margin: 5px 10px;
-    float: left;
-    padding: 0;
-}
-#options-page #file-type-destinations input {
-    margin: 0 10px 0 0;
-}
-
-#options-page #file-type-destinations .panel-body label {
-    float: left;
-    padding: 10px 20px;
+#options-page .op-body {
+  flex: 1 1 auto;
+  max-height: none;
+  overflow-y: auto;
 }
 
-#options-page input[type="checkbox"] {
-    margin: 0 10px 0 10px;
+/* Embedded in the browser's settings UI: preferences only — the Pull/About
+   nav would run the whole extension inside about:addons. */
+#options-page.embedded .rf-nav {
+  display: none;
 }
-#options-page h4 {
-    margin: 0;
-    padding: 10px 0;
+
+/* Read-later provider picker rows (the radio-row card). */
+.op-provider {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line-soft);
+  transition:
+    background var(--ease) 110ms;
 }
-#options-page #status {
-    position: fixed;
-    top: 0;
-    left: 45%;
-    width: 100%;
-    z-index: 0;
+.op-provider:last-child {
+  border-bottom: none;
+}
+.op-provider.active {
+  background: var(--signal-tint);
+}
+.op-provider .op-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+}
+.op-provider.active .op-radio {
+  background: var(--signal);
+  box-shadow: inset 0 0 0 2.5px var(--card);
+}
+.op-provider .op-prov-glyph {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+}
+.op-provider .op-prov-main {
+  flex: 1;
+  min-width: 0;
+}
+.op-provider .op-prov-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.op-provider .op-prov-ctl {
+  flex: 0 0 auto;
+}
+.op-provider .op-select-hint {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* The per-provider credential detail block below the picker card. */
+.op-cred-block {
+  margin-top: 12px;
+}
+.op-cred-block .input {
+  margin-bottom: 6px;
+}
+.op-cred-block .help-block {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 4px 0 10px;
+}
+.op-cred-block .op-cred-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.connected-service-status {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.connected-service-status.connected {
+  color: var(--success);
+}
+.connected-service-status.disconnected {
+  color: var(--ink-3);
+}
+.connected-service-status.error {
+  color: var(--fail);
+}
+
+/* ---------------------------------------------------------------------
+   About: numbered "how it works" chips render as circular signal badges.
+   --------------------------------------------------------------------- */
+.about-lead {
+  font-size: 16px;
+  color: var(--ink-2);
+  margin-bottom: 22px;
+}
+.about-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 18px;
+}
+.about-hero img {
+  width: 44px;
+  height: 44px;
+}
+.about-hero .about-name {
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.about-flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 4px 0 8px;
+}
+.about-flow .well .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--signal);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.about-flow .well .well-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.about-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0 4px;
+}
+.about-credit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+}
+.about-credit {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+.about-credit .who {
+  text-align: right;
+}
+
+/* ---------------------------------------------------------------------
+   Options feedback: #status banners (message.js) + the input-blocking
+   overlay. message.js applies `.alert` + `.alert-<type>` and toggles
+   `.hidden`; these replace the Bootstrap alert styles it used to inherit.
+   --------------------------------------------------------------------- */
+#status {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: auto;
+  max-width: 460px;
+}
+#status.hidden {
+  display: none !important;
+}
+
+.alert {
+  font-family: var(--font);
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 11px 16px;
+  margin: 0 0 8px;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  background: var(--card);
+  color: var(--ink);
+}
+.alert a {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.alert-success {
+  background: var(--success-tint);
+}
+.alert-danger {
+  background: var(--fail-tint);
+}
+.alert-info {
+  background: var(--info-tint);
+}
+.alert-warning {
+  background: var(--signal-tint);
 }
 
 #overlay {
-    background-color: rgba(0, 0, 0, 0);
-    z-index: 999;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
+  background-color: rgba(26, 23, 20, 0.04);
+  z-index: 999;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
 }

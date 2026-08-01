@@ -26,6 +26,10 @@ describe("options.verifyService — failure disables an enabled service", () => 
       storage: {
         local: { get: jest.fn().mockResolvedValue({}), set: setMock },
       },
+      permissions: {
+        request: jest.fn().mockResolvedValue(true),
+        contains: jest.fn().mockResolvedValue(true),
+      },
     };
   });
 
@@ -56,5 +60,33 @@ describe("options.verifyService — failure disables an enabled service", () => 
     await flushPromises();
 
     expect(setMock).toHaveBeenCalledWith({ service_raindrop: "disabled" });
+  });
+
+  it("requests the optional host permission before the verify fetch", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({ status: 200 });
+
+    options.verifyService("raindrop");
+    await flushPromises();
+
+    expect(globalThis.browser.permissions.request).toHaveBeenCalledWith({
+      origins: ["https://api.raindrop.io/*"],
+    });
+    expect(setMock).toHaveBeenCalledWith(
+      expect.objectContaining({ service_raindrop: "enabled" }),
+    );
+  });
+
+  it("disables the service without fetching when the permission is declined", async () => {
+    globalThis.browser.permissions.request.mockResolvedValue(false);
+    globalThis.fetch = jest.fn();
+
+    options.verifyService("raindrop");
+    await flushPromises();
+
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(setMock).toHaveBeenCalledWith({ service_raindrop: "disabled" });
+
+    const status = document.getElementById("status-raindrop");
+    expect(status.className).toContain("error");
   });
 });

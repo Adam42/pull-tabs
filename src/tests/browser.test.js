@@ -1,9 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-// form.js pulls in the whole popup module graph; sever it here.
-jest.mock("../js/form.js", () => ({ form: {} }));
-
+// browser.js no longer imports the popup view graph (the dead form.js import
+// was removed in the 0.21 redesign), so nothing needs mocking here.
 let browserUtils;
 
 beforeAll(async () => {
@@ -13,15 +12,15 @@ beforeAll(async () => {
   window.browser = {
     bookmarks: {
       getTree: jest.fn().mockResolvedValue([]),
-      create: jest.fn().mockResolvedValue({ id: "42" })
+      create: jest.fn().mockResolvedValue({ id: "42" }),
     },
     // saveBookmarkFolder now persists via browser.storage.local (Phase 7.1).
     storage: {
       local: {
         set: jest.fn().mockResolvedValue(),
-        get: jest.fn().mockResolvedValue({})
-      }
-    }
+        get: jest.fn().mockResolvedValue({}),
+      },
+    },
   };
   ({ browserUtils } = await import("../js/browser.js"));
 });
@@ -41,16 +40,16 @@ describe("browserUtils.findPulltabsBookmarkFolder", () => {
       {
         children: [
           { id: "toolbar", children: [] },
-          { id: "other", children: [] }
-        ]
-      }
+          { id: "other", children: [] },
+        ],
+      },
     ];
 
     browserUtils.findPulltabsBookmarkFolder(tree);
 
     expect(window.browser.bookmarks.create).toHaveBeenCalledWith({
       parentId: "other",
-      title: "Pulltabs"
+      title: "Pulltabs",
     });
   });
 
@@ -66,11 +65,11 @@ describe("browserUtils.findPulltabsBookmarkFolder", () => {
             id: "other",
             children: [
               { id: "unrelated", title: "Recipes" },
-              { id: "existing", title: "Pulltabs" }
-            ]
-          }
-        ]
-      }
+              { id: "existing", title: "Pulltabs" },
+            ],
+          },
+        ],
+      },
     ];
 
     browserUtils.findPulltabsBookmarkFolder(tree);
@@ -86,7 +85,7 @@ describe("browserUtils.findPulltabsBookmarkFolder", () => {
 
     expect(window.browser.bookmarks.create).toHaveBeenCalledWith({
       parentId: "only",
-      title: "Pulltabs"
+      title: "Pulltabs",
     });
   });
 
@@ -112,17 +111,17 @@ describe("browserUtils.init", () => {
       {
         children: [
           { id: "toolbar", children: [] },
-          { id: "other", children: [{ id: "existing", title: "Pulltabs" }] }
-        ]
-      }
+          { id: "other", children: [{ id: "existing", title: "Pulltabs" }] },
+        ],
+      },
     ]);
 
     // Park the persistence write until we release it.
     let resolveSet;
     window.browser.storage.local.set.mockReturnValue(
-      new Promise(resolve => {
+      new Promise((resolve) => {
         resolveSet = resolve;
-      })
+      }),
     );
 
     let resolved = false;
@@ -131,9 +130,9 @@ describe("browserUtils.init", () => {
     });
 
     // Drain microtasks: init should be parked on the pending set(), not resolved.
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(window.browser.storage.local.set).toHaveBeenCalledWith({
-      pullTabsFolderId: "existing"
+      pullTabsFolderId: "existing",
     });
     expect(resolved).toBe(false);
 

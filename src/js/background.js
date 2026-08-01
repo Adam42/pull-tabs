@@ -55,10 +55,22 @@ async function handleTerminal(state, id) {
     }
 
     //Autoclose is isolated: a failure here must not stop cleanup/broadcast.
+    //Track whether the tab was ACTUALLY removed so the popup receipt can render
+    //"· tab closed" only when true (never inferred). Only a SUCCESSFUL download
+    //("complete") may close the tab — an interrupted download must leave it
+    //open (and broadcast closed:false), matching the receipt. The active-tab
+    //guard and any failure also leave `closed` false.
+    let closed = false;
     try {
       const pref = await browser.storage.local.get(AUTO_CLOSE);
-      if (String(pref.autoCloseTabs) === "true" && tab && tab.active !== true) {
+      if (
+        state === "complete" &&
+        String(pref.autoCloseTabs) === "true" &&
+        tab &&
+        tab.active !== true
+      ) {
         await browser.tabs.remove(tab.id);
+        closed = true;
       }
     } catch (error) {
       console.warn("autoclose failed:", error && error.message);
@@ -81,6 +93,7 @@ async function handleTerminal(state, id) {
         type: "download-status",
         state,
         tab,
+        closed,
       });
     } catch (error) {
       const message = (error && error.message) || "";
@@ -117,7 +130,7 @@ async function processDownload(id, state) {
 
 //Terminal-download listener. Wakes the worker; the async body is wrapped in an
 //outer try/catch so a throw for one event can't disable the listener.
-browser.downloads.onChanged.addListener(function(delta) {
+browser.downloads.onChanged.addListener(function (delta) {
   (async () => {
     try {
       const state = delta && delta.state && delta.state.current;
@@ -137,7 +150,7 @@ browser.downloads.onChanged.addListener(function(delta) {
 //popup closing during the round trip. We derive the state and, only if terminal,
 //process our own record if still present — non-terminal downloads no-op and are
 //handled later by onChanged.
-browser.runtime.onMessage.addListener(function(message) {
+browser.runtime.onMessage.addListener(function (message) {
   if (!message || message.type !== "reconcile-download") {
     //Not ours: return undefined so other listeners keep their turn at the
     //message and this one doesn't claim the response channel.
@@ -165,7 +178,10 @@ browser.runtime.onMessage.addListener(function(message) {
       //preserving the exactly-once autoclose/broadcast guarantee.
       await processDownload(message.id, state);
     } catch (error) {
-      console.warn("reconcile-download handler failed:", error && error.message);
+      console.warn(
+        "reconcile-download handler failed:",
+        error && error.message,
+      );
     }
   })();
 });

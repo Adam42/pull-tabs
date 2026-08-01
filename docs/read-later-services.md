@@ -97,7 +97,15 @@ New "Connected services" section replacing the Pocket login row:
 
 ### Manifest
 
-Add `host_permissions`: `https://api.raindrop.io/*`,
+> **Superseded (0.21):** the API hosts now live under
+> `optional_host_permissions` and are requested at runtime by the Options
+> page's Connect button (`src/js/services/hostPermissions.js`). A fresh
+> install grants no site access; only users who actually connect a service
+> see a host prompt, and adding a future provider can't disable the extension
+> pending re-approval on update. Requires Firefox ≥ 128
+> (`strict_min_version` set in manifest-browser.json).
+
+Original plan: add `host_permissions`: `https://api.raindrop.io/*`,
 `https://www.instapaper.com/*` (replacing the getpocket.com entry).
 Raindrop supports CORS so a host permission may be technically optional, but
 declaring both keeps fetch behavior identical across browsers and makes the

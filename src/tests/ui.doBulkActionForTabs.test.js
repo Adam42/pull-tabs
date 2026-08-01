@@ -106,8 +106,8 @@ describe("UI.doBulkActionForTabs", () => {
   });
 
   it("throws on an invalid view", async () => {
-    await expect(
-      UI.doBulkActionForTabs(tabs, "raindrop", {}),
-    ).rejects.toThrow(TypeError);
+    await expect(UI.doBulkActionForTabs(tabs, "raindrop", {})).rejects.toThrow(
+      TypeError,
+    );
   });
 });

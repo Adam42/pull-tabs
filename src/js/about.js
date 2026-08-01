@@ -2,27 +2,30 @@ import { watchOptionsLink } from "./watchOptionsLink.js";
 
 var aboutPullTabs = aboutPullTabs || {
   /**
-   * Open links on the about page in a new tab to keep focus within the extension
+   * Open credit links in a background tab instead of navigating the extension
+   * page away. Delegated on the credits container so it covers links nested
+   * inside the attribution grid.
    */
-  init: function() {
+  init: function () {
     "use strict";
     var creditLinks = document.getElementById("about-credits");
-    var links = creditLinks.getElementsByTagName("a");
-    var i;
-    var len = links.length;
-
-    for (i = 0; i < len; i++) {
-      links[i].addEventListener("click", function(e) {
-        const tab = {
-          url: e.target.href,
-          active: false
-        };
-        browser.tabs.create(tab);
-      });
+    if (!creditLinks) {
+      return;
     }
-  }
+
+    creditLinks.addEventListener("click", function (e) {
+      // Resolve the anchor even when the click lands on a child node; ignore
+      // clicks that are not on a link at all.
+      const anchor = e.target.closest("a");
+      if (!anchor || !anchor.href) {
+        return;
+      }
+      e.preventDefault();
+      browser.tabs.create({ url: anchor.href, active: false });
+    });
+  },
 };
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   watchOptionsLink.init();
   aboutPullTabs.init();
 });

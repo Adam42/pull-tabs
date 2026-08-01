@@ -1,0 +1,107 @@
+/* Shared styles for the Pull Tabs refined window (rf-) and options (op-) UI. */
+
+  /* =====================================================
+     Mockup B — "Refine" (rf-)
+     ===================================================== */
+  .rf-window {
+    width: 860px; display: flex; flex-direction: column;
+    background: var(--paper); border: 1.5px solid var(--ink); border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg); overflow: hidden;
+  }
+  .rf-head { background: var(--ink); color: var(--on-ink); display: flex; align-items: center; gap: 12px; padding: 0 22px; height: 56px; }
+  .rf-logo { height: 24px; width: 24px; filter: invert(1); }
+  .rf-brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; }
+  .rf-count { font-family: var(--mono); font-size: 12px; color: var(--on-ink); margin-left: 8px; }
+  .rf-count b { color: var(--signal); }
+  .rf-nav { margin-left: auto; display: flex; gap: 4px; }
+  .rf-nav a {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--on-ink-dim); padding: 7px 11px; border-radius: var(--r-sm); font-weight: 400;
+  }
+  .rf-nav a:hover { color: var(--on-ink); text-decoration: none; background: rgba(255,255,255,0.06); }
+  .rf-nav a.active { color: #fff; background: var(--signal); }
+
+  .rf-body { padding: 22px 26px 20px; }
+  .rf-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .rf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .rf-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--ink);
+    padding: 7px 13px; border: 1.5px solid var(--ink); border-radius: 999px;
+    background: var(--card); cursor: pointer; box-shadow: 2px 2px 0 var(--ink);
+    transition: transform var(--ease) 90ms, box-shadow var(--ease) 90ms, background var(--ease) 110ms;
+  }
+  .rf-chip:hover { background: #fff; }
+  .rf-chip:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+  .rf-chip.on { background: var(--signal); color: #fff; }
+
+  .rf-card { background: var(--card); border: 1.5px solid var(--ink); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+  .rf-row {
+    display: flex; align-items: center; gap: 13px; padding: 11px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: background var(--ease) 110ms, opacity var(--ease) 110ms;
+  }
+  .rf-row:last-child { border-bottom: none; }
+  .rf-row.off { opacity: 0.45; background: var(--paper-2); }
+  .rf-row.off .fav { filter: grayscale(1); }
+  .rf-row.off .rf-title { color: var(--ink-3); }
+  .rf-row.off .rf-seg { pointer-events: none; opacity: 0.6; }
+  .rf-row.done { background: var(--success-tint); }
+  .rf-row.fail { background: var(--fail-tint); }
+  .rf-row .fav { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ink); flex: 0 0 auto; }
+  .rf-row-text { flex: 1; min-width: 0; cursor: pointer; }
+  .rf-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rf-url { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rf-seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 7px; overflow: hidden; background: var(--card); flex: 0 0 auto; }
+  .rf-seg button {
+    border: none; background: transparent; padding: 6px 8px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-right: 1px solid var(--line-soft); transition: background var(--ease) 90ms;
+  }
+  .rf-seg button:last-child { border-right: none; }
+  .rf-seg button:hover { background: var(--paper-2); }
+  .rf-seg button.on { background: var(--signal); }
+  .rf-result { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; flex: 0 0 auto; }
+  .rf-row.done .rf-result { color: var(--success); }
+  .rf-row.fail .rf-result { color: var(--fail); }
+
+  .rf-foot {
+    border-top: 1.5px solid var(--ink); background: var(--paper-2);
+    padding: 13px 26px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .rf-footright { display: inline-flex; align-items: center; gap: 16px; }
+
+  /* =====================================================
+     2A pages — results receipt + options (rs- / op-)
+     ===================================================== */
+  .rf-summary {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    padding: 11px 16px; border: 1.5px solid var(--ink); border-radius: var(--r);
+    box-shadow: var(--shadow); background: var(--info-tint);
+    font-weight: 600; font-size: 14.5px;
+  }
+  .rf-summary.ok { background: var(--success-tint); }
+  .rf-summary.bad { background: var(--fail-tint); }
+  .rf-summary .meta { margin-left: auto; color: var(--ink-2); }
+  .rf-spin {
+    width: 13px; height: 13px; border-radius: 50%; flex: 0 0 auto;
+    border: 2.5px solid var(--ink); border-right-color: transparent;
+    animation: rs-spin 0.7s linear infinite;
+  }
+  @keyframes rs-spin { to { transform: rotate(360deg); } }
+  .rf-row.queued { opacity: 0.55; }
+  .rf-row.pending { background: var(--info-tint); }
+  .rf-row.gone .rf-title { color: var(--ink-3); }
+  .rf-row.gone .fav { filter: grayscale(1); opacity: 0.7; }
+  .rf-reason { font-family: var(--mono); font-size: 10.5px; color: var(--fail); display: block; }
+  .rf-reswrap { display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+
+  .op-body { padding: 6px 26px 24px; max-height: 560px; overflow-y: auto; }
+  .op-row {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+    padding: 15px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .op-row:last-child { border-bottom: none; }
+  .op-row-main { max-width: 480px; }
+  .op-row-title { font-weight: 600; font-size: 15px; }
+  .op-row-ctl { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding-top: 2px; }

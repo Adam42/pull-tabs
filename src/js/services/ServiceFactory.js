@@ -25,8 +25,8 @@ export default class ServiceFactory {
   static getActions() {
     const providers = ServiceFactory.getProviders();
 
-    return Object.keys(providers).map(key =>
-      key.replace("Provider", "").toLowerCase()
+    return Object.keys(providers).map((key) =>
+      key.replace("Provider", "").toLowerCase(),
     );
   }
 
@@ -37,8 +37,8 @@ export default class ServiceFactory {
    * @return {ServiceProvider} The corresponding service provider class
    */
   static convertActionToProvider(action) {
-    if (!action || typeof action !== 'string') {
-      throw new TypeError('Action must be a non-empty string');
+    if (!action || typeof action !== "string") {
+      throw new TypeError("Action must be a non-empty string");
     }
 
     const name = `${capitalize(action)}Provider`;

@@ -1,131 +1,167 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Pull Tabs</title>
-        <link rel="stylesheet" href="style.css" />
-        <script type="application/javascript" src="options-page.js"></script>
-    </head>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pull Tabs</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="application/javascript" src="options-page.js"></script>
+  </head>
 
-    <body id="options-page">
-        <div id="overlay"></div>
-        <div id="content">
-            <div class="container" role="button">
-                <h3 class="page-header">Layout</h3>
+  <body id="options-page">
+    <div id="overlay"></div>
+    <div id="status" class="hidden"></div>
 
-                 <div id="preference-layout">
-                     <div class="panel-heading col-md-10">
-                        <h4>Choose to display simple, advanced or both layouts</h4>
-                    </div>
-                    <div class="panel-body col-md-4">
-                            <input type="checkbox" id="preference-input-simple" value="simple">
-                            <label for="preference-input-simple"><span>Simple</span></label>
-                            <input type="checkbox" id="preference-input-advanced" value="advanced">
-                            <label for="preference-input-advanced"><span>Advanced</span></label>
-                    </div>
-                </div>
+    <!-- No app nav here: this page renders inside the browser's embedded
+         options panel (options_ui.open_in_tab: false), so it must stay a
+         standalone settings surface — linking to popup.html/about.html would
+         load the whole extension UI into the panel. -->
+    <div class="rf-head">
+      <img class="rf-logo" src="img/logo.svg" alt="" />
+      <span class="rf-brand">Pull Tabs</span>
+      <span class="rf-count">changes save automatically</span>
+    </div>
 
-            </div>
-            <div class="container" role="button">
-                <h3 class="page-header">Autoclose</h3>
+    <div class="op-body">
+      <!-- ============================================================
+           Read-later service — the single "Save" target picker
+           ============================================================ -->
+      <div class="section-header">
+        <h3>Read-later service</h3>
+        <span class="kicker">save destination</span>
+      </div>
+      <div class="meta" style="margin-bottom: 12px">
+        The <strong style="color: var(--ink)">Save</strong> action sends a tab
+        to one read-later service. Pick the one you use — only the active
+        service runs.
+      </div>
 
-                <div id="preference-autoclose">
-                     <div class="panel-heading col-md-10">
-                        <h4>Autoclose tabs after successful action?</h4>
-                    </div>
-                    <div class="panel-body col-md-4">
-                        <input type="checkbox" id="preference-input-autoclose" value="yes">
-                        <label for="preference-input-autoclose">
+      <div class="card" id="provider-picker" style="overflow: hidden"></div>
 
-                            <span>Close tabs after action</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container">
-                <h3 class="page-header">Services</h3>
-                 <form id="preference-services" action="" method="post">
-
-                    <div id="list-of-services">
-                    </div>
-
-                </form>
-
-                <div id="status"></div>
-            </div>
-
-            <div class="container">
-                <h3 class="page-header">Connected services</h3>
-                <p>Save tabs to a read-later service. Credentials are stored
-                   locally on this device only. Each service stays hidden in
-                   the popup until you verify it here.</p>
-
-                <div id="connected-services">
-
-                    <div class="connected-service" id="connected-raindrop">
-                        <h4>Raindrop.io</h4>
-                        <label for="raindrop-token">Test token</label>
-                        <input type="password" id="raindrop-token" autocomplete="off">
-                        <p class="help-block">
-                            On the
-                            <a href="https://app.raindrop.io/settings/integrations" target="_blank" rel="noopener">Raindrop integrations page</a>,
-                            scroll down to <strong>For Developers</strong> and click
-                            <strong>Create new app</strong> (any name works, e.g. "Pull Tabs").
-                            Then click the app you just created, click
-                            <strong>Create test token</strong>, and copy the token into the field above.
-                        </p>
-                        <button type="button" id="verify-raindrop">Verify</button>
-                        <button type="button" id="disconnect-raindrop">Disconnect</button>
-                        <span id="status-raindrop" class="connected-service-status"></span>
-                    </div>
-
-                    <div class="connected-service" id="connected-instapaper">
-                        <h4>Instapaper</h4>
-                        <label for="instapaper-username">Username / email</label>
-                        <input type="text" id="instapaper-username" autocomplete="off">
-                        <label for="instapaper-password">Password (may be empty)</label>
-                        <input type="password" id="instapaper-password" autocomplete="off">
-                        <p class="help-block">
-                            Use your <a href="https://www.instapaper.com/user" target="_blank" rel="noopener">Instapaper account</a> credentials.
-                        </p>
-                        <button type="button" id="verify-instapaper">Verify</button>
-                        <button type="button" id="disconnect-instapaper">Disconnect</button>
-                        <span id="status-instapaper" class="connected-service-status"></span>
-                    </div>
-
-                    <div class="connected-service" id="connected-readwise">
-                        <h4>Readwise Reader</h4>
-                        <label for="readwise-token">Access token</label>
-                        <input type="password" id="readwise-token" autocomplete="off">
-                        <p class="help-block">
-                            Get your token at
-                            <a href="https://readwise.io/access_token" target="_blank" rel="noopener">readwise.io/access_token</a>.
-                        </p>
-                        <button type="button" id="verify-readwise">Verify</button>
-                        <button type="button" id="disconnect-readwise">Disconnect</button>
-                        <span id="status-readwise" class="connected-service-status"></span>
-                    </div>
-
-                    <div class="connected-service" id="connected-webhook">
-                        <h4>Webhook</h4>
-                        <label for="webhook-url">HTTPS endpoint URL</label>
-                        <input type="url" id="webhook-url" autocomplete="off">
-                        <p class="help-block">
-                            Each saved tab is POSTed as JSON
-                            <code>{url, title}</code>. The endpoint must accept
-                            cross-origin (CORS) POSTs.
-                            <strong>Verify sends a real test event, which may
-                            trigger downstream automations.</strong>
-                        </p>
-                        <button type="button" id="verify-webhook">Verify</button>
-                        <button type="button" id="disconnect-webhook">Disconnect</button>
-                        <span id="status-webhook" class="connected-service-status"></span>
-                    </div>
-
-                </div>
-            </div>
-
+      <!-- Per-provider credential detail blocks. All four live in the DOM;
+           options.js shows only the active provider's block. Ids are
+           preserved from the previous "Connected services" markup so the
+           verify/disconnect wiring keeps working. -->
+      <div id="provider-details">
+        <div class="op-cred-block hidden" id="cred-instapaper">
+          <div class="field-label">Username / email</div>
+          <input class="input" type="text" id="instapaper-username" autocomplete="off" />
+          <div class="field-label">Password (may be empty)</div>
+          <input class="input" type="password" id="instapaper-password" autocomplete="off" />
+          <p class="help-block">
+            Use your
+            <a href="https://www.instapaper.com/user" target="_blank" rel="noopener">Instapaper account</a>
+            credentials. Stored locally on this device only.
+          </p>
+          <div class="op-cred-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="verify-instapaper">Connect</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="disconnect-instapaper">Sign out</button>
+            <span id="status-instapaper" class="connected-service-status"></span>
+          </div>
         </div>
-    </body>
+
+        <div class="op-cred-block hidden" id="cred-raindrop">
+          <div class="field-label">Test token</div>
+          <input class="input" type="password" id="raindrop-token" autocomplete="off" />
+          <p class="help-block">
+            On the
+            <a href="https://app.raindrop.io/settings/integrations" target="_blank" rel="noopener">Raindrop integrations page</a>,
+            scroll to <strong>For Developers</strong>, create a new app, then
+            create a test token and paste it here.
+          </p>
+          <div class="op-cred-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="verify-raindrop">Connect</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="disconnect-raindrop">Sign out</button>
+            <span id="status-raindrop" class="connected-service-status"></span>
+          </div>
+        </div>
+
+        <div class="op-cred-block hidden" id="cred-readwise">
+          <div class="field-label">Access token</div>
+          <input class="input" type="password" id="readwise-token" autocomplete="off" />
+          <p class="help-block">
+            Get your token at
+            <a href="https://readwise.io/access_token" target="_blank" rel="noopener">readwise.io/access_token</a>.
+          </p>
+          <div class="op-cred-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="verify-readwise">Connect</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="disconnect-readwise">Sign out</button>
+            <span id="status-readwise" class="connected-service-status"></span>
+          </div>
+        </div>
+
+        <div class="op-cred-block hidden" id="cred-webhook">
+          <div class="field-label">Endpoint URL</div>
+          <input class="input" type="url" id="webhook-url" autocomplete="off"
+            placeholder="https://hooks.example.com/pull-tabs" />
+          <p class="help-block">
+            Each saved tab sends a JSON <code>POST</code> with its
+            <code>url</code> and <code>title</code>. The endpoint must accept
+            cross-origin (CORS) POSTs.
+            <strong>Connect sends a real test event, which may trigger
+            downstream automations.</strong>
+          </p>
+          <div class="op-cred-actions">
+            <button type="button" class="btn btn-sm btn-primary" id="verify-webhook">Connect</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="disconnect-webhook">Sign out</button>
+            <span id="status-webhook" class="connected-service-status"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           Pulling — autoclose + default action
+           ============================================================ -->
+      <div class="section-header">
+        <h3>Pulling</h3>
+        <span class="kicker">behavior</span>
+      </div>
+
+      <div class="op-row">
+        <div class="op-row-main">
+          <div class="op-row-title">Autoclose</div>
+          <div class="meta" style="margin-top: 3px">
+            Close each tab after its action succeeds.
+          </div>
+        </div>
+        <div class="op-row-ctl">
+          <label class="switch">
+            <input type="checkbox" id="preference-input-autoclose" />
+            <span class="track"></span>
+            <span class="thumb"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-row-main">
+          <div class="op-row-title">Default action</div>
+          <div class="meta" style="margin-top: 3px">
+            What every tab is set to when the window opens.
+          </div>
+        </div>
+        <div class="op-row-ctl">
+          <select class="select" id="preference-input-default-action"></select>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           Actions — which actions appear in the popup's chips & pickers
+           ============================================================ -->
+      <div class="section-header">
+        <h3>Actions</h3>
+        <span class="kicker">picker</span>
+      </div>
+      <div class="meta" style="margin-bottom: 12px">
+        Choose which actions appear in the set-all chips and each row's picker.
+      </div>
+      <form id="preference-services">
+        <div class="rf-chips" id="list-of-services"></div>
+      </form>
+    </div>
+
+    <div class="rf-foot">
+      <span class="meta">Pull Tabs · settings sync with your browser profile</span>
+      <span class="meta" id="autoclose-flag"></span>
+    </div>
+  </body>
 </html>
